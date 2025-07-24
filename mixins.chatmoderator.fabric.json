@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"minVersion": "0.7.11",
+	"package": "vakiliner.chatmoderator.fabric.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+		"ServerGamePacketListenerImplMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"refmap": "ChatModerator-fabric-refmap.json"
+}

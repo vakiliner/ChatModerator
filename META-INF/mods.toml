@@ -1,0 +1,15 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="CC0-1.0"
+issueTrackerURL="https://github.com/vakiliner/ChatModerator/issues"
+
+[[mods]]
+modId="chatmoderator"
+version="${version}"
+displayName="ChatModerator"
+description='''
+Модерация игроков в чате
+'''
+authors="VAKiliner"
+displayURL="https://github.com/vakiliner/ChatModerator"
+updateJSONURL="https://raw.githubusercontent.com/vakiliner/ChatModerator/refs/heads/main/update.json"

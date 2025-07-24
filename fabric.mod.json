@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "chatmoderator",
+	"version": "${version}",
+	"name": "ChatModerator",
+	"description": "Модерация игроков в чате",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"vakiliner.chatmoderator.fabric.ChatModeratorModInitializer"
+		]
+	},
+	"authors": [
+		"VAKiliner"
+	],
+	"contact": {
+		"homepage": "https://github.com/vakiliner/ChatModerator",
+		"issues": "https://github.com/vakiliner/ChatModerator/issues",
+		"sources": "https://github.com/vakiliner/ChatModerator"
+	},
+	"license": "CC0-1.0",
+	"mixins": [
+		"mixins.chatmoderator.fabric.json"
+	],
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/rsDWHrHbEr",
+				"modmenu.youtube": "https://youtube.com/channel/UCrJCX5gqOkVwH-Qq9HYyoxg"
+			}
+		}
+	}
+}

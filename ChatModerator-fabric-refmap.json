@@ -1,0 +1,16 @@
+{
+	"mappings": {
+		"vakiliner/chatmoderator/fabric/mixin/ServerGamePacketListenerImplMixin": {
+			"handleChat(Ljava/lang/String;)V": "Lnet/minecraft/class_3244;method_31286(Ljava/lang/String;)V",
+			"player": "field_14140:Lnet/minecraft/class_3222;"
+		}
+	},
+	"data": {
+		"named:intermediary": {
+			"vakiliner/chatmoderator/fabric/mixin/ServerGamePacketListenerImplMixin": {
+				"handleChat(Ljava/lang/String;)V": "Lnet/minecraft/class_3244;method_31286(Ljava/lang/String;)V",
+				"player": "field_14140:Lnet/minecraft/class_3222;"
+			}
+		}
+	}
+}

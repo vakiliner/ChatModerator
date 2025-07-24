@@ -1,0 +1,45 @@
+[
+	{
+		"name": "Тест 1",
+		"enabled": false,
+		"trigger_type": 1,
+		"trigger_metadata": {
+			"keyword_filter": [
+				"Hello World"
+			]
+		},
+		"actions": {
+			"block_action": true,
+			"mute_time": 60,
+			"log_admins": true,
+			"custom_block_message": "Тест 2"
+		}
+	},
+	{
+		"name": "Тест 2",
+		"enabled": false,
+		"trigger_type": 1,
+		"trigger_metadata": {
+			"keyword_filter": [
+				"word1",
+				"word2*",
+				"*word3",
+				"*word4*",
+				"word6 word6",
+				"word7 word7*",
+				"*word8 word8",
+				"*word9 word9*"
+			],
+			"regex_patterns": [
+				"word5"
+			],
+			"allow_list": [
+				"word4ru",
+				"word5ru"
+			]
+		},
+		"actions": {
+			"block_action": true
+		}
+	}
+]
