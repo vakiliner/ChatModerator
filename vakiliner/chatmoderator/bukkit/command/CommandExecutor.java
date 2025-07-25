@@ -3,10 +3,9 @@ package vakiliner.chatmoderator.bukkit.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.jetbrains.annotations.NotNull;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
-import vakiliner.chatmoderator.exception.CommandException;
+import vakiliner.chatmoderator.bukkit.exception.CommandException;
 
 public abstract class CommandExecutor implements TabExecutor {
 	protected final BukkitChatModerator manager;
@@ -15,7 +14,7 @@ public abstract class CommandExecutor implements TabExecutor {
 		this.manager = manager;
 	}
 
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		ChatCommandSender chatCommandSender = this.manager.toChatCommandSender(sender);
 		try {
 			this.execute(chatCommandSender, args);

@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-@SuppressWarnings("deprecation")
 public class BukkitListener implements Listener {
 	private final BukkitChatModerator manager;
 

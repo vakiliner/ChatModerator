@@ -68,14 +68,6 @@ public class FabricChatModerator extends ChatModerator {
 		return this.server;
 	}
 
-	public ChatOfflinePlayer getOfflinePlayerIfCached(String name) {
-		ServerPlayer player = this.server.getPlayerList().getPlayerByName(name);
-		if (player != null) {
-			return this.toChatPlayer(player);
-		}
-		return this.toChatOfflinePlayer(this.server.getProfileCache().get(name));
-	}
-
 	public void broadcast(ChatComponent component, boolean admins) {
 		Set<ChatCommandSender> recipients = new HashSet<>();
 		recipients.add(PARSER.toChatCommandSender(this.server));

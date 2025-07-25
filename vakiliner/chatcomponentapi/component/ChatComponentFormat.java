@@ -13,20 +13,24 @@ public enum ChatComponentFormat {
 
 	private static final Map<ChatTextFormat, ChatComponentFormat> BY_FORMAT = Maps.newHashMap();
 	private static final Map<String, ChatComponentFormat> BY_NAME = Maps.newHashMap();
-	private final ChatTextFormat text;
+	private final ChatTextFormat textFormat;
 	private final String name;
 
-	private ChatComponentFormat(ChatTextFormat text, String name) {
-		this.text = text;
+	private ChatComponentFormat(ChatTextFormat textFormat, String name) {
+		this.textFormat = textFormat;
 		this.name = name;
 	}
 
 	public ChatTextFormat asTextFormat() {
-		return this.text;
+		return this.textFormat;
 	}
 
 	public String getName() {
 		return this.name;
+	}
+
+	public String toString() {
+		return this.textFormat.toString();
 	}
 
 	public static ChatComponentFormat getByFormat(ChatTextFormat format) {
@@ -39,7 +43,7 @@ public enum ChatComponentFormat {
 
 	static {
 		for (ChatComponentFormat format : values()) {
-			BY_FORMAT.put(format.text, format);
+			BY_FORMAT.put(format.textFormat, format);
 			BY_NAME.put(format.name, format);
 		}
 	}

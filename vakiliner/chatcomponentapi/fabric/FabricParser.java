@@ -86,7 +86,7 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static ClickEvent fabric(ChatClickEvent event) {
-		return event != null ? new ClickEvent(ClickEvent.Action.getByName(event.getAction().name().toLowerCase()), event.getValue()) : null;
+		return event != null ? new ClickEvent(ClickEvent.Action.getByName(event.getAction().getName()), event.getValue()) : null;
 	}
 
 	public static ChatClickEvent fabric(ClickEvent event) {
@@ -102,7 +102,7 @@ public class FabricParser extends BaseParser {
 	public static <V> ChatHoverEvent<?> fabric(HoverEvent event) {
 		if (event == null) return null;
 		HoverEvent.Action<?> action = event.getAction();
-		return new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(action.getName()), (V) fabricContent2(action));
+		return new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(action.getName()), (V) fabricContent2(event.getValue(action)));
 	}
 
 	public static Object fabricContent(Object raw) {
@@ -136,7 +136,7 @@ public class FabricParser extends BaseParser {
 			ItemStack itemStack = content.getItemStack();
 			return new ChatHoverEvent.ShowItem(fabric(Registry.ITEM.getKey(itemStack.getItem())), itemStack.getCount());
 		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
 		}
 	}
 

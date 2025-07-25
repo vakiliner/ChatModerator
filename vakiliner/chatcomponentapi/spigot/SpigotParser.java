@@ -26,12 +26,10 @@ import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
 
 public class SpigotParser extends BukkitParser {
-	@SuppressWarnings("deprecation")
 	public void sendMessage(CommandSender sender, ChatComponent component) {
 		sender.spigot().sendMessage(spigot(component));
 	}
 
-	@SuppressWarnings("deprecation")
 	public void sendMessage(CommandSender sender, UUID uuid, ChatComponent component) {
 		sender.spigot().sendMessage(uuid, spigot(component));
 	}
@@ -50,9 +48,7 @@ public class SpigotParser extends BukkitParser {
 			throw new IllegalArgumentException("Could not parse BaseComponent from " + raw.getClass());
 		}
 		ChatTextColor color = raw.getColorRaw();
-		if (color != null) {
-			component.setColor(spigot(color.asFormat()));
-		}
+		if (color != null) component.setColor(spigot(color.asFormat()));
 		component.setBold(raw.isBoldRaw());
 		component.setItalic(raw.isItalicRaw());
 		component.setUnderlined(raw.isUnderlinedRaw());
@@ -80,10 +76,7 @@ public class SpigotParser extends BukkitParser {
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}
-		ChatColor color = raw.getColorRaw();
-		if (color != null) {
-			chatComponent.setColor(ChatNamedColor.getByFormat(spigot(color)));
-		}
+		chatComponent.setColor(ChatNamedColor.getByFormat(spigot(raw.getColorRaw())));
 		chatComponent.setBold(raw.isBoldRaw());
 		chatComponent.setItalic(raw.isItalicRaw());
 		chatComponent.setUnderlined(raw.isUnderlinedRaw());
@@ -107,12 +100,12 @@ public class SpigotParser extends BukkitParser {
 	}
 
 	public static HoverEvent spigot(ChatHoverEvent<?> event) {
-		return event != null ? new HoverEvent(HoverEvent.Action.valueOf(event.getAction().getName()), spigotContent(event.getValue())) : null;
+		return event != null ? new HoverEvent(HoverEvent.Action.valueOf(event.getAction().getName().toUpperCase()), spigotContent(event.getValue())) : null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <V> ChatHoverEvent<?> spigot(HoverEvent event) {
-		return event != null ? new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(event.getAction().name()), (V) spigot(event.getContents().get(0))) : null;
+		return event != null ? new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(event.getAction().name().toLowerCase()), (V) spigotContent2(event.getContents().get(0))) : null;
 	}
 
 	public static Content spigotContent(Object raw) {
@@ -132,7 +125,7 @@ public class SpigotParser extends BukkitParser {
 		}
 	}
 
-	public static Object spigot(Content raw) {
+	public static Object spigotContent2(Content raw) {
 		if (raw == null) {
 			return null;
 		} else if (raw instanceof Text) {
@@ -143,7 +136,7 @@ public class SpigotParser extends BukkitParser {
 			} else if (value instanceof BaseComponent[]) {
 				return spigot(((BaseComponent[]) value)[0]);
 			} else {
-				throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+				throw new IllegalArgumentException("Could not parse ChatTextContent from " + value.getClass());
 			}
 		} else if (raw instanceof Entity) {
 			Entity content = (Entity) raw;
@@ -152,7 +145,7 @@ public class SpigotParser extends BukkitParser {
 			Item content = (Item) raw;
 			return new ChatHoverEvent.ShowItem(new ChatId(content.getId()), content.getCount());
 		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
 		}
 	}
 

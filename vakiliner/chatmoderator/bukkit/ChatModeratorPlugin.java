@@ -7,8 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import vakiliner.chatmoderator.bukkit.command.*;
 import vakiliner.chatmoderator.paper.PaperChatModerator;
 import vakiliner.chatmoderator.spigot.SpigotChatModerator;
@@ -20,11 +18,13 @@ public class ChatModeratorPlugin extends JavaPlugin {
 	static {
 		BukkitChatModerator manager;
 		try {
+			Class.forName("net.kyori.adventure.text.Component");
 			manager = new PaperChatModerator();
-		} catch (NoClassDefFoundError paper) {
+		} catch (ClassNotFoundException paper) {
 			try {
+				Class.forName("net.md_5.bungee.api.chat.BaseComponent");
 				manager = new SpigotChatModerator();
-			} catch (NoClassDefFoundError spigot) {
+			} catch (ClassNotFoundException spigot) {
 				manager = new BukkitChatModerator();
 			}
 		}
@@ -71,7 +71,7 @@ public class ChatModeratorPlugin extends JavaPlugin {
 		MANAGER.config.reload(this.getConfig());
 	}
 
-	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		return Collections.emptyList();
 	}
 }

@@ -13,18 +13,18 @@ class ConfigImpl implements Config {
 	public final IntValue maxMessageLength;
 	public final IntValue maxMuteReasonLength;
 	public final BooleanValue autoModerationEnabled;
+	public final BooleanValue autoModerationUseThreadPool;
 	public final BooleanValue spectatorsChat;
 	public final BooleanValue fixChat;
-	public final BooleanValue autoModerationUseThreadPool;
 	public final ConfigValue<String> dictionaryFile;
 
 	public ConfigImpl(ForgeConfigSpec.Builder builder) {
 		this.maxMessageLength = builder.translation("null").defineInRange("max_message_length", 128, 0, 128);
 		this.maxMuteReasonLength = builder.translation("null").defineInRange("max_mute_reason_length", 64, 0, 64);
 		this.autoModerationEnabled = builder.translation("null").define("auto_moderation_enabled", false);
+		this.autoModerationUseThreadPool = builder.translation("null").define("fix_chat", false);
 		this.spectatorsChat = builder.translation("null").define("auto_moderation_use_thread_pool", false);
 		this.fixChat = builder.translation("null").define("spectators_chat", false);
-		this.autoModerationUseThreadPool = builder.translation("null").define("fix_chat", false);
 		this.dictionaryFile = builder.translation("null").define("dictionary_file", "");
 	}
 
@@ -40,16 +40,16 @@ class ConfigImpl implements Config {
 		return this.autoModerationEnabled.get();
 	}
 
+	public boolean autoModerationUseThreadPool() {
+		return this.autoModerationUseThreadPool.get();
+	}
+
 	public boolean spectatorsChat() {
 		return this.spectatorsChat.get();
 	}
 
 	public boolean fixChat() {
 		return false;
-	}
-
-	public boolean autoModerationUseThreadPool() {
-		return this.autoModerationUseThreadPool.get();
 	}
 
 	public String dictionaryFile() {

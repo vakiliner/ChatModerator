@@ -33,6 +33,11 @@ public abstract class ChatComponent {
 
 	protected ChatComponent(ChatComponent component) {
 		this.color = component.color;
+		this.bold = component.bold;
+		this.italic = component.italic;
+		this.underlined = component.underlined;
+		this.strikethrough = component.strikethrough;
+		this.obfuscated = component.obfuscated;
 		this.clickEvent = component.clickEvent;
 		this.hoverEvent = component.hoverEvent;
 		List<ChatComponent> extra = component.extra;

@@ -29,8 +29,6 @@ public abstract class ChatModerator {
 
 	public abstract Path getConfigPath();
 
-	public abstract ChatOfflinePlayer getOfflinePlayerIfCached(String name);
-
 	public Path getMutesPath() {
 		return this.getDataFolder().toPath().resolve("mutes.json");
 	}
@@ -41,8 +39,7 @@ public abstract class ChatModerator {
 
 	public Path getAutoModerationDictionaryPath() {
 		String name = this.getConfig().dictionaryFile();
-		if (name == null) return null;
-		return this.getDataFolder().toPath().resolve(name);
+		return name != null ? this.getDataFolder().toPath().resolve(name) : null;
 	}
 
 	public void broadcast(ChatComponent component) {
@@ -117,36 +114,34 @@ public abstract class ChatModerator {
 			return;
 		}
 		boolean spectatorsChat = this.getConfig().spectatorsChat() && player.getGameMode() == ChatGameMode.SPECTATOR;
-		if (!player.isBypassModeration()) {
-			String cancelReason = spectatorsChat && isCommand ? "Наблюдатели не могут использовать команды отправки сообщений" : null;
-			if (cancelReason == null) cancelReason = this.checkMessage(player, message);
-			if (cancelReason != null) {
-				cancel.run();
-				final ChatComponent messageComponent;
-				if (!isCommand) {
-					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", ChatTextComponent.selector(player), new ChatTextComponent(fullMessage));
-				} else {
-					messageComponent = new ChatTextComponent(fullMessage);
-				}
-				messageComponent.setColor(ChatNamedColor.RED);
-				player.sendMessage(player.getUniqueId(), messageComponent);
-				ChatTextComponent error = new ChatTextComponent(ChatNamedColor.RED);
-				if (cancelReason.startsWith("custom:")) {
-					error.setText(cancelReason.replaceFirst("^custom:", ""));
-				} else {
-					error.setText("[" + "ChatModerator" + "] ");
-					if (!isCommand) {
-						error.append(new ChatTextComponent("Ваше сообщение не было отправлено"));
-					} else {
-						error.append(new ChatTextComponent("Не удалось использовать команду"));
-					}
-					if (!cancelReason.isEmpty()) {
-						error.append(new ChatTextComponent(": "));
-						error.append(new ChatTextComponent(cancelReason));
-					}
-				}
-				player.sendMessage(error);
+		String cancelReason = spectatorsChat && isCommand ? "Наблюдатели не могут использовать команды отправки сообщений" : null;
+		if (cancelReason == null) cancelReason = this.checkMessage(player, message);
+		if (cancelReason != null) {
+			cancel.run();
+			final ChatComponent messageComponent;
+			if (!isCommand) {
+				messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", ChatTextComponent.selector(player), new ChatTextComponent(fullMessage));
+			} else {
+				messageComponent = new ChatTextComponent(fullMessage);
 			}
+			messageComponent.setColor(ChatNamedColor.RED);
+			player.sendMessage(player.getUniqueId(), messageComponent);
+			ChatTextComponent error = new ChatTextComponent(ChatNamedColor.RED);
+			if (cancelReason.startsWith("custom:")) {
+				error.setText(cancelReason.replaceFirst("^custom:", ""));
+			} else {
+				error.setText("[" + "ChatModerator" + "] ");
+				if (!isCommand) {
+					error.append(new ChatTextComponent("Ваше сообщение не было отправлено"));
+				} else {
+					error.append(new ChatTextComponent("Не удалось использовать команду"));
+				}
+				if (!cancelReason.isEmpty()) {
+					error.append(new ChatTextComponent(": "));
+					error.append(new ChatTextComponent(cancelReason));
+				}
+			}
+			player.sendMessage(error);
 		}
 		if (spectatorsChat) {
 			cancel.run();
@@ -155,6 +150,7 @@ public abstract class ChatModerator {
 	}
 
 	private String checkMessage(ChatPlayer player, String message) {
+		if (player.isBypassModeration()) return null;
 		Date now = new Date();
 		boolean isBypassMutes = player.isBypassMutes();
 		MutedPlayer mute = !isBypassMutes ? player.getMute(false) : null;
@@ -194,13 +190,13 @@ public abstract class ChatModerator {
 			final CheckResult checkResult;
 			if (this.getConfig().autoModerationUseThreadPool()) {
 				try {
-					checkResult = this.automod.checkMessageInThreadPool(player, message, TriggerType.MESSAGE);
+					checkResult = this.automod.checkMessageInThreadPool(message, TriggerType.MESSAGE);
 				} catch (InterruptedException err) {
 					Thread.currentThread().interrupt();
 					return null;
 				}
 			} else {
-				checkResult = this.automod.checkMessage(player, message, TriggerType.MESSAGE);
+				checkResult = this.automod.checkMessage(message, TriggerType.MESSAGE);
 			}
 			if (checkResult.isTriggered()) {
 				if (checkResult.muteTime() != null) {
@@ -210,12 +206,12 @@ public abstract class ChatModerator {
 				if (checkResult.logAdmins() != null) {
 					@SuppressWarnings("unused")
 					AutoModerationRule rule = checkResult.logAdmins();
-					ChatTextComponent showMessage = new ChatTextComponent("показать сообщение");
-					showMessage.setUnderlined(true);
-					showMessage.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(message)));
 					ChatTextComponent log = new ChatTextComponent("Заблокировано сообщение от игрока ");
 					log.append(ChatTextComponent.selector(player));
 					log.append(new ChatTextComponent(", "));
+					ChatTextComponent showMessage = new ChatTextComponent("показать сообщение");
+					showMessage.setUnderlined(true);
+					showMessage.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(message)));
 					log.append(showMessage);
 					ChatTranslateComponent component = new ChatTranslateComponent("[%s: %s]", "chat.type.admin", ChatNamedColor.GRAY, new ChatTextComponent("AutoMod"), log);
 					this.broadcast(component, true);

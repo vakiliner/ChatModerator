@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.fabric;
 
+import java.util.Objects;
 import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.MinecraftServer;
@@ -12,9 +13,9 @@ public class FabricChatOfflinePlayer implements ChatOfflinePlayer {
 	protected final GameProfile gameProfile;
 
 	public FabricChatOfflinePlayer(FabricParser parser, MinecraftServer server, GameProfile gameProfile) {
-		this.parser = parser;
-		this.server = server;
-		this.gameProfile = gameProfile;
+		this.parser = Objects.requireNonNull(parser);
+		this.server = Objects.requireNonNull(server);
+		this.gameProfile = Objects.requireNonNull(gameProfile);
 	}
 
 	public GameProfile getGameProfile() {
@@ -31,10 +32,6 @@ public class FabricChatOfflinePlayer implements ChatOfflinePlayer {
 
 	public boolean isOp() {
 		return this.server.getPlayerList().isOp(this.gameProfile);
-	}
-
-	public boolean isOnline() {
-		return this.server.getPlayerList().getPlayer(this.getUniqueId()) != null;
 	}
 
 	public ChatTeam getTeam() {

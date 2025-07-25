@@ -37,10 +37,6 @@ public class FabricChatPlayer implements ChatPlayer {
 		return this.player.getServer().getPlayerList().isOp(this.player.getGameProfile());
 	}
 
-	public boolean isOnline() {
-		return this.player.getServer().getPlayerList().getPlayer(this.getUniqueId()) != null;
-	}
-
 	public ChatTeam getTeam() {
 		return this.parser.toChatTeam(this.player.getServer().getScoreboard().getPlayerTeam(this.getName()));
 	}
@@ -62,6 +58,6 @@ public class FabricChatPlayer implements ChatPlayer {
 	}
 
 	public void sendMessage(UUID uuid, ChatComponent component) {
-		this.player.sendMessage(FabricParser.fabric(component), ChatType.CHAT, uuid);
+		this.player.sendMessage(FabricParser.fabric(component), uuid != Util.NIL_UUID ? ChatType.CHAT : ChatType.SYSTEM, uuid);
 	}
 }

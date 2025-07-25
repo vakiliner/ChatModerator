@@ -20,29 +20,7 @@ import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 public class MuteManager {
 	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
-	private final Thread threadSaveConfig = new Thread() {
-		private boolean save;
-
-		public void run() {
-			try {
-				while (true) {
-					synchronized (this) {
-						if (!this.save) this.wait();
-						this.save = false;
-					}
-					try {
-						MuteManager.this.save();
-					} catch (IOException err) {
-						err.printStackTrace();
-						return;
-					}
-					Thread.sleep(15_000);
-				}
-			} catch (InterruptedException err) {
-				this.interrupt();
-			}
-		}
-	};
+	private final ThreadSaveConfig threadSaveConfig = new ThreadSaveConfig(this);
 
 	public MuteManager(ChatModerator manager) {
 		this.manager = manager;
@@ -78,9 +56,7 @@ public class MuteManager {
 			if (mute != null && !mute.isExpired(now)) return false;
 			this.map.put(player.getUniqueId(), new MutedPlayer(player, moderator, moderatorType, now, duration, reason));
 		}
-		synchronized (this.threadSaveConfig) {
-			this.threadSaveConfig.notify();
-		}
+		this.threadSaveConfig.save();
 		return true;
 	}
 
@@ -98,9 +74,7 @@ public class MuteManager {
 		synchronized (this.map) {
 			mute = this.map.remove(uuid);
 		}
-		if (mute != null) synchronized (this.threadSaveConfig) {
-			this.threadSaveConfig.notify();
-		}
+		if (mute != null) this.threadSaveConfig.save();
 		return mute != null && !mute.isExpired();
 	}
 

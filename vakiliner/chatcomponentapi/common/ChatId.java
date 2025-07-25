@@ -24,6 +24,6 @@ public class ChatId {
 	}
 
 	public String toString() {
-		return this.namespace + ":" + this.value;
+		return this.namespace + ':' + this.value;
 	}
 }

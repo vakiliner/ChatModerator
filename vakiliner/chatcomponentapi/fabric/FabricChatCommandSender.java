@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.fabric;
 
+import java.util.Objects;
 import java.util.UUID;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSource;
@@ -13,8 +14,8 @@ public class FabricChatCommandSender implements ChatCommandSender {
 	protected final CommandSource commandSource;
 
 	public FabricChatCommandSender(FabricParser parser, CommandSource commandSource) {
-		this.parser = parser;
-		this.commandSource = commandSource;
+		this.parser = Objects.requireNonNull(parser);
+		this.commandSource = Objects.requireNonNull(commandSource);
 	}
 
 	public boolean isConsole() {

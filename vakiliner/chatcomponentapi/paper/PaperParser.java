@@ -58,7 +58,7 @@ public class PaperParser extends SpigotParser {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
 			component = Component.translatable().key(chatComponent.getKey()).args(chatComponent.getWith().stream().map(PaperParser::paper).collect(Collectors.toList())).style(style).append(children).build();
 		} else {
-			throw new IllegalArgumentException("Could not parse BaseComponent from " + raw.getClass());
+			throw new IllegalArgumentException("Could not parse Component from " + raw.getClass());
 		}
 		return component;
 	}
@@ -94,7 +94,7 @@ public class PaperParser extends SpigotParser {
 	}
 
 	public static ClickEvent paper(ChatClickEvent event) {
-		return event != null ? ClickEvent.clickEvent(ClickEvent.Action.NAMES.value(event.getAction().name().toLowerCase()), event.getValue()) : null;
+		return event != null ? ClickEvent.clickEvent(ClickEvent.Action.NAMES.value(event.getAction().getName()), event.getValue()) : null;
 	}
 
 	public static ChatClickEvent paper(ClickEvent event) {

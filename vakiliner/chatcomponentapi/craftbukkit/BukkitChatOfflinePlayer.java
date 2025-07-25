@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.scoreboard.Team;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 
@@ -33,12 +32,7 @@ public class BukkitChatOfflinePlayer implements ChatOfflinePlayer {
 		return this.player.isOp();
 	}
 
-	public boolean isOnline() {
-		return this.player.isOnline();
-	}
-
 	public ChatTeam getTeam() {
-		Team team = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(this.getName());
-		return team != null ? this.parser.toChatTeam(team) : null;
+		return this.parser.toChatTeam(Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(this.getName()));
 	}
 }

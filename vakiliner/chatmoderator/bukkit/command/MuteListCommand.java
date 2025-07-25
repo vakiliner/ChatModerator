@@ -3,7 +3,6 @@ package vakiliner.chatmoderator.bukkit.command;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,11 +14,11 @@ import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
+import vakiliner.chatmoderator.bukkit.exception.CommandException;
+import vakiliner.chatmoderator.bukkit.exception.UnknownArgumentException;
+import vakiliner.chatmoderator.bukkit.exception.UnknownCommandException;
 import vakiliner.chatmoderator.core.MutedPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
-import vakiliner.chatmoderator.exception.CommandException;
-import vakiliner.chatmoderator.exception.UnknownArgumentException;
-import vakiliner.chatmoderator.exception.UnknownCommandException;
 
 public class MuteListCommand extends CommandExecutor {
 	public MuteListCommand(BukkitChatModerator manager) {
@@ -89,9 +88,9 @@ public class MuteListCommand extends CommandExecutor {
 		} else {
 			int page = 1;
 			if (pageString != null) {
-				if (!pageString.equals("0") && Pattern.matches("^\\d+$", pageString)) {
+				try {
 					page = Integer.parseInt(pageString);
-				} else {
+				} catch (NumberFormatException err) {
 					throw new UnknownArgumentException(1);
 				}
 			}

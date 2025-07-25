@@ -9,9 +9,9 @@ import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
+import vakiliner.chatmoderator.bukkit.exception.CommandException;
+import vakiliner.chatmoderator.bukkit.exception.UnknownCommandException;
 import vakiliner.chatmoderator.core.MutedPlayer;
-import vakiliner.chatmoderator.exception.CommandException;
-import vakiliner.chatmoderator.exception.UnknownCommandException;
 
 public class UnmuteCommand extends CommandExecutor {
 	public UnmuteCommand(BukkitChatModerator manager) {

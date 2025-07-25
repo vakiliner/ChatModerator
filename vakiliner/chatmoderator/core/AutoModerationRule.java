@@ -276,11 +276,7 @@ public class AutoModerationRule {
 			case 1: return word.startsWith(keyword);
 			case 2: return word.endsWith(keyword);
 			case 3: return word.contains(keyword);
-			default: throw new IllegalArgumentException("Invalid index");
+			default: throw new IllegalArgumentException("Invalid flag");
 		}
-	}
-
-	@SuppressWarnings("unused")
-	private static final void test() {
 	}
 }

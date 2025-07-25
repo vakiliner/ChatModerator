@@ -49,7 +49,7 @@ public class ForgeParser extends BaseParser {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
 			component = new TranslationTextComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(ForgeParser::forge).toArray());
 		} else {
-			throw new IllegalArgumentException("Could not parse TextComponent from " + raw.getClass());
+			throw new IllegalArgumentException("Could not parse ITextComponent from " + raw.getClass());
 		}
 		component.setStyle(forgeStyle(raw));
 		List<ChatComponent> extra = raw.getExtra();
@@ -86,7 +86,7 @@ public class ForgeParser extends BaseParser {
 	}
 
 	public static ClickEvent forge(ChatClickEvent event) {
-		return event != null ? new ClickEvent(ClickEvent.Action.getByName(event.getAction().name().toLowerCase()), event.getValue()) : null;
+		return event != null ? new ClickEvent(ClickEvent.Action.getByName(event.getAction().getName()), event.getValue()) : null;
 	}
 
 	public static ChatClickEvent forge(ClickEvent event) {
@@ -102,7 +102,7 @@ public class ForgeParser extends BaseParser {
 	public static <V> ChatHoverEvent<?> forge(HoverEvent event) {
 		if (event == null) return null;
 		HoverEvent.Action<?> action = event.getAction();
-		return new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(action.getName()), (V) forgeContent2(action));
+		return new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(action.getName()), (V) forgeContent2(event.getValue(action)));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -138,7 +138,7 @@ public class ForgeParser extends BaseParser {
 			ItemStack itemStack = content.getItemStack();
 			return new ChatHoverEvent.ShowItem(forge(Registry.ITEM.getKey(itemStack.getItem())), itemStack.getCount());
 		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
 		}
 	}
 

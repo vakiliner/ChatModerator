@@ -24,22 +24,18 @@ public class BukkitChatTeam implements ChatTeam {
 		return this.team.getName();
 	}
 
-	@SuppressWarnings("deprecation")
 	public ChatNamedColor getColor() {
 		return ChatNamedColor.getByFormat(BukkitParser.bukkit(this.team.getColor()));
 	}
 
-	@SuppressWarnings("deprecation")
 	public ChatComponent getDisplayName() {
 		return new ChatTextComponent(this.team.getDisplayName());
 	}
 
-	@SuppressWarnings("deprecation")
 	public ChatComponent getPrefix() {
 		return new ChatTextComponent(this.team.getPrefix());
 	}
 
-	@SuppressWarnings("deprecation")
 	public ChatComponent getSuffix() {
 		return new ChatTextComponent(this.team.getSuffix());
 	}

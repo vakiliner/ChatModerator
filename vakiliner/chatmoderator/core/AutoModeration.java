@@ -22,7 +22,6 @@ import vakiliner.chatmoderator.api.GsonAutoMod;
 import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 import vakiliner.chatmoderator.api.GsonDictionary;
 import vakiliner.chatmoderator.base.ChatModerator;
-import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.AutoModerationRule.Actions;
 import vakiliner.chatmoderator.core.AutoModerationRule.TriggerType;
 
@@ -36,7 +35,7 @@ public class AutoModeration {
 		this.manager = manager;
 	}
 
-	public CheckResult checkMessage(ChatPlayer player, String message, TriggerType triggerType) {
+	public CheckResult checkMessage(String message, TriggerType triggerType) {
 		Objects.requireNonNull(triggerType);
 		ArrayList<AutoModerationRule> rules = new ArrayList<>();
 		LinkedList<AutoModerationRule> triggeredRules = new LinkedList<>();
@@ -66,7 +65,7 @@ public class AutoModeration {
 		return checkResult.parse();
 	}
 
-	public CheckResult checkMessageInThreadPool(ChatPlayer player, String message, TriggerType triggerType) throws InterruptedException {
+	public CheckResult checkMessageInThreadPool(String message, TriggerType triggerType) throws InterruptedException {
 		Objects.requireNonNull(triggerType);
 		ArrayList<AutoModerationRule> rules = new ArrayList<>();
 		LinkedList<AutoModerationRule> triggeredRules = new LinkedList<>();
@@ -176,9 +175,5 @@ public class AutoModeration {
 			}
 			return this;
 		}
-	}
-
-	public static interface FilterRules {
-		boolean get(AutoModerationRule rule);
 	}
 }

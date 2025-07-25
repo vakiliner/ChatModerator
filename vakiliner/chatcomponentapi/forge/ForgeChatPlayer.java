@@ -38,11 +38,6 @@ public class ForgeChatPlayer implements ChatPlayer {
 	}
 
 	@SuppressWarnings("null")
-	public boolean isOnline() {
-		return this.player.getServer().getPlayerList().getPlayer(this.getUniqueId()) != null;
-	}
-
-	@SuppressWarnings("null")
 	public ChatTeam getTeam() {
 		return this.parser.toChatTeam(this.player.getServer().getScoreboard().getPlayerTeam(this.getName()));
 	}
@@ -64,6 +59,6 @@ public class ForgeChatPlayer implements ChatPlayer {
 	}
 
 	public void sendMessage(UUID uuid, ChatComponent component) {
-		this.player.sendMessage(ForgeParser.forge(component), ChatType.CHAT, uuid);
+		this.player.sendMessage(ForgeParser.forge(component), uuid != Util.NIL_UUID ? ChatType.CHAT : ChatType.SYSTEM, uuid);
 	}
 }

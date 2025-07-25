@@ -54,4 +54,8 @@ public class ChatTextColor {
 	public ChatTextFormat asFormat() {
 		return this.asFormat;
 	}
+
+	public String toString() {
+		return this.asFormat.toString();
+	}
 }

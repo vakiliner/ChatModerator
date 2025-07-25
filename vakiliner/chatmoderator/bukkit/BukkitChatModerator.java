@@ -53,15 +53,6 @@ public class BukkitChatModerator extends ChatModerator {
 		return this.plugin.getDataFolder().toPath().resolve("config.yml");
 	}
 
-	public ChatOfflinePlayer getOfflinePlayerIfCached(String name) {
-		OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(name);
-		if (player == null) {
-			return null;
-		}
-		return this.toChatOfflinePlayer(player);
-	}
-
-	@SuppressWarnings("deprecation")
 	public void broadcast(ChatComponent component, boolean admins) {
 		Bukkit.broadcast(component.toLegacyText(), admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS);
 	}
@@ -82,6 +73,17 @@ public class BukkitChatModerator extends ChatModerator {
 		}
 	}
 
+	public ChatOfflinePlayer getOfflinePlayerIfCached(String name) {
+		OfflinePlayer player = Bukkit.getPlayerExact(name);
+		if (player == null) for (OfflinePlayer target : Bukkit.getOfflinePlayers()) {
+			if (target.getName().equalsIgnoreCase(name)) {
+				player = target;
+				break;
+			}
+		}
+		return this.toChatOfflinePlayer(player);
+	}
+
 	public ChatPlayer toChatPlayer(Player player) {
 		return player != null ? new BukkitChatPlayer(this, player) : null;
 	}
@@ -94,8 +96,8 @@ public class BukkitChatModerator extends ChatModerator {
 	}
 
 	public ChatCommandSender toChatCommandSender(CommandSender sender) {
-		if (sender instanceof OfflinePlayer) {
-			return (ChatCommandSender) this.toChatOfflinePlayer((OfflinePlayer) sender);
+		if (sender instanceof Player) {
+			return this.toChatPlayer((Player) sender);
 		}
 		return sender != null ? new BukkitChatCommandSender(PARSER, sender) : null;
 	}

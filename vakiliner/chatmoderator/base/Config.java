@@ -7,11 +7,11 @@ public interface Config {
 
 	boolean autoModerationEnabled();
 
+	boolean autoModerationUseThreadPool();
+
 	boolean spectatorsChat();
 
 	boolean fixChat();
-
-	boolean autoModerationUseThreadPool();
 
 	String dictionaryFile();
 }

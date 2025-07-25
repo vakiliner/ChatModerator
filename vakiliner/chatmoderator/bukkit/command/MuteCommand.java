@@ -13,10 +13,10 @@ import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
+import vakiliner.chatmoderator.bukkit.exception.CommandException;
+import vakiliner.chatmoderator.bukkit.exception.UnknownArgumentException;
+import vakiliner.chatmoderator.bukkit.exception.UnknownCommandException;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
-import vakiliner.chatmoderator.exception.CommandException;
-import vakiliner.chatmoderator.exception.UnknownArgumentException;
-import vakiliner.chatmoderator.exception.UnknownCommandException;
 
 public class MuteCommand extends CommandExecutor {
 	public MuteCommand(BukkitChatModerator manager) {
