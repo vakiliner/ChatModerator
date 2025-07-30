@@ -2,15 +2,13 @@ package vakiliner.chatcomponentapi.fabric;
 
 import java.util.Objects;
 import java.util.UUID;
-import net.minecraft.Util;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatGameMode;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 public class FabricChatPlayer implements ChatPlayer {
 	protected final FabricParser parser;
@@ -45,19 +43,7 @@ public class FabricChatPlayer implements ChatPlayer {
 		return ChatGameMode.getByValue(this.player.gameMode.getGameModeForPlayer().getId());
 	}
 
-	public void sendMessage(String message) {
-		this.sendMessage(Util.NIL_UUID, message);
-	}
-
-	public void sendMessage(ChatComponent component) {
-		this.sendMessage(Util.NIL_UUID, component);
-	}
-
-	public void sendMessage(UUID uuid, String message) {
-		this.sendMessage(uuid, new ChatTextComponent(message));
-	}
-
-	public void sendMessage(UUID uuid, ChatComponent component) {
-		this.player.sendMessage(FabricParser.fabric(component), uuid != Util.NIL_UUID ? ChatType.CHAT : ChatType.SYSTEM, uuid);
+	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
+		this.parser.sendMessage(this.player, component, type, uuid);
 	}
 }

@@ -12,9 +12,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.GameProfileArgument;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.SelectorTextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
+import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.core.MutedPlayer;
 import vakiliner.chatmoderator.forge.ChatModeratorModInitializer;
 import vakiliner.chatmoderator.forge.ForgeChatModerator;
@@ -42,9 +42,10 @@ public class UnmuteCommand {
 			throw GameProfileArgument.ERROR_UNKNOWN_PLAYER.create();
 		}
 		if (manager.mutes.unmute(gameProfile.getId())) {
-			IFormattableTextComponent component = StringTextComponent.EMPTY.copy();
-			component.append(new SelectorTextComponent(gameProfile.getName()).append(new StringTextComponent(" теперь снова может общаться")));
-			stack.sendSuccess(component, true);
+			ChatTextComponent component = new ChatTextComponent();
+			component.append(ChatTextComponent.selector(ChatModeratorModInitializer.MANAGER.toChatOfflinePlayer(gameProfile)));
+			component.append(new ChatTextComponent(" теперь снова может общаться"));
+			stack.sendSuccess(ForgeParser.forge(component), true);
 			return 1;
 		} else {
 			throw ERROR_NOT_MUTED.create();

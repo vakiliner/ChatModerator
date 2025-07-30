@@ -6,27 +6,37 @@ import java.util.UUID;
 import com.google.common.collect.Maps;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatcomponentapi.common.ChatId;
+import vakiliner.chatcomponentapi.gson.APIGson;
 
 public class ChatHoverEvent<V> {
 	private final Action<V> action;
-	private final V value;
+	private final V contents;
 
-	public ChatHoverEvent(Action<V> action, V value) {
+	public ChatHoverEvent(Action<V> action, V contents) {
 		this.action = Objects.requireNonNull(action);
-		this.value = Objects.requireNonNull(value);
+		this.contents = Objects.requireNonNull(contents);
 	}
 
 	public ChatHoverEvent(ChatHoverEvent<V> event) {
 		this.action = event.action;
-		this.value = event.value;
+		this.contents = event.contents;
 	}
 
 	public Action<V> getAction() {
 		return this.action;
 	}
 
-	public V getValue() {
-		return this.value;
+	public V getContents() {
+		return this.contents;
+	}
+
+	@Deprecated
+	public ChatComponent getValue() {
+		if (this.action == Action.SHOW_TEXT) {
+			return (ChatComponent) this.contents;
+		} else {
+			return new ChatTextComponent(APIGson.builder(true).create().toJson(this.contents));
+		}
 	}
 
 	public ChatHoverEvent<V> clone() {
@@ -92,9 +102,9 @@ public class ChatHoverEvent<V> {
 
 	public static class ShowItem {
 		private final ChatId item;
-		private final int count;
+		private final Integer count;
 
-		public ShowItem(ChatId item, int count) {
+		public ShowItem(ChatId item, Integer count) {
 			this.item = item;
 			this.count = count;
 		}
@@ -103,7 +113,7 @@ public class ChatHoverEvent<V> {
 			return this.item;
 		}
 
-		public int getCount() {
+		public Integer getCount() {
 			return this.count;
 		}
 	}

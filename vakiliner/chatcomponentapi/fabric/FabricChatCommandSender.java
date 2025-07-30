@@ -2,12 +2,11 @@ package vakiliner.chatcomponentapi.fabric;
 
 import java.util.Objects;
 import java.util.UUID;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 public class FabricChatCommandSender implements ChatCommandSender {
 	protected final FabricParser parser;
@@ -26,19 +25,7 @@ public class FabricChatCommandSender implements ChatCommandSender {
 		return "CONSOLE";
 	}
 
-	public void sendMessage(String message) {
-		this.sendMessage(Util.NIL_UUID, message);
-	}
-
-	public void sendMessage(ChatComponent component) {
-		this.sendMessage(Util.NIL_UUID, component);
-	}
-
-	public void sendMessage(UUID uuid, String message) {
-		this.sendMessage(uuid, new ChatTextComponent(message));
-	}
-
-	public void sendMessage(UUID uuid, ChatComponent component) {
-		this.commandSource.sendMessage(FabricParser.fabric(component), uuid);
+	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
+		this.parser.sendMessage(this.commandSource, component, type, uuid);
 	}
 }

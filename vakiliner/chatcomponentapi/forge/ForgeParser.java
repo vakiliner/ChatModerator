@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
@@ -12,7 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -28,6 +31,7 @@ import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatId;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
@@ -36,8 +40,18 @@ import vakiliner.chatcomponentapi.component.ChatComponentFormat;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
+import vakiliner.chatcomponentapi.forge.mixin.StyleMixin;
 
 public class ForgeParser extends BaseParser {
+	public void sendMessage(ICommandSource commandSource, ChatComponent component, ChatMessageType type, UUID uuid) {
+		if (commandSource instanceof ServerPlayerEntity) {
+			ServerPlayerEntity player = (ServerPlayerEntity) commandSource;
+			player.sendMessage(forge(component), forge(type), uuid != null ? uuid : Util.NIL_UUID);
+		} else {
+			commandSource.sendMessage(forge(component), uuid != null ? uuid : Util.NIL_UUID);
+		}
+	}
+
 	public static ITextComponent forge(ChatComponent raw) {
 		final TextComponent component;
 		if (raw == null) {
@@ -74,11 +88,11 @@ public class ForgeParser extends BaseParser {
 		}
 		Style style = raw.getStyle();
 		chatComponent.setColor(forgeColor(style.getColor()));
-		if (style.isBold()) chatComponent.setBold(true);
-		if (style.isItalic()) chatComponent.setItalic(true);
-		if (style.isStrikethrough()) chatComponent.setStrikethrough(true);
-		if (style.isUnderlined()) chatComponent.setUnderlined(true);
-		if (style.isObfuscated()) chatComponent.setObfuscated(true);
+		chatComponent.setBold(((StyleMixin) style).getBold());
+		chatComponent.setItalic(((StyleMixin) style).getItalic());
+		chatComponent.setStrikethrough(((StyleMixin) style).getStrikethrough());
+		chatComponent.setUnderlined(((StyleMixin) style).getUnderlined());
+		chatComponent.setObfuscated(((StyleMixin) style).getObfuscated());
 		chatComponent.setClickEvent(forge(style.getClickEvent()));
 		chatComponent.setHoverEvent(forge(style.getHoverEvent()));
 		chatComponent.setExtra(raw.getSiblings().stream().map(ForgeParser::forge).collect(Collectors.toList()));
@@ -95,7 +109,7 @@ public class ForgeParser extends BaseParser {
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public static <V> HoverEvent forge(ChatHoverEvent<?> event) {
-		return event != null ? new HoverEvent(HoverEvent.Action.getByName(event.getAction().getName()), forgeContent(event.getValue())) : null;
+		return event != null ? new HoverEvent(HoverEvent.Action.getByName(event.getAction().getName()), forgeContent(event.getContents())) : null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -148,6 +162,14 @@ public class ForgeParser extends BaseParser {
 
 	public static ChatId forge(ResourceLocation resourceLocation) {
 		return resourceLocation != null ? new ChatId(resourceLocation.getNamespace(), resourceLocation.getPath()) : null;
+	}
+
+	public static ChatType forge(ChatMessageType type) {
+		return type != null ? ChatType.valueOf(type.name()) : null;
+	}
+
+	public static ChatMessageType forge(ChatType type) {
+		return type != null ? ChatMessageType.valueOf(type.name()) : null;
 	}
 
 	public static Style forgeStyle(ChatComponent component) {

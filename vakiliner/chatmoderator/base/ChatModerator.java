@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Date;
 import vakiliner.chatcomponentapi.common.ChatGameMode;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
@@ -125,7 +126,7 @@ public abstract class ChatModerator {
 				messageComponent = new ChatTextComponent(fullMessage);
 			}
 			messageComponent.setColor(ChatNamedColor.RED);
-			player.sendMessage(player.getUniqueId(), messageComponent);
+			player.sendMessage(messageComponent, ChatMessageType.CHAT, player.getUniqueId());
 			ChatTextComponent error = new ChatTextComponent(ChatNamedColor.RED);
 			if (cancelReason.startsWith("custom:")) {
 				error.setText(cancelReason.replaceFirst("^custom:", ""));

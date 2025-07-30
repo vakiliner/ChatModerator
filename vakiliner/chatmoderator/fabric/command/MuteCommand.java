@@ -16,11 +16,11 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.GameProfileArgument;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.SelectorComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
+import vakiliner.chatcomponentapi.fabric.FabricParser;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
@@ -95,9 +95,10 @@ public class MuteCommand {
 			moderatorType = ModeratorType.UNKNOWN;
 		}
 		if (manager.mutes.mute(player, entity != null ? entity.getName().getString() : "CONSOLE", moderatorType, duration, reason)) {
-			MutableComponent component = TextComponent.EMPTY.copy();
-			component.append(new SelectorComponent(player.getName()).append(new TextComponent(" заглушён")));
-			stack.sendSuccess(component, true);
+			ChatTextComponent component = new ChatTextComponent();
+			component.append(ChatTextComponent.selector(player));
+			component.append(new ChatTextComponent(" заглушён"));
+			stack.sendSuccess(FabricParser.fabric(component), true);
 			return 1;
 		} else {
 			throw ERROR_ALREADY_MUTED.create();

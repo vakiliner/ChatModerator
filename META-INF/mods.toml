@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[32,)"
 license="CC0-1.0"
 issueTrackerURL="https://github.com/vakiliner/ChatModerator/issues"
 
@@ -13,3 +13,8 @@ description='''
 authors="VAKiliner"
 displayURL="https://github.com/vakiliner/ChatModerator"
 updateJSONURL="https://raw.githubusercontent.com/vakiliner/ChatModerator/refs/heads/main/update.json"
+
+[[dependencies.musicpack]]
+	modId="forge"
+	mandatory=true
+	versionRange="[32.0.72,37)"

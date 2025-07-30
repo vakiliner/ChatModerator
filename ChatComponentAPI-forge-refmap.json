@@ -1,0 +1,22 @@
+{
+	"mappings": {
+		"vakiliner/chatcomponentapi/forge/mixin/StyleMixin": {
+			"bold": "field_150248_c:Ljava/lang/Boolean;",
+			"italic": "field_150245_d:Ljava/lang/Boolean;",
+			"obfuscated": "field_150244_g:Ljava/lang/Boolean;",
+			"strikethrough": "field_150243_f:Ljava/lang/Boolean;",
+			"underlined": "field_150246_e:Ljava/lang/Boolean;"
+		}
+	},
+	"data": {
+		"named:intermediary": {
+			"vakiliner/chatcomponentapi/forge/mixin/StyleMixin": {
+				"bold": "field_150248_c:Ljava/lang/Boolean;",
+				"italic": "field_150245_d:Ljava/lang/Boolean;",
+				"obfuscated": "field_150244_g:Ljava/lang/Boolean;",
+				"strikethrough": "field_150243_f:Ljava/lang/Boolean;",
+				"underlined": "field_150246_e:Ljava/lang/Boolean;"
+			}
+		}
+	}
+}

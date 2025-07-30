@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.player.ChatVisiblity;
@@ -16,11 +17,11 @@ public abstract class ServerGamePacketListenerImplMixin {
 	@Accessor("player")
 	public abstract ServerPlayer getPlayer();
 
-	@Inject(at = @At("INVOKE"), method = "handleChat(Ljava/lang/String;)V", cancellable = true)
-	void handleChat(String string, CallbackInfo callbackInfo) {
+	@Inject(at = @At("INVOKE"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", cancellable = true)
+	void handleChat(ServerboundChatPacket packet, CallbackInfo callbackInfo) {
 		ServerPlayer player = this.getPlayer();
 		if (player.getChatVisibility() == ChatVisiblity.HIDDEN) return;
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		manager.onChat(manager.toChatPlayer(player), string, callbackInfo::cancel);
+		manager.onChat(manager.toChatPlayer(player), packet.getMessage(), callbackInfo::cancel);
 	}
 }

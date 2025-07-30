@@ -1,6 +1,7 @@
 package vakiliner.chatcomponentapi.base;
 
 import java.util.UUID;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 
 public interface ChatCommandSender {
@@ -8,11 +9,9 @@ public interface ChatCommandSender {
 
 	boolean isConsole();
 
-	void sendMessage(String message);
+	default void sendMessage(ChatComponent component) {
+		this.sendMessage(component, ChatMessageType.SYSTEM, null);
+	}
 
-	void sendMessage(ChatComponent component);
-
-	void sendMessage(UUID uuid, String message);
-
-	void sendMessage(UUID uuid, ChatComponent component);
+	void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid);
 }

@@ -18,10 +18,17 @@
 		"issues": "https://github.com/vakiliner/ChatModerator/issues",
 		"sources": "https://github.com/vakiliner/ChatModerator"
 	},
-	"license": "CC0-1.0",
 	"mixins": [
-		"mixins.chatmoderator.fabric.json"
+		"mixins.chatmoderator.fabric.json",
+		"mixins.chatcomponentapi.fabric.json"
 	],
+	"depends": {
+		"minecraft": "<1.19",
+		"fabricloader": ">=0.9",
+		"fabric-lifecycle-events-v1": ">=1.1",
+		"fabric-command-api-v1": "*"
+	},
+	"license": "CC0-1.0",
 	"custom": {
 		"modmenu": {
 			"links": {

@@ -4,17 +4,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import com.google.gson.Gson;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
-import net.md_5.bungee.api.chat.hover.content.Content;
-import net.md_5.bungee.api.chat.hover.content.Entity;
-import net.md_5.bungee.api.chat.hover.content.Item;
-import net.md_5.bungee.api.chat.hover.content.Text;
-import vakiliner.chatcomponentapi.common.ChatId;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
@@ -24,14 +22,36 @@ import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
+import vakiliner.chatcomponentapi.gson.APIGson;
 
 public class SpigotParser extends BukkitParser {
-	public void sendMessage(CommandSender sender, ChatComponent component) {
-		sender.spigot().sendMessage(spigot(component));
+	private static final HoverEventParser HOVER_EVENT_PARSER;
+
+	static {
+		HoverEventParser hoverEventParser;
+		try {
+			hoverEventParser = new HoverEventParser();
+		} catch (NoClassDefFoundError err) {
+			hoverEventParser = null;
+		}
+		HOVER_EVENT_PARSER = hoverEventParser;
 	}
 
-	public void sendMessage(CommandSender sender, UUID uuid, ChatComponent component) {
-		sender.spigot().sendMessage(uuid, spigot(component));
+	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			if (sendMessageWithUUID) {
+				player.spigot().sendMessage(spigot(type), uuid, spigot(component));
+			} else {
+				player.spigot().sendMessage(spigot(type), spigot(component));
+			}
+		} else {
+			if (sendMessageWithUUID) {
+				sender.spigot().sendMessage(uuid, spigot(component));
+			} else {
+				sender.spigot().sendMessage(spigot(component));
+			}
+		}
 	}
 
 	public static BaseComponent spigot(ChatComponent raw) {
@@ -99,54 +119,40 @@ public class SpigotParser extends BukkitParser {
 		return event != null ? new ChatClickEvent(ChatClickEvent.Action.getByName(event.getAction().name().toLowerCase()), event.getValue()) : null;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static HoverEvent spigot(ChatHoverEvent<?> event) {
-		return event != null ? new HoverEvent(HoverEvent.Action.valueOf(event.getAction().getName().toUpperCase()), spigotContent(event.getValue())) : null;
+		if (event == null) return null;
+		if (HOVER_EVENT_PARSER != null) return HOVER_EVENT_PARSER.spigot(event);
+		return new HoverEvent(HoverEvent.Action.valueOf(event.getAction().getName().toUpperCase()), new BaseComponent[] { spigot(event.getValue()) });
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("deprecation")
 	public static <V> ChatHoverEvent<?> spigot(HoverEvent event) {
-		return event != null ? new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(event.getAction().name().toLowerCase()), (V) spigotContent2(event.getContents().get(0))) : null;
-	}
-
-	public static Content spigotContent(Object raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof ChatComponent) {
-			ChatComponent content = (ChatComponent) raw;
-			return new Text(new BaseComponent[] { spigot(content) });
-		} else if (raw instanceof ChatHoverEvent.ShowEntity) {
-			ChatHoverEvent.ShowEntity content = (ChatHoverEvent.ShowEntity) raw;
-			return new Entity(content.getType().toString(), content.getUniqueId().toString(), spigot(content.getName()));
-		} else if (raw instanceof ChatHoverEvent.ShowItem) {
-			ChatHoverEvent.ShowItem content = (ChatHoverEvent.ShowItem) raw;
-			return new Item(content.getItem().toString(), content.getCount(), null);
-		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+		if (event == null) return null;
+		if (HOVER_EVENT_PARSER != null) return HOVER_EVENT_PARSER.spigot(event);
+		HoverEvent.Action action = event.getAction();
+		if (action == HoverEvent.Action.SHOW_TEXT) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, spigot(event.getValue()[0]));
+		}
+		String json = ((TextComponent) event.getValue()[0]).getText();
+		Gson gson = APIGson.builder(true).create();
+		switch (action) {
+			case SHOW_ENTITY:
+				ChatHoverEvent.ShowEntity showEntity = gson.fromJson(json, ChatHoverEvent.ShowEntity.class);
+				return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ENTITY, showEntity);
+			case SHOW_ITEM:
+				ChatHoverEvent.ShowItem showItem = gson.fromJson(json, ChatHoverEvent.ShowItem.class);
+				return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, showItem);
+			default: throw new IllegalArgumentException();
 		}
 	}
 
-	public static Object spigotContent2(Content raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof Text) {
-			Text content = (Text) raw;
-			Object value = content.getValue();
-			if (value instanceof String) {
-				return new ChatTextComponent((String) value);
-			} else if (value instanceof BaseComponent[]) {
-				return spigot(((BaseComponent[]) value)[0]);
-			} else {
-				throw new IllegalArgumentException("Could not parse ChatTextContent from " + value.getClass());
-			}
-		} else if (raw instanceof Entity) {
-			Entity content = (Entity) raw;
-			return new ChatHoverEvent.ShowEntity(new ChatId(content.getType()), UUID.fromString(content.getId()), spigot(content.getName()));
-		} else if (raw instanceof Item) {
-			Item content = (Item) raw;
-			return new ChatHoverEvent.ShowItem(new ChatId(content.getId()), content.getCount());
-		} else {
-			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
-		}
+	public static net.md_5.bungee.api.ChatMessageType spigot(ChatMessageType type) {
+		return type != null ? net.md_5.bungee.api.ChatMessageType.valueOf(type.name()) : null;
+	}
+
+	public static ChatMessageType spigot(net.md_5.bungee.api.ChatMessageType type) {
+		return type != null ? ChatMessageType.valueOf(type.name()) : null;
 	}
 
 	public static ChatColor spigot(ChatTextFormat color) {

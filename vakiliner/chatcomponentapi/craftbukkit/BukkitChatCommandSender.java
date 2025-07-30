@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 
 public class BukkitChatCommandSender implements ChatCommandSender {
@@ -24,19 +25,7 @@ public class BukkitChatCommandSender implements ChatCommandSender {
 		return this.sender instanceof ConsoleCommandSender;
 	}
 
-	public void sendMessage(String message) {
-		this.sender.sendMessage(message);
-	}
-
-	public void sendMessage(UUID uuid, String message) {
-		this.sender.sendMessage(uuid, message);
-	}
-
-	public void sendMessage(ChatComponent component) {
-		this.parser.sendMessage(this.sender, component);
-	}
-
-	public void sendMessage(UUID uuid, ChatComponent component) {
-		this.parser.sendMessage(this.sender, uuid, component);
+	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
+		this.parser.sendMessage(this.sender, component, type, uuid);
 	}
 }

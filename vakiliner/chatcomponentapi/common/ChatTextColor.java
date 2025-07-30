@@ -24,6 +24,14 @@ public class ChatTextColor {
 		return color((red & 0xFF) << 16 | (green & 0xFF) << 8 | (blue & 0xFF), asFormat);
 	}
 
+	public static ChatTextColor of(String string) {
+		if (string.startsWith("#") && string.length() == 7) {
+			return color(Integer.parseInt(string.substring(1), 16), null);
+		} else {
+			return ChatNamedColor.getByName(string);
+		}
+	}
+
 	public int value() {
 		return this.value;
 	}

@@ -54,7 +54,7 @@ public class ChatModeratorPlugin extends JavaPlugin {
 		this.getCommand("mute").setExecutor(new MuteCommand(MANAGER));
 		this.getCommand("unmute").setExecutor(new UnmuteCommand(MANAGER));
 		this.getCommand("mutes").setExecutor(new MuteListCommand(MANAGER));
-		this.getLogger().info("Плагин запущен " + MANAGER.getClass().getSimpleName());
+		this.getLogger().info("Плагин запущен");
 	}
 
 	public void onDisable() {

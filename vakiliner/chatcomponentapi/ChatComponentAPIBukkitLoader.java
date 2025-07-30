@@ -30,4 +30,16 @@ public class ChatComponentAPIBukkitLoader {
 		}
 		return PARSER;
 	}
+
+	public static BukkitParser getBukkit() {
+		return PARSER;
+	}
+
+	public static SpigotParser getSpigot() {
+		return (SpigotParser) PARSER;
+	}
+
+	public static PaperParser getPaper() {
+		return (PaperParser) PARSER;
+	}
 }

@@ -18,9 +18,9 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.GameProfileArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.SelectorTextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
+import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
@@ -95,9 +95,10 @@ public class MuteCommand {
 			moderatorType = ModeratorType.UNKNOWN;
 		}
 		if (manager.mutes.mute(player, entity != null ? entity.getName().getString() : "CONSOLE", moderatorType, duration, reason)) {
-			IFormattableTextComponent component = StringTextComponent.EMPTY.copy();
-			component.append(new SelectorTextComponent(player.getName()).append(new StringTextComponent(" заглушён")));
-			stack.sendSuccess(component, true);
+			ChatTextComponent component = new ChatTextComponent();
+			component.append(ChatTextComponent.selector(player));
+			component.append(new ChatTextComponent(" заглушён"));
+			stack.sendSuccess(ForgeParser.forge(component), true);
 			return 1;
 		} else {
 			throw ERROR_ALREADY_MUTED.create();

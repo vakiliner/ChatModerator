@@ -20,6 +20,7 @@ public abstract class ChatComponent {
 	protected Boolean underlined;
 	protected Boolean strikethrough;
 	protected Boolean obfuscated;
+	protected String insertion;
 	protected ChatClickEvent clickEvent;
 	protected ChatHoverEvent<?> hoverEvent;
 	protected List<ChatComponent> extra;
@@ -38,6 +39,7 @@ public abstract class ChatComponent {
 		this.underlined = component.underlined;
 		this.strikethrough = component.strikethrough;
 		this.obfuscated = component.obfuscated;
+		this.insertion = component.insertion;
 		this.clickEvent = component.clickEvent;
 		this.hoverEvent = component.hoverEvent;
 		List<ChatComponent> extra = component.extra;
@@ -54,7 +56,8 @@ public abstract class ChatComponent {
 		StringBuilder text = new StringBuilder();
 		Set<ChatComponentFormat> formats = new HashSet<>(parentFormats);
 		ChatTextColor color = this.color;
-		boolean reset = color != null && !color.equals(parentColor);
+		if (color == null) color = parentColor;
+		boolean reset = !color.equals(parentColor);
 		for (Map.Entry<ChatComponentFormat, Boolean> entry : this.getFormatsRaw().entrySet()) {
 			Boolean isSet = entry.getValue();
 			if (isSet != null) {
@@ -65,7 +68,6 @@ public abstract class ChatComponent {
 				}
 			}
 		}
-		if (color == null) color = parentColor;
 		formats = Collections.unmodifiableSet(formats);
 		if (reset) {
 			ChatTextFormat textFormat = color.asFormat();
@@ -86,7 +88,7 @@ public abstract class ChatComponent {
 		if (extra != null) for (ChatComponent component : extra) {
 			text.append(component.toLegacyText(color, formats));
 		}
-		reset = color != parentColor;
+		reset = !color.equals(parentColor);
 		if (!reset) for (ChatComponentFormat format : formats) {
 			if (!parentFormats.contains(format)) {
 				reset = true;
@@ -206,6 +208,10 @@ public abstract class ChatComponent {
 		return map;
 	}
 
+	public String getInsertion() {
+		return this.insertion;
+	}
+
 	public ChatClickEvent getClickEvent() {
 		return this.clickEvent;
 	}
@@ -252,6 +258,10 @@ public abstract class ChatComponent {
 
 	public void setObfuscated(Boolean obfuscated) {
 		this.obfuscated = obfuscated;
+	}
+
+	public void setInsertion(String insertion) {
+		this.insertion = insertion;
 	}
 
 	public void setClickEvent(ChatClickEvent clickEvent) {

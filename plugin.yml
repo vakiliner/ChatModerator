@@ -4,7 +4,7 @@ main: vakiliner.chatmoderator.bukkit.ChatModeratorPlugin
 description: Модерация игроков в чате
 author: VAKiliner
 website: https://github.com/vakiliner/ChatModerator
-api-version: '1.16'
+api-version: '1.13'
 load: STARTUP
 commands:
   mute:

@@ -13,13 +13,11 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.GameProfileArgument;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.SelectorComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import vakiliner.chatcomponentapi.component.ChatClickEvent;
+import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
+import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
+import vakiliner.chatcomponentapi.fabric.FabricParser;
 import vakiliner.chatmoderator.core.MutedPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 import vakiliner.chatmoderator.fabric.ChatModeratorModInitializer;
@@ -55,54 +53,59 @@ public class MuteListCommand {
 		} else if (page > pages) {
 			page = 1;
 		}
-		MutableComponent border = TextComponent.EMPTY.copy();
+		ChatTextComponent border = new ChatTextComponent();
 		border.append(button("[⏮]", 1, "First page"));
-		border.append(new TextComponent(" "));
+		border.append(new ChatTextComponent(" "));
 		border.append(button("[⏪]", page - 1, "Previous page"));
-		border.append(new TextComponent(" "));
-		border.append(new TranslatableComponent("book.pageIndicator", new TextComponent(Integer.toString(page)), new TextComponent(Integer.toString(pages))));
-		border.append(new TextComponent(" "));
+		border.append(new ChatTextComponent(" "));
+		border.append(new ChatTranslateComponent("Page %1$s of %2$s", "book.pageIndicator", new ChatTextComponent(Integer.toString(page)), new ChatTextComponent(Integer.toString(pages))));
+		border.append(new ChatTextComponent(" "));
 		border.append(button("[⏩]", page + 1, "Next page"));
-		border.append(new TextComponent(" "));
+		border.append(new ChatTextComponent(" "));
 		border.append(button("[⏭]", pages, "Last page"));
-		stack.sendSuccess(border, false);
+		stack.sendSuccess(FabricParser.fabric(border), false);
 		if (!mutes.isEmpty()) {
 			int a = page * 10;
 			for (int i = (page - 1) * 10; a > i && size > i; i++) {
 				MutedPlayer mute = mutes.get(i);
-				MutableComponent component = TextComponent.EMPTY.copy();
-				MutableComponent unmute = new TextComponent("[❌]").withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/unmute " + mute.getName())).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("Unmute player"))));
+				ChatTextComponent component = new ChatTextComponent();
+				ChatTextComponent unmute = new ChatTextComponent("[❌]");
+				unmute.setClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/unmute " + mute.getName()));
+				unmute.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent("Unmute player")));
 				component.append(unmute);
-				component.append(new TextComponent(" " + mute.getName()));
+				component.append(new ChatTextComponent(" " + mute.getName()));
 				ModeratorType moderatorType = mute.getModeratorType();
 				switch (moderatorType) {
 					case PLAYER:
-						component.append(new TextComponent(" заглушён модератором " + mute.getModeratorName()));
+						component.append(new ChatTextComponent(" заглушён модератором " + mute.getModeratorName()));
 						break;
 					case SERVER:
-						component.append(new TextComponent(" заглушён сервером"));
+						component.append(new ChatTextComponent(" заглушён сервером"));
 						break;
 					case PLUGIN:
-						component.append(new TextComponent(" заглушён плагином " + mute.getModeratorName()));
+						component.append(new ChatTextComponent(" заглушён плагином " + mute.getModeratorName()));
 						break;
 					case AUTOMOD:
-						component.append(new TextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
+						component.append(new ChatTextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
 						break;
 					default:
-						component.append(new TextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
+						component.append(new ChatTextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
 						break;
 				}
-				stack.sendSuccess(component, false);
+				stack.sendSuccess(FabricParser.fabric(component), false);
 			}
 		} else {
-			stack.sendSuccess(new TextComponent("No mutes"), false);
+			stack.sendSuccess(FabricParser.fabric(new ChatTextComponent("No mutes")), false);
 		}
-		stack.sendSuccess(border, false);
+		stack.sendSuccess(FabricParser.fabric(border), false);
 		return size;
 	}
 
-	private static MutableComponent button(String button, int page, String text) {
-		return new TextComponent(button).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mutes " + page)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent(text))));
+	private static ChatTextComponent button(String button, int page, String text) {
+		ChatTextComponent component = new ChatTextComponent(button);
+		component.setClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/mutes " + page));
+		component.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(text)));
+		return component;
 	}
 
 	private static int getMute(CommandSourceStack stack, GameProfile gameProfile) throws CommandSyntaxException {
@@ -111,8 +114,8 @@ public class MuteListCommand {
 			throw GameProfileArgument.ERROR_UNKNOWN_PLAYER.create();
 		}
 		MutedPlayer mute = manager.mutes.get(gameProfile.getId());
-		MutableComponent component = TextComponent.EMPTY.copy();
-		component.append(new SelectorComponent(gameProfile.getName()));
+		ChatTextComponent component = new ChatTextComponent();
+		component.append(ChatTextComponent.selector(ChatModeratorModInitializer.MANAGER.toChatOfflinePlayer(gameProfile)));
 		if (mute != null && !mute.isExpired()) {
 			ModeratorType moderatorType = mute.getModeratorType();
 			switch (moderatorType) {
@@ -121,40 +124,40 @@ public class MuteListCommand {
 				case PLUGIN:
 					switch (moderatorType) {
 						case PLAYER:
-							component.append(new TextComponent(" заглушён модератором " + mute.getModeratorName()));
+							component.append(new ChatTextComponent(" заглушён модератором " + mute.getModeratorName()));
 							break;
 						case SERVER:
-							component.append(new TextComponent(" заглушён сервером"));
+							component.append(new ChatTextComponent(" заглушён сервером"));
 							break;
 						case PLUGIN:
-							component.append(new TextComponent(" заглушён плагином " + mute.getModeratorName()));
+							component.append(new ChatTextComponent(" заглушён плагином " + mute.getModeratorName()));
 							break;
 						default: throw new RuntimeException();
 					}
 					String reason = mute.getReason();
 					if (reason != null) {
-						component.append(new TextComponent("\nПричина: "));
-						component.append(new TextComponent(reason));
+						component.append(new ChatTextComponent("\nПричина: "));
+						component.append(new ChatTextComponent(reason));
 					}
 					break;
 				case AUTOMOD:
-					component.append(new TextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
+					component.append(new ChatTextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
 					break;
 				default:
-					component.append(new TextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
+					component.append(new ChatTextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
 					break;
 			}
 			Date expiration = mute.getExpirationAt();
 			if (expiration != null) {
-				component.append(new TextComponent("\nЗаглушён временно, до: " + expiration.toString()));
+				component.append(new ChatTextComponent("\nЗаглушён временно, до: " + expiration.toString()));
 			} else {
-				component.append(new TextComponent("\nЗаглушён навсегда"));
+				component.append(new ChatTextComponent("\nЗаглушён навсегда"));
 			}
-			stack.sendSuccess(component, false);
+			stack.sendSuccess(FabricParser.fabric(component), false);
 			return 1;
 		} else {
-			component.append(new TextComponent(" не заглушён"));
-			stack.sendSuccess(component, false);
+			component.append(new ChatTextComponent(" не заглушён"));
+			stack.sendSuccess(FabricParser.fabric(component), false);
 			return 0;
 		}
 	}

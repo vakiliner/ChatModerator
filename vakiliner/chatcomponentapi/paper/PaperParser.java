@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextDecoration.State;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatId;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
@@ -34,12 +35,12 @@ import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.spigot.SpigotParser;
 
 public class PaperParser extends SpigotParser {
-	public void sendMessage(CommandSender sender, ChatComponent component) {
-		sender.sendMessage(paper(component));
-	}
-
-	public void sendMessage(CommandSender sender, UUID uuid, ChatComponent component) {
-		sender.sendMessage(Identity.identity(uuid), paper(component), MessageType.CHAT);
+	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
+		if (sendMessageWithUUID && uuid != null) {
+			sender.sendMessage(Identity.identity(uuid), paper(component), paper(type));
+		} else {
+			sender.sendMessage(paper(component), paper(type));
+		}
 	}
 
 	public static Component paper(ChatComponent raw) {
@@ -103,7 +104,7 @@ public class PaperParser extends SpigotParser {
 
 	@SuppressWarnings("unchecked")
 	public static <V> HoverEvent<?> paper(ChatHoverEvent<?> event) {
-		return event != null ? HoverEvent.hoverEvent((HoverEvent.Action<V>) HoverEvent.Action.NAMES.value(event.getAction().getName()), (V) paperContent(event.getValue())) : null;
+		return event != null ? HoverEvent.hoverEvent((HoverEvent.Action<V>) HoverEvent.Action.NAMES.value(event.getAction().getName()), (V) paperContent(event.getContents())) : null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -151,6 +152,14 @@ public class PaperParser extends SpigotParser {
 
 	public static ChatId paper(Key key) {
 		return key != null ? new ChatId(key.namespace(), key.value()) : null;
+	}
+
+	public static MessageType paper(ChatMessageType type) {
+		return type != null ? MessageType.valueOf(type.name()) : null;
+	}
+
+	public static ChatMessageType paper(MessageType type) {
+		return type != null ? ChatMessageType.valueOf(type.name()) : null;
 	}
 
 	public static Style paperStyle(ChatComponent component) {
