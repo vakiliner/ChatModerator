@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
@@ -107,50 +108,37 @@ public class AutoModerationRule {
 	}
 
 	public static class Actions {
-		private boolean blockAction;
+		private String blockAction;
 		private int muteTime;
 		private boolean logAdmins;
-		private String customBlockMessage;
 
-		public boolean blockAction() {
+		public String blockAction() {
 			return this.blockAction;
-		}
-
-		public boolean mutePlayer() {
-			return this.muteTime > 0;
-		}
-
-		public boolean logAdmins() {
-			return this.logAdmins;
-		}
-
-		public String customBlockMessage() {
-			return this.customBlockMessage;
 		}
 
 		public int muteTime() {
 			return this.muteTime;
 		}
 
-		public void blockAction(boolean blockAction) {
-			this.blockAction = blockAction;
+		public boolean logAdmins() {
+			return this.logAdmins;
 		}
 
-		public void muteTime(int muteTime) {
+		public synchronized void blockAction(String message) {
+			this.blockAction = message;
+		}
+
+		public synchronized void muteTime(int muteTime) {
 			if (muteTime < 0) throw new IllegalArgumentException();
 			this.muteTime = muteTime;
 		}
 
-		public void logAdmins(boolean logAdmins) {
+		public synchronized void logAdmins(boolean logAdmins) {
 			this.logAdmins = logAdmins;
-		}
-
-		public void customBlockMessage(String customBlockMessage) {
-			this.customBlockMessage = customBlockMessage;
 		}
 	}
 
-	public Object checkText(String rawMessage, Map<Character, String> cleaner) {
+	public MatchResult checkText(String rawMessage, Map<Character, String> cleaner) {
 		final List<String> words;
 		final List<String> cleanedWords;
 		{
@@ -222,8 +210,11 @@ public class AutoModerationRule {
 				}
 				String check = String.join(" ", list);
 				String cleanedCheck = String.join(" ", cleaned);
-				if (checkWord(check.toLowerCase(), keyword, flags) || checkWord(cleanedCheck.toLowerCase(), keyword, flags)) {
-					return new Object();
+				if (checkWord(check.toLowerCase(), keyword, flags)) {
+					return new MatchResult(keyword, check);
+				}
+				if (checkWord(cleanedCheck.toLowerCase(), keyword, flags)) {
+					return new MatchResult(keyword, cleanedCheck);
 				}
 			}
 		}
@@ -252,14 +243,17 @@ public class AutoModerationRule {
 			cleanedMessage = cleanedMessageBuilder.stream().map(StringBuilder::toString).collect(Collectors.toList());
 		}
 		for (Pattern pattern : metadata.regexPatterns) {
+			String keyword = pattern.pattern();
 			for (String msg : message) {
-				if (pattern.matcher(msg).find()) {
-					return new Object();
+				Matcher matcher = pattern.matcher(msg);
+				if (matcher.find()) {
+					return new MatchResult(keyword, matcher.group());
 				}
 			}
 			for (String msg : cleanedMessage) {
-				if (pattern.matcher(msg).find()) {
-					return new Object();
+				Matcher matcher = pattern.matcher(msg);
+				if (matcher.find()) {
+					return new MatchResult(keyword, matcher.group());
 				}
 			}
 		}
@@ -267,7 +261,7 @@ public class AutoModerationRule {
 	}
 
 	private static byte parseFlags(String word) {
-		return (byte) ((word.endsWith("*") ? 1 : 0) + (word.startsWith("*") ? 2 : 0));
+		return (byte) ((word.endsWith("*") ? 1 : 0) | (word.startsWith("*") ? 2 : 0));
 	}
 
 	private static boolean checkWord(String word, String keyword, byte flags) {
@@ -277,6 +271,24 @@ public class AutoModerationRule {
 			case 2: return word.endsWith(keyword);
 			case 3: return word.contains(keyword);
 			default: throw new IllegalArgumentException("Invalid flag");
+		}
+	}
+
+	public static class MatchResult {
+		private final String keyword;
+		private final String content;
+
+		private MatchResult(String keyword, String content) {
+			this.keyword = keyword;
+			this.content = content;
+		}
+
+		public String getKeyword() {
+			return this.keyword;
+		}
+
+		public String getContent() {
+			return this.content;
 		}
 	}
 }

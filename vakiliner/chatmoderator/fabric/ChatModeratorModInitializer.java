@@ -14,8 +14,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import vakiliner.chatmoderator.api.GsonConfig;
+import vakiliner.chatmoderator.base.ILoader;
 
-public class ChatModeratorModInitializer implements ModInitializer {
+public class ChatModeratorModInitializer implements ModInitializer, ILoader {
 	public static final FabricChatModerator MANAGER;
 	private final FabricListener listener = MANAGER.createListener();
 	private ClassLoader classLoader;
@@ -27,31 +28,23 @@ public class ChatModeratorModInitializer implements ModInitializer {
 	public void onInitialize() {
 		this.classLoader = this.getClass().getClassLoader();
 		MANAGER.init(this);
-		this.saveDefaultConfig();
-		if (!MANAGER.getAutoModerationRulesPath().toFile().exists()) {
-			this.saveResource("auto_moderation_rules.json", false);
-		}
-		this.reloadConfig();
-		String dictionaryFile = MANAGER.config.dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!MANAGER.getAutoModerationDictionaryPath().toFile().exists()) {
-				this.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			MANAGER.automod.reload();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
-		CommandRegistrationCallback.EVENT.register(this.listener::onCommandRegistration);
-		ServerLifecycleEvents.SERVER_STARTING.register(this.listener::onServerStarting);
-		ServerLifecycleEvents.SERVER_STOPPED.register(this.listener::onServerStopped);
+		CommandRegistrationCallback.EVENT.register(this.listener);
+		ServerLifecycleEvents.SERVER_STARTING.register(this.listener);
+		ServerLifecycleEvents.SERVER_STOPPED.register(this.listener);
 		FabricChatModerator.LOGGER.info("Готов. Ждёт активации сервера");
 	}
 
 	public void saveDefaultConfig() {
 		if (!MANAGER.getConfigPath().toFile().exists()) {
 			this.saveResource("config.json", false);
+		}
+	}
+
+	public void saveConfig() {
+		try {
+			Files.write(MANAGER.getConfigPath(), new Gson().toJson(MANAGER.config.config).getBytes(StandardCharsets.UTF_8));
+		} catch (IOException err) {
+			err.printStackTrace();
 		}
 	}
 
@@ -71,7 +64,7 @@ public class ChatModeratorModInitializer implements ModInitializer {
 		MANAGER.config.reload(config);
 	}
 
-	private void saveResource(String resourcePath, boolean replace) {
+	public void saveResource(String resourcePath, boolean replace) {
 		InputStream in = this.classLoader.getResourceAsStream(resourcePath);
 		if (in == null) {
 			throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found");
@@ -102,5 +95,9 @@ public class ChatModeratorModInitializer implements ModInitializer {
 		} catch (IOException err) {
 			FabricChatModerator.LOGGER.warn("Could not save " + outFile.getName() + " to " + outFile);
 		}
+	}
+
+	public void log(String message) {
+		FabricChatModerator.LOGGER.info(message);
 	}
 }

@@ -9,20 +9,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import com.google.gson.Gson;
 import vakiliner.chatmoderator.api.GsonAutoMod;
 import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 import vakiliner.chatmoderator.api.GsonDictionary;
 import vakiliner.chatmoderator.base.ChatModerator;
-import vakiliner.chatmoderator.core.AutoModerationRule.Actions;
+import vakiliner.chatmoderator.core.AutoModerationRule.MatchResult;
 import vakiliner.chatmoderator.core.AutoModerationRule.TriggerType;
 
 public class AutoModeration {
@@ -35,72 +37,53 @@ public class AutoModeration {
 		this.manager = manager;
 	}
 
-	public CheckResult checkMessage(String message, TriggerType triggerType) {
-		Objects.requireNonNull(triggerType);
-		ArrayList<AutoModerationRule> rules = new ArrayList<>();
-		LinkedList<AutoModerationRule> triggeredRules = new LinkedList<>();
-		for (AutoModerationRule rule : this.rules) {
-			if (rule.isEnabled() && rule.getTriggerType() == triggerType) {
-				rules.add(rule);
-			}
+	public CheckResult checkMessage(String message) {
+		try {
+			return this.check(message, TriggerType.MESSAGE, false);
+		} catch (InterruptedException err) {
+			Thread.currentThread().interrupt();
+			throw new RuntimeException(err);
 		}
-		CheckResult checkResult = new CheckResult(rules, triggeredRules);
-		rules.sort((a, b) -> b.getActions().muteTime() - a.getActions().muteTime());
-		for (AutoModerationRule rule : rules) {
-			Object result = rule.checkText(message, cleaner);
-			Actions actions = rule.getActions();
-			int muteTime = actions.muteTime();
-			boolean mute = muteTime > 0;
-			trigger: if (result != null) {
-				if (mute) {
-					AutoModerationRule firstRule = triggeredRules.peek();
-					if (firstRule != null && muteTime - firstRule.getActions().muteTime() > 0) {
-						triggeredRules.addFirst(rule);
-						break trigger;
-					}
-				}
-				triggeredRules.addLast(rule);
-			}
-		}
-		return checkResult.parse();
 	}
 
-	public CheckResult checkMessageInThreadPool(String message, TriggerType triggerType) throws InterruptedException {
+	public CheckResult checkMessageInThreadPool(String message) throws InterruptedException {
+		return this.check(message, TriggerType.MESSAGE, true);
+	}
+
+	private CheckResult check(String message, TriggerType triggerType, boolean useThreadPool) throws InterruptedException {
 		Objects.requireNonNull(triggerType);
 		ArrayList<AutoModerationRule> rules = new ArrayList<>();
-		LinkedList<AutoModerationRule> triggeredRules = new LinkedList<>();
+		TreeMap<AutoModerationRule, MatchResult> triggeredRules = new TreeMap<>((a, b) -> b.getActions().muteTime() - a.getActions().muteTime());
 		for (AutoModerationRule rule : this.rules) {
-			if (rule.isEnabled() && rule.getTriggerType() == triggerType) {
-				rules.add(rule);
-			}
+			if (rule.isEnabled() && rule.getTriggerType() == triggerType) rules.add(rule);
 		}
-		CheckResult checkResult = new CheckResult(rules, triggeredRules);
-		rules.sort((a, b) -> b.getActions().muteTime() - a.getActions().muteTime());
-		List<Future<?>> waitlist = new ArrayList<>();
-		for (AutoModerationRule rule : rules) waitlist.add(this.threadPool.submit(() -> {
-			Object result = rule.checkText(message, cleaner);
-			Actions actions = rule.getActions();
-			int muteTime = actions.muteTime();
-			boolean mute = muteTime > 0;
-			trigger: if (result != null) {
-				if (mute) {
-					AutoModerationRule firstRule = triggeredRules.peek();
-					if (firstRule != null && muteTime - firstRule.getActions().muteTime() > 0) {
-						triggeredRules.addFirst(rule);
-						break trigger;
-					}
+		CheckResult checkResult = new CheckResult(rules, triggeredRules, message);
+		Consumer<AutoModerationRule> consumer = (rule) -> {
+			MatchResult matchResult = rule.checkText(checkResult.getMessage(), cleaner);
+			if (matchResult != null) synchronized (triggeredRules) {
+				triggeredRules.put(rule, matchResult);
+			}
+		};
+		int size = checkResult.rules.size();
+		if (useThreadPool) {
+			List<Future<?>> waitlist = new ArrayList<>();
+			int index = 0;
+			for (AutoModerationRule rule : checkResult.rules) {
+				if (size > ++index) {
+					waitlist.add(this.threadPool.submit(() -> consumer.accept(rule)));
+				} else {
+					consumer.accept(rule);
 				}
-				triggeredRules.addLast(rule);
 			}
-		}));
-		for (Future<?> future : waitlist) {
-			try {
-				future.get();
-			} catch (ExecutionException err) {
-				throw new RuntimeException(err);
+			for (Future<?> future : waitlist) {
+				try {
+					future.get();
+				} catch (ExecutionException err) {
+					throw new RuntimeException(err);
+				}
 			}
-		}
-		return checkResult.parse();
+		} else for (AutoModerationRule rule : checkResult.rules) consumer.accept(rule);
+		return checkResult;
 	}
 
 	public void reload() throws IOException {
@@ -126,14 +109,13 @@ public class AutoModeration {
 
 	public static class CheckResult {
 		private final List<AutoModerationRule> rules;
-		private final List<AutoModerationRule> triggeredRules;
-		private AutoModerationRule blockAction;
-		private AutoModerationRule muteTime;
-		private AutoModerationRule logAdmins;
+		private final NavigableMap<AutoModerationRule, MatchResult> triggeredRules;
+		private final String message;
 
-		private CheckResult(Collection<AutoModerationRule> rules, List<AutoModerationRule> triggeredRules) {
+		private CheckResult(Collection<AutoModerationRule> rules, NavigableMap<AutoModerationRule, MatchResult> triggeredRules, String message) {
 			this.rules = Collections.unmodifiableList(new ArrayList<>(rules));
-			this.triggeredRules = Collections.unmodifiableList(triggeredRules);
+			this.triggeredRules = Collections.unmodifiableNavigableMap(triggeredRules);
+			this.message = message;
 		}
 
 		public boolean isTriggered() {
@@ -144,36 +126,12 @@ public class AutoModeration {
 			return this.rules;
 		}
 
-		public List<AutoModerationRule> getTriggeredRules() {
+		public NavigableMap<AutoModerationRule, AutoModerationRule.MatchResult> getTriggeredRules() {
 			return this.triggeredRules;
 		}
 
-		public AutoModerationRule blockAction() {
-			return this.blockAction;
-		}
-
-		public AutoModerationRule muteTime() {
-			return this.muteTime;
-		}
-
-		public AutoModerationRule logAdmins() {
-			return this.logAdmins;
-		}
-
-		private CheckResult parse() {
-			for (AutoModerationRule rule : this.triggeredRules) {
-				Actions actions = rule.getActions();
-				if (actions.blockAction() && this.blockAction == null) {
-					this.blockAction = rule;
-				}
-				if (actions.mutePlayer() && this.muteTime == null) {
-					this.muteTime = rule;
-				}
-				if (actions.logAdmins() && this.logAdmins == null) {
-					this.logAdmins = rule;
-				}
-			}
-			return this;
+		public String getMessage() {
+			return this.message;
 		}
 	}
 }

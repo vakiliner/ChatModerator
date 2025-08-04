@@ -9,24 +9,21 @@ load: STARTUP
 commands:
   mute:
     description: Заглушить игрока в чате
-    permission: chatmoderator.mute
+    permission: chatmoderator.command.mute
     usage: /mute <player_name> [<duration>] [<reason>]
   unmute:
     description: Снять с игрока мут
-    permission: chatmoderator.mute
+    permission: chatmoderator.command.unmute
     usage: /unmute <player_name>
   mutes:
     description: Показать список активных мутов
-    permission: chatmoderator.mute
+    permission: chatmoderator.command.mutes
     usage: /mutes [<page>]
 default-permission: false
 permissions:
   chatmoderator.*:
     description: Все разрешения для плагина ChatModerator
     children:
-      chatmoderator.mute:
-        description: Разрешение на глушение игроков в чате
-        default: op
       chatmoderator.spectator_chat:
         description: Чат наблюдателя
         default: false
@@ -35,4 +32,16 @@ permissions:
         children:
           chatmoderator.bypass_moderation.mutes:
             description: Обход заглушения и автомода
+            default: op
+      chatmoderator.command.*:
+        description: Все команды плагина ChatModerator
+        children:
+          chatmoderator.command.mute:
+            description: Использование команды /mute
+            default: op
+          chatmoderator.command.unmute:
+            description: Использование команды /unmute
+            default: op
+          chatmoderator.command.mutes:
+            description: Использование команды /mutes
             default: op

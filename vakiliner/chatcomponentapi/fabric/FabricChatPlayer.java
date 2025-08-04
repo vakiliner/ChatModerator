@@ -3,7 +3,6 @@ package vakiliner.chatcomponentapi.fabric;
 import java.util.Objects;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatGameMode;
@@ -19,7 +18,7 @@ public class FabricChatPlayer implements ChatPlayer {
 		this.player = Objects.requireNonNull(player);
 	}
 
-	public Player getPlayer() {
+	public ServerPlayer getPlayer() {
 		return this.player;
 	}
 

@@ -18,10 +18,9 @@ public class GsonAutoModerationRule {
 	}
 
 	public static class Actions {
-		public Boolean block_action;
+		public String block_action;
 		public Integer mute_time;
 		public Boolean log_admins;
-		public String custom_block_message;
 	}
 
 	public AutoModerationRule toAutoModerationRule() {
@@ -39,7 +38,6 @@ public class GsonAutoModerationRule {
 		if (actions.block_action != null) actions2.blockAction(actions.block_action);
 		if (actions.mute_time != null) actions2.muteTime(actions.mute_time);
 		if (actions.log_admins != null) actions2.logAdmins(actions.log_admins);
-		if (actions.custom_block_message != null) actions2.customBlockMessage(actions.custom_block_message);
 		return rule;
 	}
 

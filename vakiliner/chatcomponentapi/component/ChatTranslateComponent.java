@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
+import vakiliner.chatcomponentapi.util.Utils;
 
 public class ChatTranslateComponent extends ChatComponent {
 	private String key;
@@ -71,7 +72,7 @@ public class ChatTranslateComponent extends ChatComponent {
 		if (with.isEmpty()) {
 			return this.legacyText;
 		} else {
-			return String.format(this.legacyText, with.stream().map((component) -> component.toLegacyText(parentColor, parentFormats)).toArray());
+			return Utils.stringFormat(this.legacyText, with.stream().map((component) -> component.toLegacyText(parentColor, parentFormats)).toArray());
 		}
 	}
 

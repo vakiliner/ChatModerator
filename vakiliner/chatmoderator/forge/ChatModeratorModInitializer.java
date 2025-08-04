@@ -6,13 +6,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.Type;
+import vakiliner.chatmoderator.base.ILoader;
 
 @Mod(ForgeChatModerator.ID)
-public class ChatModeratorModInitializer {
+public class ChatModeratorModInitializer implements ILoader {
 	public static final ForgeChatModerator MANAGER;
+	protected final ModContainer modContainer;
 	private final ForgeListener listener = MANAGER.createListener();
 	private ClassLoader classLoader;
 
@@ -25,24 +29,9 @@ public class ChatModeratorModInitializer {
 	}
 
 	public ChatModeratorModInitializer(ModLoadingContext context) {
+		this.modContainer = context.getActiveContainer();
 		this.classLoader = this.getClass().getClassLoader();
 		MANAGER.init(this);
-		this.saveDefaultConfig();
-		context.registerConfig(Type.COMMON, ConfigImpl.configSpec, "ChatModerator/config.toml");
-		if (!MANAGER.getAutoModerationRulesPath().toFile().exists()) {
-			this.saveResource("auto_moderation_rules.json", false);
-		}
-		String dictionaryFile = MANAGER.config.dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!MANAGER.getAutoModerationDictionaryPath().toFile().exists()) {
-				this.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			MANAGER.automod.reload();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
 		MinecraftForge.EVENT_BUS.register(this.listener);
 		ForgeChatModerator.LOGGER.info("Готов. Ждёт активации сервера");
 	}
@@ -53,7 +42,16 @@ public class ChatModeratorModInitializer {
 		}
 	}
 
-	private void saveResource(String resourcePath, boolean replace) {
+	public void saveConfig() {
+		ConfigImpl.configSpec.save();
+	}
+
+	@Deprecated
+	public void reloadConfig() {
+		this.modContainer.addConfig(new ModConfig(Type.COMMON, ConfigImpl.configSpec, this.modContainer, "ChatModerator/config.toml"));
+	}
+
+	public void saveResource(String resourcePath, boolean replace) {
 		InputStream in = this.classLoader.getResourceAsStream(resourcePath);
 		if (in == null) {
 			throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found");
@@ -84,5 +82,9 @@ public class ChatModeratorModInitializer {
 		} catch (IOException err) {
 			ForgeChatModerator.LOGGER.warn("Could not save " + outFile.getName() + " to " + outFile);
 		}
+	}
+
+	public void log(String message) {
+		ForgeChatModerator.LOGGER.info(message);
 	}
 }
