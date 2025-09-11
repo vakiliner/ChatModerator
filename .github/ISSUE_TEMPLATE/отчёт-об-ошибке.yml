@@ -1,0 +1,10 @@
+name: Отчёт об ошибке
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Опишите ошибку
+      description: Четкое и краткое описание ошибки
+    validations:
+      required: true
