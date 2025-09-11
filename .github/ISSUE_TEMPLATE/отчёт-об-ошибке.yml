@@ -1,4 +1,5 @@
 name: Отчёт об ошибке
+description: Сообщить об ошибке
 labels: ["bug"]
 body:
   - type: textarea
