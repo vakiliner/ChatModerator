@@ -1,5 +1,5 @@
 name: Отчёт об ошибке
-description: Сообщить об ошибке
+description: Создайте отчет об ошибке или неисправности
 labels: ["bug"]
 body:
   - type: textarea
