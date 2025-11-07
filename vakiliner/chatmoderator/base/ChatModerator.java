@@ -239,7 +239,9 @@ public abstract class ChatModerator {
 				}
 			}
 			player.sendMessage(error);
-		} else if (spectatorsChat) {
+			return;
+		}
+		if (spectatorsChat) {
 			cancel.run();
 			this.spectatorsChat(new ChatTranslateComponent("<%s> %s", "chat.type.text", ChatTextComponent.selector(player), new ChatTextComponent(fullMessage)));
 		}
