@@ -54,7 +54,7 @@ public abstract class ChatModerator {
 			if (configVersion < Short.MIN_VALUE || configVersion > CONFIG_VERSION) throw new IllegalStateException("Unsupported config version " + configVersion);
 			loader.log("Updating config to new version " + CONFIG_VERSION);
 			switch (configVersion - Short.MIN_VALUE) {
-				case 1:
+				case 0:
 					this.getConfig().showFailMessage(true);
 					Map<String, String> messages = new HashMap<>();
 					messages.put("fail_send_message", "Ваше сообщение не было отправлено");
