@@ -239,6 +239,7 @@ public abstract class ChatModerator {
 				}
 			}
 			player.sendMessage(error);
+			return;
 		}
 		if (spectatorsChat) {
 			cancel.run();
