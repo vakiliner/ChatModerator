@@ -17,7 +17,7 @@ import vakiliner.chatmoderator.forge.command.MuteListCommand;
 import vakiliner.chatmoderator.forge.command.UnmuteCommand;
 
 @EventBusSubscriber(modid = ForgeChatModerator.ID)
-public class ForgeListener {
+class ForgeListener {
 	private final ForgeChatModerator manager;
 
 	public ForgeListener(ForgeChatModerator manager) {

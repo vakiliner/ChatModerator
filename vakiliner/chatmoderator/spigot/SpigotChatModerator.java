@@ -6,12 +6,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permissible;
+import net.md_5.bungee.api.chat.BaseComponent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.spigot.SpigotParser;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
 
 public class SpigotChatModerator extends BukkitChatModerator {
-	public void broadcast(ChatComponent component, boolean admins) {
+	public void broadcast(ChatComponent chatComponent, boolean admins) {
 		Set<CommandSender> recipients = new HashSet<>();
 		String permission = admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS;
 		for (Permissible permissible : Bukkit.getPluginManager().getPermissionSubscriptions(permission)) {
@@ -19,8 +20,9 @@ public class SpigotChatModerator extends BukkitChatModerator {
 				recipients.add((CommandSender) permissible);
 			}
 		}
+		BaseComponent component = SpigotParser.spigot(chatComponent);
 		for (CommandSender recipient : recipients) {
-			recipient.spigot().sendMessage(SpigotParser.spigot(component));
+			recipient.spigot().sendMessage(component);
 		}
 	}
 }

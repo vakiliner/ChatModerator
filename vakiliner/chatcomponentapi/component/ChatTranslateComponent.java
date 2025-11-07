@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
+import vakiliner.chatcomponentapi.util.Utils;
 
 public class ChatTranslateComponent extends ChatComponent {
 	private String key;
@@ -22,14 +24,14 @@ public class ChatTranslateComponent extends ChatComponent {
 	}
 
 	public ChatTranslateComponent(String legacyText, String key, Collection<ChatComponent> with) {
-		this.key = key;
+		this.key = Objects.requireNonNull(key);
 		this.with.addAll(with);
 		this.legacyText = legacyText;
 	}
 
 	public ChatTranslateComponent(String legacyText, String key, ChatTextColor color, Collection<ChatComponent> with) {
 		super(color);
-		this.key = key;
+		this.key = Objects.requireNonNull(key);
 		this.with.addAll(with);
 		this.legacyText = legacyText;
 	}
@@ -41,6 +43,10 @@ public class ChatTranslateComponent extends ChatComponent {
 		this.legacyText = component.legacyText;
 	}
 
+	public ChatTranslateComponent clone() {
+		return new ChatTranslateComponent(this);
+	}
+
 	public String getKey() {
 		return this.key;
 	}
@@ -50,7 +56,7 @@ public class ChatTranslateComponent extends ChatComponent {
 	}
 
 	public void setKey(String key) {
-		this.key = key;
+		this.key = Objects.requireNonNull(key);
 	}
 
 	public void setWith(Collection<ChatComponent> with) {
@@ -71,11 +77,7 @@ public class ChatTranslateComponent extends ChatComponent {
 		if (with.isEmpty()) {
 			return this.legacyText;
 		} else {
-			return String.format(this.legacyText, with.stream().map((component) -> component.toLegacyText(parentColor, parentFormats)).toArray());
+			return Utils.stringFormat(this.legacyText, with.stream().map((component) -> component.toLegacyText(parentColor, parentFormats)).toArray());
 		}
-	}
-
-	public ChatTranslateComponent clone() {
-		return new ChatTranslateComponent(this);
 	}
 }

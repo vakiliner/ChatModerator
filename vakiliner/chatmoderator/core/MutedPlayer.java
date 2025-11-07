@@ -1,8 +1,10 @@
 package vakiliner.chatmoderator.core;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import com.google.common.collect.Maps;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 
 public class MutedPlayer {
@@ -93,6 +95,7 @@ public class MutedPlayer {
 		AUTOMOD(3),
 		PLUGIN(4);
 
+		private static final Map<Integer, ModeratorType> BY_INT = Maps.newHashMap();
 		private final byte type;
 
 		private ModeratorType(int type) {
@@ -104,7 +107,13 @@ public class MutedPlayer {
 		}
 
 		public static ModeratorType valueOf(int type) {
-			return values()[type];
+			return BY_INT.get(type);
+		}
+
+		static {
+			for (ModeratorType moderatorType : values()) {
+				BY_INT.put((int) moderatorType.type, moderatorType);
+			}
 		}
 	}
 }

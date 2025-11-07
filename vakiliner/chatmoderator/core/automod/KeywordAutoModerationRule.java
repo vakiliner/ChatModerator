@@ -1,4 +1,4 @@
-package vakiliner.chatmoderator.core;
+package vakiliner.chatmoderator.core.automod;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,151 +6,44 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import vakiliner.chatmoderator.api.GsonAutoModerationRule;
+import vakiliner.chatmoderator.api.GsonKeywordTriggerMetadata;
+import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.core.AutoModeration;
 
-public class AutoModerationRule {
-	private String name;
-	private final TriggerType triggerType;
-	private boolean enabled = false;
+public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 	private final TriggerMetadata triggerMetadata = new TriggerMetadata();
-	private final Actions actions = new Actions();
 
-	public AutoModerationRule(String name, TriggerType triggerType) {
-		this.name = Objects.requireNonNull(name);
-		this.triggerType = Objects.requireNonNull(triggerType);
+	public KeywordAutoModerationRule(AutoModeration automod, String name, EventType eventType) {
+		super(automod, name, eventType);
 	}
 
-	public String getName() {
-		return this.name;
+	public KeywordAutoModerationRule(AutoModeration automod, GsonAutoModerationRule rule) {
+		super(automod, rule);
+		GsonKeywordTriggerMetadata triggerMetadata = new Gson().fromJson(rule.trigger_metadata, GsonKeywordTriggerMetadata.class);
+		if (triggerMetadata.keyword_filter != null) this.triggerMetadata.setKeywordFilter(triggerMetadata.keyword_filter);
+		if (triggerMetadata.regex_patterns != null) this.triggerMetadata.setRegexPatterns(triggerMetadata.regex_patterns);
+		if (triggerMetadata.allow_list != null) this.triggerMetadata.setAllowList(triggerMetadata.allow_list);
 	}
 
-	public TriggerType getTriggerType() {
-		return this.triggerType;
+	public TriggerType<KeywordAutoModerationRule> getTriggerType() {
+		return TriggerType.KEYWORD;
 	}
 
-	public boolean isEnabled() {
-		return this.enabled;
+	protected boolean isSupportEventType(EventType eventType) {
+		return eventType == EventType.MESSAGE;
 	}
 
 	public TriggerMetadata getTriggerMetadata() {
 		return this.triggerMetadata;
 	}
 
-	public Actions getActions() {
-		return this.actions;
-	}
-
-	public void setName(String name) {
-		this.name = Objects.requireNonNull(name);
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public static enum TriggerType {
-		MESSAGE(1);
-
-		private static final Map<Integer, TriggerType> BY_INT = Maps.newHashMap();
-		private final byte type;
-
-		private TriggerType(int type) {
-			this.type = (byte) type;
-		}
-
-		public byte get() {
-			return this.type;
-		}
-
-		public static TriggerType getByInt(int type) {
-			return BY_INT.get(type);
-		}
-
-		static {
-			for (TriggerType triggerType : values()) {
-				BY_INT.put((int) triggerType.type, triggerType);
-			}
-		}
-	}
-
-	public static class TriggerMetadata {
-		private List<String> keywordFilter = Collections.emptyList();
-		private List<Pattern> regexPatterns = Collections.emptyList();
-		private List<String> allowList = Collections.emptyList();
-
-		public List<String> getKeywordFilter() {
-			return this.keywordFilter;
-		}
-
-		public List<Pattern> getRegexPatterns() {
-			return this.regexPatterns;
-		}
-
-		public List<String> getAllowList() {
-			return this.allowList;
-		}
-
-		public void setKeywordFilter(Collection<String> keywordFilter) {
-			this.keywordFilter = Collections.unmodifiableList(new ArrayList<>(keywordFilter));
-		}
-
-		public void setRegexPatterns(Collection<String> regexPatterns) {
-			this.regexPatterns = Collections.unmodifiableList(regexPatterns.stream().map((regex) -> Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)).collect(Collectors.toList()));
-		}
-
-		public void setAllowList(Collection<String> allowList) {
-			this.allowList = Collections.unmodifiableList(new ArrayList<>(allowList));
-		}
-	}
-
-	public static class Actions {
-		private boolean blockAction;
-		private int muteTime;
-		private boolean logAdmins;
-		private String customBlockMessage;
-
-		public boolean blockAction() {
-			return this.blockAction;
-		}
-
-		public boolean mutePlayer() {
-			return this.muteTime > 0;
-		}
-
-		public boolean logAdmins() {
-			return this.logAdmins;
-		}
-
-		public String customBlockMessage() {
-			return this.customBlockMessage;
-		}
-
-		public int muteTime() {
-			return this.muteTime;
-		}
-
-		public void blockAction(boolean blockAction) {
-			this.blockAction = blockAction;
-		}
-
-		public void muteTime(int muteTime) {
-			if (muteTime < 0) throw new IllegalArgumentException();
-			this.muteTime = muteTime;
-		}
-
-		public void logAdmins(boolean logAdmins) {
-			this.logAdmins = logAdmins;
-		}
-
-		public void customBlockMessage(String customBlockMessage) {
-			this.customBlockMessage = customBlockMessage;
-		}
-	}
-
-	public Object checkText(String rawMessage, Map<Character, String> cleaner) {
+	public MatchResult checkText(ChatPlayer player, String rawMessage) {
+		Map<Character, String> cleaner = this.automod.cleaner;
 		final List<String> words;
 		final List<String> cleanedWords;
 		{
@@ -222,8 +115,11 @@ public class AutoModerationRule {
 				}
 				String check = String.join(" ", list);
 				String cleanedCheck = String.join(" ", cleaned);
-				if (checkWord(check.toLowerCase(), keyword, flags) || checkWord(cleanedCheck.toLowerCase(), keyword, flags)) {
-					return new Object();
+				if (checkWord(check.toLowerCase(), keyword, flags)) {
+					return new MatchResult(keyword, check);
+				}
+				if (checkWord(cleanedCheck.toLowerCase(), keyword, flags)) {
+					return new MatchResult(keyword, cleanedCheck);
 				}
 			}
 		}
@@ -252,14 +148,17 @@ public class AutoModerationRule {
 			cleanedMessage = cleanedMessageBuilder.stream().map(StringBuilder::toString).collect(Collectors.toList());
 		}
 		for (Pattern pattern : metadata.regexPatterns) {
+			String keyword = pattern.pattern();
 			for (String msg : message) {
-				if (pattern.matcher(msg).find()) {
-					return new Object();
+				Matcher matcher = pattern.matcher(msg);
+				if (matcher.find()) {
+					return new MatchResult(keyword, matcher.group());
 				}
 			}
 			for (String msg : cleanedMessage) {
-				if (pattern.matcher(msg).find()) {
-					return new Object();
+				Matcher matcher = pattern.matcher(msg);
+				if (matcher.find()) {
+					return new MatchResult(keyword, matcher.group());
 				}
 			}
 		}
@@ -267,7 +166,7 @@ public class AutoModerationRule {
 	}
 
 	private static byte parseFlags(String word) {
-		return (byte) ((word.endsWith("*") ? 1 : 0) + (word.startsWith("*") ? 2 : 0));
+		return (byte) ((word.endsWith("*") ? 1 : 0) | (word.startsWith("*") ? 2 : 0));
 	}
 
 	private static boolean checkWord(String word, String keyword, byte flags) {
@@ -277,6 +176,36 @@ public class AutoModerationRule {
 			case 2: return word.endsWith(keyword);
 			case 3: return word.contains(keyword);
 			default: throw new IllegalArgumentException("Invalid flag");
+		}
+	}
+
+	public static class TriggerMetadata {
+		private List<String> keywordFilter = Collections.emptyList();
+		private List<Pattern> regexPatterns = Collections.emptyList();
+		private List<String> allowList = Collections.emptyList();
+
+		public List<String> getKeywordFilter() {
+			return this.keywordFilter;
+		}
+
+		public List<Pattern> getRegexPatterns() {
+			return this.regexPatterns;
+		}
+
+		public List<String> getAllowList() {
+			return this.allowList;
+		}
+
+		public void setKeywordFilter(Collection<String> keywordFilter) {
+			this.keywordFilter = Collections.unmodifiableList(new ArrayList<>(keywordFilter));
+		}
+
+		public void setRegexPatterns(Collection<String> regexPatterns) {
+			this.regexPatterns = Collections.unmodifiableList(regexPatterns.stream().map((regex) -> Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)).collect(Collectors.toList()));
+		}
+
+		public void setAllowList(Collection<String> allowList) {
+			this.allowList = Collections.unmodifiableList(new ArrayList<>(allowList));
 		}
 	}
 }

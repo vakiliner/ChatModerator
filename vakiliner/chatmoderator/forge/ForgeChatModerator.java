@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -21,6 +22,9 @@ import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
+import vakiliner.chatmoderator.core.automod.MessageActions;
+import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
 
 public class ForgeChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
@@ -31,6 +35,7 @@ public class ForgeChatModerator extends ChatModerator {
 
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
+		super.init(modInitializer);
 	}
 
 	public ChatModeratorModInitializer getModInitializer() {
@@ -59,6 +64,16 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public Path getConfigPath() {
 		return this.getDataFolder().toPath().resolve("config.toml");
+	}
+
+	public String getName() {
+		String displayName = this.modInitializer.modContainer.getModInfo().getDisplayName();
+		return displayName != null ? displayName : this.modInitializer.modContainer.getModId();
+	}
+
+	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
+		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.forge.ForgeChatPlayer) player).getPlayer(), checkResult, actions);
+		return !MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	public MinecraftServer getServer() {

@@ -18,16 +18,16 @@ public class ChatClickEvent {
 		this.value = event.value;
 	}
 
+	public ChatClickEvent clone() {
+		return new ChatClickEvent(this);
+	}
+
 	public Action getAction() {
 		return this.action;
 	}
 
 	public String getValue() {
 		return this.value;
-	}
-
-	public ChatClickEvent clone() {
-		return new ChatClickEvent(this);
 	}
 
 	public static enum Action {

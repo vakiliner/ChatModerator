@@ -22,6 +22,9 @@ import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.base.Config;
+import vakiliner.chatmoderator.bukkit.event.AutoModerationTriggerEvent;
+import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
+import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public class BukkitChatModerator extends ChatModerator {
 	public static final String SPECTATORS_CHAT = "chatmoderator.spectator_chat";
@@ -31,6 +34,7 @@ public class BukkitChatModerator extends ChatModerator {
 
 	void init(ChatModeratorPlugin plugin) {
 		this.plugin = plugin;
+		super.init(plugin);
 	}
 
 	public ChatModeratorPlugin getPlugin() {
@@ -53,12 +57,23 @@ public class BukkitChatModerator extends ChatModerator {
 		return this.plugin.getDataFolder().toPath().resolve("config.yml");
 	}
 
+	public String getName() {
+		String prefix = this.plugin.getDescription().getPrefix();
+		return prefix != null ? prefix : this.plugin.getDescription().getName();
+	}
+
 	public void broadcast(ChatComponent component, boolean admins) {
 		Bukkit.broadcast(component.toLegacyText(), admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS);
 	}
 
 	public Collection<ChatPlayer> getOnlinePlayers() {
 		return Bukkit.getOnlinePlayers().stream().map(this::toChatPlayer).collect(Collectors.toList());
+	}
+
+	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
+		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.craftbukkit.BukkitChatPlayer) player).getPlayer(), checkResult, actions);
+		Bukkit.getPluginManager().callEvent(event);
+		return !event.isCancelled();
 	}
 
 	protected void spectatorsChat(ChatTranslateComponent component) {

@@ -16,6 +16,7 @@ import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.SelectorComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -34,6 +35,7 @@ import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.fabric.mixin.StyleMixin;
@@ -113,6 +115,9 @@ public class FabricParser extends BaseParser {
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
 			component = new TranslatableComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(FabricParser::fabric).toArray());
+		} else if (raw instanceof ChatSelectorComponent) {
+			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
+			component = new SelectorComponent(chatComponent.getSelector());
 		} else {
 			throw new IllegalArgumentException("Could not parse Component from " + raw.getClass());
 		}
@@ -142,6 +147,9 @@ public class FabricParser extends BaseParser {
 		} else if (raw instanceof TranslatableComponent) {
 			TranslatableComponent component = (TranslatableComponent) raw;
 			chatComponent = new ChatTranslateComponent(null, component.getKey(), Arrays.stream(component.getArgs()).map((arg) -> arg instanceof Component ? fabric((Component) arg) : new ChatTextComponent(String.valueOf(arg))).collect(Collectors.toList()));
+		} else if (raw instanceof SelectorComponent) {
+			SelectorComponent component = (SelectorComponent) raw;
+			chatComponent = new ChatSelectorComponent(component.getPattern());
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}

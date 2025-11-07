@@ -1,7 +1,20 @@
+version: -32767
 max_message_length: 80
 max_mute_reason_length: 50
 auto_moderation_enabled: true
 auto_moderation_use_thread_pool: true
 spectators_chat: false
-fix_chat: false
 dictionary_file: dictionary_ru.json
+show_fail_message: true
+messages:
+  fail_send_message: Ваше сообщение не было отправлено
+  fail_send_command: Не удалось использовать команду
+  fail_reasons:
+    muted: Вы были ограничены
+    muted_with_reason: |-
+      Вы были ограничены
+      Причина: %s
+    cannot_use_msg_command_in_spectator: Наблюдатели не могут использовать команды отправки сообщений
+    long_message: Слишком длинное сообщение
+    automod_blocked_without_custom_message: Публикация невозможна, поскольку сообщение содержит материалы, заблокированные этим сервером. Владельцы сервера также могут просматривать содержимое сообщений.
+    automod_blocked_with_custom_message: 'Содержимое сообщения заблокировано сервером. Сообщение от модераторов: «%s»'

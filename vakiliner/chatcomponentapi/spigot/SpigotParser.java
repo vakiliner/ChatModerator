@@ -10,6 +10,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.SelectorComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
@@ -18,7 +19,9 @@ import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
@@ -56,6 +59,9 @@ public class SpigotParser extends BukkitParser {
 
 	public static BaseComponent spigot(ChatComponent raw) {
 		final BaseComponent component;
+		if (raw instanceof ChatComponentWithLegacyText) {
+			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		}
 		if (raw == null) {
 			return null;
 		} else if (raw instanceof ChatTextComponent) {
@@ -64,6 +70,9 @@ public class SpigotParser extends BukkitParser {
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
 			component = new TranslatableComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(SpigotParser::spigot).toArray());
+		} else if (raw instanceof ChatSelectorComponent) {
+			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
+			component = new SelectorComponent(chatComponent.getSelector());
 		} else {
 			throw new IllegalArgumentException("Could not parse BaseComponent from " + raw.getClass());
 		}
@@ -93,6 +102,9 @@ public class SpigotParser extends BukkitParser {
 		} else if (raw instanceof TranslatableComponent) {
 			TranslatableComponent component = (TranslatableComponent) raw;
 			chatComponent = new ChatTranslateComponent(null, component.getTranslate(), component.getWith().stream().map(SpigotParser::spigot).collect(Collectors.toList()));
+		} else if (raw instanceof SelectorComponent) {
+			SelectorComponent component = (SelectorComponent) raw;
+			chatComponent = new ChatSelectorComponent(component.getSelector());
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}

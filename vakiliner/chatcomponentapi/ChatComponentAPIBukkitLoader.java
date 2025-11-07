@@ -31,14 +31,17 @@ public class ChatComponentAPIBukkitLoader {
 		return PARSER;
 	}
 
+	@Deprecated
 	public static BukkitParser getBukkit() {
 		return PARSER;
 	}
 
+	@Deprecated
 	public static SpigotParser getSpigot() {
 		return (SpigotParser) PARSER;
 	}
 
+	@Deprecated
 	public static PaperParser getPaper() {
 		return (PaperParser) PARSER;
 	}

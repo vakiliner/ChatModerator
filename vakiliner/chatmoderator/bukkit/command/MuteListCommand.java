@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
@@ -14,18 +15,18 @@ import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
-import vakiliner.chatmoderator.bukkit.exception.CommandException;
-import vakiliner.chatmoderator.bukkit.exception.UnknownArgumentException;
-import vakiliner.chatmoderator.bukkit.exception.UnknownCommandException;
 import vakiliner.chatmoderator.core.MutedPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 
-public class MuteListCommand extends CommandExecutor {
+public class MuteListCommand implements TabExecutor {
+	private final BukkitChatModerator manager;
+
 	public MuteListCommand(BukkitChatModerator manager) {
-		super(manager);
+		this.manager = manager;
 	}
 
-	public void execute(ChatCommandSender sender, String[] args) throws CommandException {
+	public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
 		String pageString;
 		if (args.length > 0) {
 			pageString = args[0];
@@ -34,12 +35,12 @@ public class MuteListCommand extends CommandExecutor {
 		}
 		Date now = new Date();
 		if (pageString != null && pageString.equals("get")) {
-			if (args.length < 2) throw new UnknownCommandException();
+			if (args.length < 2) return false;
 			String targetName = args[1];
 			ChatOfflinePlayer player = this.manager.getOfflinePlayerIfCached(targetName);
 			if (player == null) {
 				sender.sendMessage(new ChatTranslateComponent("No player was found", "argument.entity.notfound.player", ChatNamedColor.RED));
-				return;
+				return true;
 			}
 			MutedPlayer mute = this.manager.mutes.get(player.getUniqueId());
 			ChatTextComponent result = new ChatTextComponent();
@@ -91,7 +92,7 @@ public class MuteListCommand extends CommandExecutor {
 				try {
 					page = Integer.parseInt(pageString);
 				} catch (NumberFormatException err) {
-					throw new UnknownArgumentException(1);
+					return false;
 				}
 			}
 			List<MutedPlayer> mutes = this.manager.mutes.map().values().stream().filter((mute) -> !mute.isExpired(now)).collect(Collectors.toList());
@@ -148,6 +149,7 @@ public class MuteListCommand extends CommandExecutor {
 			}
 			sender.sendMessage(border);
 		}
+		return true;
 	}
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

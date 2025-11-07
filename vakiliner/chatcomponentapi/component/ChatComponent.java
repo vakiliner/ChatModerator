@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
@@ -47,6 +48,8 @@ public abstract class ChatComponent {
 			this.append(chatComponent.clone());
 		}
 	}
+
+	public abstract ChatComponent clone();
 
 	public String toLegacyText() {
 		return this.toLegacyText(ChatNamedColor.RESET, Collections.unmodifiableSet(new HashSet<>()));
@@ -111,8 +114,6 @@ public abstract class ChatComponent {
 	}
 
 	protected abstract String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats);
-
-	public abstract ChatComponent clone();
 
 	public ChatTextColor getColor() {
 		ChatTextColor color = this.color;
@@ -309,5 +310,13 @@ public abstract class ChatComponent {
 		}
 		component.parent = this;
 		extra.add(component);
+	}
+
+	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
+		return new ChatComponentWithLegacyText(this, getLegacyText);
+	}
+
+	public ChatComponentWithLegacyText withLegacyText(String legacyText) {
+		return new ChatComponentWithLegacyText(this, legacyText);
 	}
 }

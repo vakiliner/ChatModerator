@@ -22,6 +22,10 @@ public class ChatHoverEvent<V> {
 		this.contents = event.contents;
 	}
 
+	public ChatHoverEvent<V> clone() {
+		return new ChatHoverEvent<>(this);
+	}
+
 	public Action<V> getAction() {
 		return this.action;
 	}
@@ -37,10 +41,6 @@ public class ChatHoverEvent<V> {
 		} else {
 			return new ChatTextComponent(APIGson.builder(true).create().toJson(this.contents));
 		}
-	}
-
-	public ChatHoverEvent<V> clone() {
-		return new ChatHoverEvent<>(this);
 	}
 
 	public static class Action<V> {

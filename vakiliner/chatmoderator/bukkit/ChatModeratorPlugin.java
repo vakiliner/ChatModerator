@@ -7,11 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import vakiliner.chatmoderator.base.ILoader;
 import vakiliner.chatmoderator.bukkit.command.*;
 import vakiliner.chatmoderator.paper.PaperChatModerator;
 import vakiliner.chatmoderator.spigot.SpigotChatModerator;
 
-public class ChatModeratorPlugin extends JavaPlugin {
+public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 	private static final BukkitChatModerator MANAGER;
 	private final BukkitListener listener = MANAGER.createListener();
 
@@ -33,23 +34,7 @@ public class ChatModeratorPlugin extends JavaPlugin {
 
 	public void onEnable() {
 		MANAGER.init(this);
-		this.saveDefaultConfig();
-		if (!MANAGER.getAutoModerationRulesPath().toFile().exists()) {
-			this.saveResource("auto_moderation_rules.json", false);
-		}
-		this.reloadConfig();
-		String dictionaryFile = MANAGER.config.dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!MANAGER.getAutoModerationDictionaryPath().toFile().exists()) {
-				this.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			MANAGER.automod.reload();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
-		Bukkit.getConsoleSender().addAttachment(this, "chatmoderator.*", true);
+		Bukkit.getConsoleSender().addAttachment(this, "chatmoderator.spectator_chat", true);
 		Bukkit.getPluginManager().registerEvents(this.listener, this);
 		this.getCommand("mute").setExecutor(new MuteCommand(MANAGER));
 		this.getCommand("unmute").setExecutor(new UnmuteCommand(MANAGER));
@@ -69,6 +54,10 @@ public class ChatModeratorPlugin extends JavaPlugin {
 	public void reloadConfig() {
 		super.reloadConfig();
 		MANAGER.config.reload(this.getConfig());
+	}
+
+	public void log(String message) {
+		this.getLogger().info(message);
 	}
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

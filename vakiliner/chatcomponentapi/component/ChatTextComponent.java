@@ -19,17 +19,21 @@ public class ChatTextComponent extends ChatComponent {
 	}
 
 	public ChatTextComponent(String text) {
-		this.text = text;
+		this.text = Objects.requireNonNull(text);
 	}
 
 	public ChatTextComponent(String text, ChatTextColor color) {
 		super(color);
-		this.text = text;
+		this.text = Objects.requireNonNull(text);
 	}
 
 	public ChatTextComponent(ChatTextComponent component) {
 		super(component);
 		this.text = component.text;
+	}
+
+	public ChatTextComponent clone() {
+		return new ChatTextComponent(this);
 	}
 
 	public String getText() {
@@ -42,10 +46,6 @@ public class ChatTextComponent extends ChatComponent {
 
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.text;
-	}
-
-	public ChatTextComponent clone() {
-		return new ChatTextComponent(this);
 	}
 
 	public static ChatTextComponent selector(ChatOfflinePlayer player) {

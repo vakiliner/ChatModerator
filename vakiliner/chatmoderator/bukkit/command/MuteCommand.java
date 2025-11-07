@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -13,21 +14,21 @@ import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.bukkit.BukkitChatModerator;
-import vakiliner.chatmoderator.bukkit.exception.CommandException;
-import vakiliner.chatmoderator.bukkit.exception.UnknownArgumentException;
-import vakiliner.chatmoderator.bukkit.exception.UnknownCommandException;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 
-public class MuteCommand extends CommandExecutor {
+public class MuteCommand implements TabExecutor {
+	private final BukkitChatModerator manager;
+
 	public MuteCommand(BukkitChatModerator manager) {
-		super(manager);
+		this.manager = manager;
 	}
 
-	public void execute(ChatCommandSender sender, String[] args) throws CommandException {
-		if (args.length < 2) throw new UnknownCommandException();
+	public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+		if (args.length < 2) return false;
+		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
 		String targetName = args[0];
 		String durationString = args[1];
-		Integer duration;
+		final Integer duration;
 		if (durationString.equals("infinite")) {
 			duration = null;
 		} else {
@@ -37,25 +38,23 @@ public class MuteCommand extends CommandExecutor {
 			} catch (NumberFormatException err) {
 				d = 0;
 			}
-			if (d <= 0 || d * 10 % 1 != 0) {
-				throw new UnknownArgumentException(2);
-			}
+			if (d <= 0 || d * 10 % 1 != 0) return false;
 			duration = (int) (d * 60);
 		}
 		String reason = args.length > 2 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : null;
 		int maxMuteReasonLength = this.manager.getConfig().maxMuteReasonLength();
 		if (reason != null && reason.length() > maxMuteReasonLength) {
 			sender.sendMessage(new ChatTextComponent("The maximum length of reason is " + maxMuteReasonLength + ". You have reached " + reason.length(), ChatNamedColor.RED));
-			return;
+			return true;
 		}
 		ChatOfflinePlayer target = this.manager.getOfflinePlayerIfCached(targetName);
 		if (target == null) {
 			sender.sendMessage(new ChatTranslateComponent("No player was found", "argument.entity.notfound.player", ChatNamedColor.RED));
-			return;
+			return true;
 		}
 		if (target.isBypassMutes()) {
 			sender.sendMessage(new ChatTextComponent("Cannot mute a player who can bypass mutes", ChatNamedColor.RED));
-			return;
+			return true;
 		}
 		final ModeratorType moderatorType;
 		if (sender instanceof ChatPlayer) {
@@ -73,6 +72,7 @@ public class MuteCommand extends CommandExecutor {
 		} else {
 			sender.sendMessage(new ChatTextComponent("This player is already muted", ChatNamedColor.RED));
 		}
+		return true;
 	}
 
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

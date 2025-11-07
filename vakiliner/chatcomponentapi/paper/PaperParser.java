@@ -12,6 +12,7 @@ import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.SelectorComponent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -29,7 +30,9 @@ import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.spigot.SpigotParser;
@@ -45,6 +48,9 @@ public class PaperParser extends SpigotParser {
 
 	public static Component paper(ChatComponent raw) {
 		if (raw == null) return null;
+		if (raw instanceof ChatComponentWithLegacyText) {
+			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		}
 		final Component component;
 		Style style = paperStyle(raw);
 		List<Component> children = new ArrayList<>();
@@ -58,6 +64,9 @@ public class PaperParser extends SpigotParser {
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
 			component = Component.translatable().key(chatComponent.getKey()).args(chatComponent.getWith().stream().map(PaperParser::paper).collect(Collectors.toList())).style(style).append(children).build();
+		} else if (raw instanceof ChatSelectorComponent) {
+			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
+			component = Component.selector().pattern(chatComponent.getSelector()).style(style).append(children).build();
 		} else {
 			throw new IllegalArgumentException("Could not parse Component from " + raw.getClass());
 		}
@@ -74,6 +83,9 @@ public class PaperParser extends SpigotParser {
 		} else if (raw instanceof TranslatableComponent) {
 			TranslatableComponent component = (TranslatableComponent) raw;
 			chatComponent = new ChatTranslateComponent(null, component.key(), component.args().stream().map(PaperParser::paper).collect(Collectors.toList()));
+		} else if (raw instanceof SelectorComponent) {
+			SelectorComponent component = (SelectorComponent) raw;
+			chatComponent = new ChatSelectorComponent(component.pattern());
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}

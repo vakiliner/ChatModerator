@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,16 +25,21 @@ import vakiliner.chatcomponentapi.fabric.FabricParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
+import vakiliner.chatmoderator.core.automod.MessageActions;
+import vakiliner.chatmoderator.fabric.event.AutoModerationTriggerCallback;
 
 public class FabricChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
 	public static final FabricParser PARSER = ChatComponentAPIFabricLoader.load();
 	public final ConfigImpl config = new ConfigImpl();
+	private final ModContainer modContainer = FabricLoader.getInstance().getModContainer(ID).get();
 	protected MinecraftServer server;
 	private ChatModeratorModInitializer modInitializer;
 
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
+		super.init(modInitializer);
 	}
 
 	public ChatModeratorModInitializer getModInitializer() {
@@ -62,6 +68,15 @@ public class FabricChatModerator extends ChatModerator {
 
 	public Path getConfigPath() {
 		return this.getDataFolder().toPath().resolve("config.json");
+	}
+
+	public String getName() {
+		String name = this.modContainer.getMetadata().getName();
+		return name != null ? name : this.modContainer.getMetadata().getId();
+	}
+
+	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
+		return AutoModerationTriggerCallback.EVENT.invoker().trigger(((vakiliner.chatcomponentapi.fabric.FabricChatPlayer) player).getPlayer(), checkResult, actions, true);
 	}
 
 	public MinecraftServer getServer() {
