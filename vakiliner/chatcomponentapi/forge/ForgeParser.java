@@ -37,6 +37,7 @@ import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
@@ -54,6 +55,9 @@ public class ForgeParser extends BaseParser {
 
 	public static ITextComponent forge(ChatComponent raw) {
 		final TextComponent component;
+		if (raw instanceof ChatComponentWithLegacyText) {
+			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		}
 		if (raw == null) {
 			return null;
 		} else if (raw instanceof ChatTextComponent) {
