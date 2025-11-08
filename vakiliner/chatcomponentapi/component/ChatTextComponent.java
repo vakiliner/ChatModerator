@@ -62,7 +62,7 @@ public class ChatTextComponent extends ChatComponent {
 			if (prefix != null) {
 				component.append(prefix);
 			}
-			component.append(component);
+			component.append(new ChatTextComponent(player.getName()));
 			if (suffix != null) {
 				component.append(suffix);
 			}
