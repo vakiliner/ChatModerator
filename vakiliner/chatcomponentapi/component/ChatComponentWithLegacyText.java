@@ -43,6 +43,14 @@ public class ChatComponentWithLegacyText extends ChatComponent {
 		return Objects.requireNonNull(this.getLegacyText.get());
 	}
 
+	public ChatComponentWithLegacyText withLegacyText(String legacyText) {
+		return this.component.withLegacyText(legacyText);
+	}
+
+	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
+		return this.component.withLegacyText(getLegacyText);
+	}
+
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		throw new UnsupportedOperationException();
 	}
