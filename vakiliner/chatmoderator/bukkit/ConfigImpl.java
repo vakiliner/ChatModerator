@@ -83,6 +83,14 @@ class ConfigImpl implements Config {
 		this.configuration.set("show_fail_message", show);
 	}
 
+	public boolean logBlockedMessages() {
+		return this.configuration.getBoolean("log_blocked_messages", false);
+	}
+
+	public void logBlockedMessages(boolean log) {
+		this.configuration.set("log_blocked_messages", log);
+	}
+
 	public String message(String key) {
 		return this.configuration.getConfigurationSection("messages").getString(key);
 	}

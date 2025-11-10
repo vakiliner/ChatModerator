@@ -39,6 +39,10 @@ public interface Config {
 
 	void showFailMessage(boolean show);
 
+	boolean logBlockedMessages();
+	
+	void logBlockedMessages(boolean log);
+
 	String message(String key);
 
 	void messages(Map<String, String> message);
