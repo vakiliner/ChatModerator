@@ -1,6 +1,7 @@
 package vakiliner.chatmoderator.forge;
 
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -120,9 +121,14 @@ class ConfigImpl implements Config {
 		this.logBlockedMessages.set(log);
 	}
 
-	public String message(String key) {
-		Map<String, String> map = new Gson().fromJson(this.rawMessages.get(), TypeToken.getParameterized(Map.class, String.class, String.class).getType());
-		return map.get(key);
+	public String message(String key, boolean required) {
+		String message = this.messages().get(key);
+		if (required) Objects.requireNonNull(message, "Message not found");
+		return message;
+	}
+
+	private Map<String, String> messages() {
+		return Objects.requireNonNull(new Gson().fromJson(this.rawMessages.get(), TypeToken.getParameterized(Map.class, String.class, String.class).getType()), "Config not have a messages property");
 	}
 
 	public void messages(Map<String, String> message) {
