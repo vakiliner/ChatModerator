@@ -52,7 +52,7 @@ public abstract class ChatModerator {
 		int configVersion = this.getConfig().version();
 		if (configVersion != CONFIG_VERSION) {
 			if (configVersion < Short.MIN_VALUE || configVersion > CONFIG_VERSION) throw new IllegalStateException("Unsupported config version " + configVersion);
-			loader.log("Updating config to new version " + CONFIG_VERSION);
+			this.log("Updating config to new version " + CONFIG_VERSION);
 			switch (configVersion - Short.MIN_VALUE) {
 				case 0:
 					this.getConfig().showFailMessage(true);
@@ -115,6 +115,8 @@ public abstract class ChatModerator {
 			err.printStackTrace();
 		}
 	}
+
+	protected abstract void log(String message);
 
 	public abstract Config getConfig();
 
