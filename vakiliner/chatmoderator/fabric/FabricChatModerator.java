@@ -50,6 +50,10 @@ public class FabricChatModerator extends ChatModerator {
 		return new FabricListener(this);
 	}
 
+	protected void log(String message) {
+		LOGGER.info(message);
+	}
+
 	public ConfigImpl getConfig() {
 		return this.config;
 	}

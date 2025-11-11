@@ -8,6 +8,4 @@ public interface ILoader {
 	void reloadConfig();
 
 	void saveResource(String resourcePath, boolean replace);
-
-	void log(String message);
 }
