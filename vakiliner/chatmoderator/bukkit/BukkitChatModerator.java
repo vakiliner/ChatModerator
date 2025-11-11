@@ -45,6 +45,10 @@ public class BukkitChatModerator extends ChatModerator {
 		return new BukkitListener(this);
 	}
 
+	protected void log(String message) {
+		this.plugin.getLogger().info(message);
+	}
+
 	public Config getConfig() {
 		return this.config;
 	}

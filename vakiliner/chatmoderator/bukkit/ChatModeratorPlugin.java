@@ -56,10 +56,6 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 		MANAGER.config.reload(this.getConfig());
 	}
 
-	public void log(String message) {
-		this.getLogger().info(message);
-	}
-
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		return Collections.emptyList();
 	}
