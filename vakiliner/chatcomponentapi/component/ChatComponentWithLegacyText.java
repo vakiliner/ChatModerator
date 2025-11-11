@@ -17,6 +17,7 @@ public class ChatComponentWithLegacyText extends ChatComponent {
 	}
 
 	public ChatComponentWithLegacyText(ChatComponent component, Supplier<String> getLegacyText) {
+		if (component instanceof ChatComponentWithLegacyText) throw new IllegalArgumentException("ChatComponentWithLegacyText cannot be used as a component");
 		this.component = Objects.requireNonNull(component);
 		this.getLegacyText = Objects.requireNonNull(getLegacyText);
 	}
@@ -40,6 +41,14 @@ public class ChatComponentWithLegacyText extends ChatComponent {
 
 	public String toLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return Objects.requireNonNull(this.getLegacyText.get());
+	}
+
+	public ChatComponentWithLegacyText withLegacyText(String legacyText) {
+		return this.component.withLegacyText(legacyText);
+	}
+
+	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
+		return this.component.withLegacyText(getLegacyText);
 	}
 
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {

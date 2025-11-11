@@ -303,6 +303,7 @@ public abstract class ChatComponent {
 	}
 
 	public void append(ChatComponent component) {
+		if (component == this) throw new IllegalArgumentException("This component cannot be added");
 		if (component.parent != null) throw new IllegalArgumentException("Component already has parent");
 		List<ChatComponent> extra = this.extra;
 		if (extra == null) {
