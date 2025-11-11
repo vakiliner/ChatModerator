@@ -46,6 +46,10 @@ public class ForgeChatModerator extends ChatModerator {
 		return new ForgeListener(this);
 	}
 
+	protected void log(String message) {
+		LOGGER.info(message);
+	}
+
 	public ConfigImpl getConfig() {
 		return this.config;
 	}

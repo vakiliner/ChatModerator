@@ -96,8 +96,4 @@ public class ChatModeratorModInitializer implements ModInitializer, ILoader {
 			FabricChatModerator.LOGGER.warn("Could not save " + outFile.getName() + " to " + outFile);
 		}
 	}
-
-	public void log(String message) {
-		FabricChatModerator.LOGGER.info(message);
-	}
 }

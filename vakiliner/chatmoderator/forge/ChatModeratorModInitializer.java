@@ -83,8 +83,4 @@ public class ChatModeratorModInitializer implements ILoader {
 			ForgeChatModerator.LOGGER.warn("Could not save " + outFile.getName() + " to " + outFile);
 		}
 	}
-
-	public void log(String message) {
-		ForgeChatModerator.LOGGER.info(message);
-	}
 }
