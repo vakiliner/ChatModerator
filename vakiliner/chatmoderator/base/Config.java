@@ -38,8 +38,12 @@ public interface Config {
 	boolean showFailMessage();
 
 	void showFailMessage(boolean show);
+	
+	default String message(String key) {
+		return this.message(key, true);
+	}
 
-	String message(String key);
+	String message(String key, boolean required);
 
 	void messages(Map<String, String> message);
 }

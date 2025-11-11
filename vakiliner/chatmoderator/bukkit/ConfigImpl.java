@@ -1,6 +1,8 @@
 package vakiliner.chatmoderator.bukkit;
 
 import java.util.Map;
+import java.util.Objects;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import vakiliner.chatmoderator.base.Config;
 
@@ -83,11 +85,17 @@ class ConfigImpl implements Config {
 		this.configuration.set("show_fail_message", show);
 	}
 
-	public String message(String key) {
-		return this.configuration.getConfigurationSection("messages").getString(key);
+	public String message(String key, boolean required) {
+		String message = this.messages().getString(key);
+		if (required) Objects.requireNonNull(message, "Message not found");
+		return message;
+	}
+
+	private ConfigurationSection messages() {
+		return Objects.requireNonNull(this.configuration.getConfigurationSection("messages"), "Config not have a messages property");
 	}
 
 	public void messages(Map<String, String> message) {
-		this.configuration.set("messages", message);
+		this.configuration.createSection("messages", message);
 	}
 }

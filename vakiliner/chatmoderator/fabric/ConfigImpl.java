@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.fabric;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.Config;
 
@@ -84,8 +85,14 @@ class ConfigImpl implements Config {
 		this.config.show_fail_message = show;
 	}
 
-	public String message(String key) {
-		return this.config.messages.get(key);
+	public String message(String key, boolean required) {
+		String message = this.messages().get(key);
+		if (required) Objects.requireNonNull(message, "Message not found");
+		return message;
+	}
+
+	private Map<String, String> messages() {
+		return Objects.requireNonNull(this.config.messages, "Config not have a messages property");
 	}
 
 	public void messages(Map<String, String> message) {
