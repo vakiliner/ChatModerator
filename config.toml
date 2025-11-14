@@ -1,4 +1,4 @@
-version = -32767
+version = -32766
 max_message_length = 80
 max_mute_reason_length = 50
 auto_moderation_enabled = true

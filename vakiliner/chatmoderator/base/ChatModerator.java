@@ -33,7 +33,7 @@ import vakiliner.chatmoderator.core.automod.EventType;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public abstract class ChatModerator {
-	public static final int CONFIG_VERSION = Short.MIN_VALUE + 1;
+	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
 	public final MuteManager mutes = new MuteManager(this);
@@ -93,6 +93,8 @@ public abstract class ChatModerator {
 							throw new RuntimeException(err);
 						}
 					}
+				case 1:
+					this.getConfig().logBlockedCommands(true);
 			}
 			this.getConfig().version(CONFIG_VERSION);
 			loader.saveConfig();
