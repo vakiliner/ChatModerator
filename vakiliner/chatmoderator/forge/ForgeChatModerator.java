@@ -17,6 +17,7 @@ import net.minecraftforge.common.MinecraftForge;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatModerator;
@@ -92,7 +93,7 @@ public class ForgeChatModerator extends ChatModerator {
 			recipients.add(player);
 		}
 		for (ChatCommandSender recipient : recipients) {
-			recipient.sendMessage(component);
+			recipient.sendMessage(recipient.isConsole() ? new ChatTextComponent(component.toLegacyText()) : component);
 		}
 	}
 
