@@ -22,6 +22,10 @@ public abstract class ServerGamePacketListenerImplMixin {
 		ServerPlayer player = this.getPlayer();
 		if (player.getChatVisibility() == ChatVisiblity.HIDDEN) return;
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		manager.onChat(manager.toChatPlayer(player), packet.getMessage(), callbackInfo::cancel);
+		try {
+			manager.onChat(manager.toChatPlayer(player), packet.getMessage(), callbackInfo::cancel);
+		} catch (Throwable err) {
+			FabricChatModerator.LOGGER.error(err);
+		}
 	}
 }
