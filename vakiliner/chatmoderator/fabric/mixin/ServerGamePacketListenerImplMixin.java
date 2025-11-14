@@ -25,7 +25,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		try {
 			manager.onChat(manager.toChatPlayer(player), packet.getMessage(), callbackInfo::cancel);
 		} catch (Throwable err) {
-			FabricChatModerator.LOGGER.error(err);
+			FabricChatModerator.LOGGER.error("Failed to handle chat", err);
 		}
 	}
 }
