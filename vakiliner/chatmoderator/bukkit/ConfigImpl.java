@@ -93,6 +93,14 @@ class ConfigImpl implements Config {
 		this.configuration.set("log_blocked_messages", log);
 	}
 
+	public boolean logBlockedCommands() {
+		return this.configuration.getBoolean("log_blocked_commands", false);
+	}
+
+	public void logBlockedCommands(boolean log) {
+		this.configuration.set("log_blocked_commands", log);
+	}
+
 	public String message(String key, boolean required) {
 		String message = this.messages().getString(key);
 		if (required) Objects.requireNonNull(message, "Message not found");

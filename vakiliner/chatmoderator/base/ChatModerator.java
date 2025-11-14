@@ -215,8 +215,8 @@ public abstract class ChatModerator {
 		if (cancelReason == null) cancelReason = this.checkMessage(player, message);
 		if (cancelReason != null) {
 			cancel.run();
-			if (!isCommand && this.getConfig().logBlockedMessages()) {
-				this.log("Blocked message " + player.getName() + ": " + message);
+			if (this.getConfig().logBlockedMessages() && (!isCommand || this.getConfig().logBlockedCommands())) {
+				this.log("Blocked " + (isCommand ? "using command" : "message") + " " + player.getName() + ": " + fullMessage);
 			}
 			if (this.getConfig().showFailMessage()) {
 				final ChatComponent messageComponent;
