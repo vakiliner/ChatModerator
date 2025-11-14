@@ -11,5 +11,7 @@ public class GsonConfig {
 	public Boolean spectators_chat;
 	public String dictionary_file;
 	public Boolean show_fail_message;
+	public Boolean log_blocked_messages;
+	public Boolean log_blocked_commands;
 	public Map<String, String> messages;
 }

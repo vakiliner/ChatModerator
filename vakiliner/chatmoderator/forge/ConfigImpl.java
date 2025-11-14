@@ -23,6 +23,8 @@ class ConfigImpl implements Config {
 	public final BooleanValue fixChat;
 	public final ConfigValue<String> dictionaryFile;
 	public final BooleanValue showFailMessage;
+	public final BooleanValue logBlockedMessages;
+	public final BooleanValue logBlockedCommands;
 	public final ConfigValue<String> rawMessages;
 
 	public ConfigImpl(ForgeConfigSpec.Builder builder) {
@@ -35,6 +37,8 @@ class ConfigImpl implements Config {
 		this.fixChat = builder.translation("null").define("spectators_chat", false);
 		this.dictionaryFile = builder.translation("null").define("dictionary_file", "");
 		this.showFailMessage = builder.translation("null").define("show_fail_message", true);
+		this.logBlockedMessages = builder.translation("null").define("log_blocked_messages", false);
+		this.logBlockedCommands = builder.translation("null").define("log_blocked_commands", false);
 		this.rawMessages = builder.translation("null").define("messages", "{}");
 	}
 
@@ -109,6 +113,22 @@ class ConfigImpl implements Config {
 
 	public void showFailMessage(boolean show) {
 		this.showFailMessage.set(show);
+	}
+
+	public boolean logBlockedMessages() {
+		return this.logBlockedMessages.get();
+	}
+
+	public void logBlockedMessages(boolean log) {
+		this.logBlockedMessages.set(log);
+	}
+
+	public boolean logBlockedCommands() {
+		return this.logBlockedCommands.get();
+	}
+
+	public void logBlockedCommands(boolean log) {
+		this.logBlockedCommands.set(log);
 	}
 
 	public String message(String key, boolean required) {

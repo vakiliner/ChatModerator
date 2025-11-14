@@ -1,4 +1,4 @@
-version: -32767
+version: -32766
 max_message_length: 80
 max_mute_reason_length: 50
 auto_moderation_enabled: true
@@ -6,6 +6,8 @@ auto_moderation_use_thread_pool: true
 spectators_chat: false
 dictionary_file: dictionary_ru.json
 show_fail_message: true
+log_blocked_messages: false
+log_blocked_commands: false
 messages:
   fail_send_message: Ваше сообщение не было отправлено
   fail_send_command: Не удалось использовать команду
