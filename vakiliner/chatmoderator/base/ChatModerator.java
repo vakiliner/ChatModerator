@@ -94,8 +94,8 @@ public abstract class ChatModerator {
 						}
 					}
 				case 1:
-					this.getConfig().logBlockedMessages(true);
-					this.getConfig().logBlockedCommands(true);
+					this.getConfig().logBlockedMessages(false);
+					this.getConfig().logBlockedCommands(false);
 			}
 			this.getConfig().version(CONFIG_VERSION);
 			loader.saveConfig();

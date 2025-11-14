@@ -7,8 +7,8 @@
 	"spectators_chat": false,
 	"dictionary_file": "dictionary_ru.json",
 	"show_fail_message": true,
-	"log_blocked_messages": true,
-	"log_blocked_commands": true,
+	"log_blocked_messages": false,
+	"log_blocked_commands": false,
 	"messages": {
 		"fail_send_message": "Ваше сообщение не было отправлено",
 		"fail_send_command": "Не удалось использовать команду",
