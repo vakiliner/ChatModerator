@@ -15,6 +15,7 @@ import org.bukkit.permissions.Permissible;
 import vakiliner.chatcomponentapi.ChatComponentAPIBukkitLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitChatCommandSender;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
@@ -66,8 +67,17 @@ public class BukkitChatModerator extends ChatModerator {
 		return prefix != null ? prefix : this.plugin.getDescription().getName();
 	}
 
-	public void broadcast(ChatComponent component, boolean admins) {
-		Bukkit.broadcast(component.toLegacyText(), admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS);
+	public void broadcast(ChatComponent chatComponent, boolean admins) {
+		Set<ChatCommandSender> recipients = new HashSet<>();
+		String permission = admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS;
+		for (Permissible permissible : Bukkit.getPluginManager().getPermissionSubscriptions(permission)) {
+			if (permissible instanceof CommandSender && permissible.hasPermission(permission)) {
+				recipients.add(this.toChatCommandSender((CommandSender) permissible));
+			}
+		}
+		recipients.forEach((recipient) -> {
+			recipient.sendMessage(recipient.isConsole() ? new ChatTextComponent(chatComponent.toLegacyText()) : chatComponent);
+		});
 	}
 
 	public Collection<ChatPlayer> getOnlinePlayers() {
