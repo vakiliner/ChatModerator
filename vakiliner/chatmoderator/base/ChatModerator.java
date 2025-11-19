@@ -334,11 +334,12 @@ public abstract class ChatModerator {
 					if (logAdmins) {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
 						log.append(ChatTextComponent.selector(player));
-						log.append(new ChatTextComponent(", "));
+						ChatTextComponent getMessage = new ChatTextComponent(", ");
 						ChatTextComponent showMessage = new ChatTextComponent("показать сообщение");
 						showMessage.setUnderlined(true);
 						showMessage.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(checkResult.getMessage())));
-						log.append(showMessage);
+						getMessage.append(showMessage);
+						log.append(getMessage.withLegacyText(": " + message));
 						ChatTranslateComponent component = new ChatTranslateComponent("[%s: %s]", "chat.type.admin", ChatNamedColor.GRAY, new ChatTextComponent("AutoMod"), log);
 						this.broadcast(component, true);
 					}

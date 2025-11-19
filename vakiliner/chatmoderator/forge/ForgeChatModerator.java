@@ -11,13 +11,16 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
+import vakiliner.chatcomponentapi.forge.ForgeChatCommandSender;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
@@ -84,16 +87,14 @@ public class ForgeChatModerator extends ChatModerator {
 		return this.server;
 	}
 
-	public void broadcast(ChatComponent component, boolean admins) {
-		Set<ChatCommandSender> recipients = new HashSet<>();
-		recipients.add(PARSER.toChatCommandSender(this.server));
+	public void broadcast(ChatComponent component, boolean adminMessage) {
+		Set<ChatPlayer> admins = new HashSet<>();
 		for (ChatPlayer player : this.getOnlinePlayers()) {
-			if (admins && !player.isOp()) continue;
-			recipients.add(player);
+			if (adminMessage && !player.isOp()) continue;
+			admins.add(player);
 		}
-		for (ChatCommandSender recipient : recipients) {
-			recipient.sendMessage(component);
-		}
+		this.toChatCommandSender(this.server).sendMessage(new ChatTextComponent(component.toLegacyText()));
+		admins.forEach((p) -> p.sendMessage(component));
 	}
 
 	public Collection<ChatPlayer> getOnlinePlayers() {
@@ -102,7 +103,7 @@ public class ForgeChatModerator extends ChatModerator {
 
 	protected void spectatorsChat(ChatTranslateComponent component) {
 		Set<ChatCommandSender> recipients = new HashSet<>();
-		recipients.add(PARSER.toChatCommandSender(this.server));
+		recipients.add(this.toChatCommandSender(this.server));
 		for (ServerPlayerEntity player : this.server.getPlayerList().getPlayers()) {
 			if (player.isSpectator()) {
 				recipients.add(this.toChatPlayer(player));
@@ -119,5 +120,12 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public ChatOfflinePlayer toChatOfflinePlayer(GameProfile gameProfile) {
 		return gameProfile != null ? new ForgeChatOfflinePlayer(this, gameProfile) : null;
+	}
+
+	public ChatCommandSender toChatCommandSender(ICommandSource sender) {
+		if (sender instanceof ServerPlayerEntity) {
+			return this.toChatPlayer((ServerPlayerEntity) sender);
+		}
+		return sender != null ? new ForgeChatCommandSender(PARSER, sender) : null;
 	}
 }
