@@ -12,6 +12,7 @@
 		"actions": {
 			"block_action": "Тест 2",
 			"mute_time": 60,
+			"mute_reason": "Тест",
 			"log_admins": true
 		}
 	},

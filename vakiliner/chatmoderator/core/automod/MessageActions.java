@@ -5,6 +5,7 @@ import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 public class MessageActions extends BaseActions {
 	private String blockAction;
 	private int muteTime;
+	private String muteReason;
 
 	public MessageActions() {
 	}
@@ -13,6 +14,7 @@ public class MessageActions extends BaseActions {
 		super(actions);
 		if (actions.block_action != null) this.blockAction = actions.block_action;
 		if (actions.mute_time != null) this.muteTime = actions.mute_time;
+		if (actions.mute_reason != null) this.muteReason = actions.mute_reason;
 	}
 
 	public String blockAction() {
@@ -21,6 +23,10 @@ public class MessageActions extends BaseActions {
 
 	public int muteTime() {
 		return this.muteTime;
+	}
+
+	public String muteReason() {
+		return this.muteReason;
 	}
 
 	public synchronized void blockAction(String message) {
@@ -32,5 +38,9 @@ public class MessageActions extends BaseActions {
 			throw new IllegalArgumentException("Invalid mute time: " + muteTime);
 		}
 		this.muteTime = muteTime;
+	}
+
+	public synchronized void muteReason(String muteReason) {
+		this.muteReason = muteReason;
 	}
 }

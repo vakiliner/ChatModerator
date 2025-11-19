@@ -54,6 +54,10 @@ public class AutoModerationTriggerEvent extends Event {
 		return this.actions.muteTime();
 	}
 
+	public String getMuteReason() {
+		return this.actions.muteReason();
+	}
+
 	public boolean getLogAdmins() {
 		return this.actions.logAdmins();
 	}
@@ -77,6 +81,10 @@ public class AutoModerationTriggerEvent extends Event {
 
 	public void setMuteTime(int muteTime) {
 		this.actions.muteTime(muteTime);
+	}
+
+	public void setMuteReason(String muteReason) {
+		this.actions.muteReason(muteReason);
 	}
 
 	public void setLogAdmins(boolean logAdmins) {

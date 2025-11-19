@@ -15,6 +15,7 @@ public class GsonAutoModerationRule {
 	public static class Actions {
 		public String block_action;
 		public Integer mute_time;
+		public String mute_reason;
 		public Boolean log_admins;
 	}
 
