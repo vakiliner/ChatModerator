@@ -312,12 +312,14 @@ public abstract class ChatModerator {
 					MessageActions ruleActions = (MessageActions) rule.getActions();
 					String blockAction = ruleActions.blockAction();
 					int muteTime = ruleActions.muteTime();
+					String muteReason = ruleActions.muteReason();
 					boolean logAdmins = ruleActions.logAdmins();
 					if (actions.blockAction() == null && blockAction != null) {
 						actions.blockAction(blockAction);
 					}
 					if (actions.muteTime() < muteTime) {
 						actions.muteTime(muteTime);
+						actions.muteReason(muteReason);
 					}
 					if (!actions.logAdmins() && logAdmins) {
 						actions.logAdmins(logAdmins);
@@ -329,7 +331,7 @@ public abstract class ChatModerator {
 					int muteTime = actions.muteTime();
 					boolean logAdmins = actions.logAdmins();
 					if (muteTime > 0) {
-						this.mutes.mute(player, firstRule.getName(), ModeratorType.AUTOMOD, muteTime, null);
+						this.mutes.mute(player, firstRule.getName(), ModeratorType.AUTOMOD, muteTime, actions.muteReason());
 					}
 					if (logAdmins) {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
