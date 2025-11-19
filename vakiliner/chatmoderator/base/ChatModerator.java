@@ -219,7 +219,7 @@ public abstract class ChatModerator {
 		if (cancelReason != null) {
 			cancel.run();
 			if (this.getConfig().logBlockedMessages() && (!isCommand || this.getConfig().logBlockedCommands())) {
-				this.log("Blocked " + (isCommand ? "using command" : "message") + " " + player.getName() + ": " + fullMessage);
+				this.log((isCommand ? "Command issue" : "Message") + " blocked " + player.getName() + ": " + fullMessage);
 			}
 			if (this.getConfig().showFailMessage()) {
 				final ChatComponent messageComponent;
