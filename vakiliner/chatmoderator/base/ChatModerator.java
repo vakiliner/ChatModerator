@@ -33,7 +33,7 @@ import vakiliner.chatmoderator.core.automod.EventType;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public abstract class ChatModerator {
-	public static final int CONFIG_VERSION = Short.MIN_VALUE + 1;
+	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
 	public final MuteManager mutes = new MuteManager(this);
@@ -93,6 +93,9 @@ public abstract class ChatModerator {
 							throw new RuntimeException(err);
 						}
 					}
+				case 1:
+					this.getConfig().logBlockedMessages(false);
+					this.getConfig().logBlockedCommands(false);
 			}
 			this.getConfig().version(CONFIG_VERSION);
 			loader.saveConfig();
@@ -215,6 +218,9 @@ public abstract class ChatModerator {
 		if (cancelReason == null) cancelReason = this.checkMessage(player, message);
 		if (cancelReason != null) {
 			cancel.run();
+			if (this.getConfig().logBlockedMessages() && (!isCommand || this.getConfig().logBlockedCommands())) {
+				this.log((isCommand ? "Command issue" : "Message") + " blocked " + player.getName() + ": " + fullMessage);
+			}
 			if (this.getConfig().showFailMessage()) {
 				final ChatComponent messageComponent;
 				if (!isCommand) {
