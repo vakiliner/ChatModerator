@@ -88,16 +88,14 @@ public class FabricChatModerator extends ChatModerator {
 		return this.server;
 	}
 
-	public void broadcast(ChatComponent component, boolean admins) {
-		Set<ChatCommandSender> recipients = new HashSet<>();
-		recipients.add(PARSER.toChatCommandSender(this.server));
+	public void broadcast(ChatComponent component, boolean adminMessage) {
+		Set<ChatPlayer> admins = new HashSet<>();
 		for (ChatPlayer player : this.getOnlinePlayers()) {
-			if (admins && !player.isOp()) continue;
-			recipients.add(player);
+			if (adminMessage && !player.isOp()) continue;
+			admins.add(player);
 		}
-		for (ChatCommandSender recipient : recipients) {
-			recipient.sendMessage(recipient.isConsole() ? new ChatTextComponent(component.toLegacyText()) : component);
-		}
+		this.toChatCommandSender(this.server).sendMessage(new ChatTextComponent(component.toLegacyText()));
+		admins.forEach((p) -> p.sendMessage(component));
 	}
 
 	public Collection<ChatPlayer> getOnlinePlayers() {
@@ -106,7 +104,7 @@ public class FabricChatModerator extends ChatModerator {
 
 	protected void spectatorsChat(ChatTranslateComponent component) {
 		Set<ChatCommandSender> recipients = new HashSet<>();
-		recipients.add(PARSER.toChatCommandSender(this.server));
+		recipients.add(this.toChatCommandSender(this.server));
 		for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
 			if (player.isSpectator()) {
 				recipients.add(this.toChatPlayer(player));
@@ -127,7 +125,7 @@ public class FabricChatModerator extends ChatModerator {
 
 	public ChatCommandSender toChatCommandSender(CommandSource sender) {
 		if (sender instanceof ServerPlayer) {
-			return (ChatCommandSender) this.toChatPlayer((ServerPlayer) sender);
+			return this.toChatPlayer((ServerPlayer) sender);
 		}
 		return sender != null ? new FabricChatCommandSender(PARSER, sender) : null;
 	}
