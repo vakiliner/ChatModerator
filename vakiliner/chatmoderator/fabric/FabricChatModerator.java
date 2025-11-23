@@ -32,7 +32,7 @@ import vakiliner.chatmoderator.fabric.event.AutoModerationTriggerCallback;
 
 public class FabricChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
-	public static final FabricParser PARSER = ChatComponentAPIFabricLoader.load();
+	public static final FabricParser PARSER = ChatComponentAPIFabricLoader.PARSER;
 	public final ConfigImpl config = new ConfigImpl();
 	private final ModContainer modContainer = FabricLoader.getInstance().getModContainer(ID).get();
 	protected MinecraftServer server;

@@ -31,7 +31,7 @@ import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
 
 public class ForgeChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
-	public static final ForgeParser PARSER = ChatComponentAPIForgeLoader.load();
+	public static final ForgeParser PARSER = ChatComponentAPIForgeLoader.PARSER;
 	public final ConfigImpl config = ConfigImpl.config;
 	protected MinecraftServer server;
 	private ChatModeratorModInitializer modInitializer;
