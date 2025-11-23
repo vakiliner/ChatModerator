@@ -29,7 +29,7 @@ import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public class BukkitChatModerator extends ChatModerator {
 	public static final String SPECTATORS_CHAT = "chatmoderator.spectator_chat";
-	public static final BukkitParser PARSER = ChatComponentAPIBukkitLoader.load();
+	public static final BukkitParser PARSER = ChatComponentAPIBukkitLoader.PARSER;
 	public final ConfigImpl config = new ConfigImpl();
 	private ChatModeratorPlugin plugin;
 
