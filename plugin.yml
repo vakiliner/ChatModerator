@@ -24,9 +24,6 @@ permissions:
   chatmoderator.*:
     description: Все разрешения для плагина ChatModerator
     children:
-      chatmoderator.spectator_chat:
-        description: Чат наблюдателя
-        default: false
       chatmoderator.bypass_moderation.*:
         description: Обход модерации
         children:
