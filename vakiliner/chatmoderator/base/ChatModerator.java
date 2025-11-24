@@ -50,6 +50,26 @@ public abstract class ChatModerator {
 		}
 	}
 
+	protected void setup(ILoader loader) {
+		String dictionaryFile = this.getConfig().dictionaryFile();
+		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
+			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
+				loader.saveResource("dictionary_ru.json", false);
+			}
+		}
+		try {
+			this.mutes.reload();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+		try {
+			this.automod.reload();
+			this.automod.reloadDictionary();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+	}
+
 	protected boolean checkConfigUpdates() {
 		Config config = this.getConfig();
 		int version = config.version();

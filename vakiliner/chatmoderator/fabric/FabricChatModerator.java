@@ -44,29 +44,13 @@ public class FabricChatModerator extends ChatModerator {
 
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
-		super.init(modInitializer);
+		super.init(this.modInitializer);
 		try {
 			this.reloadConfig();
 		} catch (IOException err) {
 			throw new RuntimeException(err);
 		}
-		String dictionaryFile = this.config.dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
-				this.modInitializer.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			this.mutes.reload();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
-		try {
-			this.automod.reload();
-			this.automod.reloadDictionary();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
+		super.setup(this.modInitializer);
 	}
 
 	public void saveConfig() throws IOException {

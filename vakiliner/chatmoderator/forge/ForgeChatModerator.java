@@ -44,7 +44,7 @@ public class ForgeChatModerator extends ChatModerator {
 
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
-		super.init(modInitializer);
+		super.init(this.modInitializer);
 		ModContainer modContainer = this.modInitializer.modContainer;
 		modContainer.addConfig(new ModConfig(ModConfig.Type.COMMON, ConfigImpl.configSpec, modContainer, "ChatModerator/config.toml"));
 	}
@@ -74,23 +74,7 @@ public class ForgeChatModerator extends ChatModerator {
 
 	@SubscribeEvent
 	public void onFMLCommonSetup(FMLCommonSetupEvent event) {
-		String dictionaryFile = this.config.dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
-				this.modInitializer.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			this.mutes.reload();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
-		try {
-			this.automod.reload();
-			this.automod.reloadDictionary();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
+		this.setup(this.modInitializer);
 	}
 
 	protected File getDataFolder() {

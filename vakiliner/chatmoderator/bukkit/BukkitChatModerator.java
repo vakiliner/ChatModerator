@@ -1,7 +1,6 @@
 package vakiliner.chatmoderator.bukkit;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,23 +38,7 @@ public class BukkitChatModerator extends ChatModerator {
 		this.plugin = plugin;
 		super.init(this.plugin);
 		this.plugin.getConfig();
-		String dictionaryFile = this.config.dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
-				this.plugin.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			this.mutes.reload();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
-		try {
-			this.automod.reload();
-			this.automod.reloadDictionary();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
+		this.setup(this.plugin);
 	}
 
 	void reloadConfig(FileConfiguration configuration) {
