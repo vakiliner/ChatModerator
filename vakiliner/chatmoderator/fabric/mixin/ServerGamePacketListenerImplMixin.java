@@ -34,18 +34,20 @@ public abstract class ServerGamePacketListenerImplMixin {
 		try {
 			manager.onChat(chatPlayer, message, callbackInfo::cancel, () -> {
 				callbackInfo.cancel();
-				ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", chatPlayer.getDisplayName(), new ChatTextComponent(message));
-				Set<ChatCommandSender> recipients = new HashSet<>();
-				MinecraftServer server = manager.getServer();
-				recipients.add(manager.toChatCommandSender(server));
-				for (ServerPlayer recipient : server.getPlayerList().getPlayers()) {
-					if (recipient.isSpectator()) {
-						recipients.add(manager.toChatPlayer(recipient));
+				player.getLevel().getServer().execute(() -> {
+					ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", chatPlayer.getDisplayName(), new ChatTextComponent(message));
+					Set<ChatCommandSender> recipients = new HashSet<>();
+					MinecraftServer server = manager.getServer();
+					recipients.add(manager.toChatCommandSender(server));
+					for (ServerPlayer recipient : server.getPlayerList().getPlayers()) {
+						if (recipient.isSpectator()) {
+							recipients.add(manager.toChatPlayer(recipient));
+						}
 					}
-				}
-				for (ChatCommandSender recipient : recipients) {
-					recipient.sendMessage(component);
-				}
+					for (ChatCommandSender recipient : recipients) {
+						recipient.sendMessage(component);
+					}
+				});
 			});
 		} catch (Throwable err) {
 			FabricChatModerator.LOGGER.error("Failed to handle chat", err);
