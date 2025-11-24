@@ -1,6 +1,7 @@
 package vakiliner.chatmoderator.bukkit;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import vakiliner.chatcomponentapi.ChatComponentAPIBukkitLoader;
@@ -35,7 +37,32 @@ public class BukkitChatModerator extends ChatModerator {
 
 	void init(ChatModeratorPlugin plugin) {
 		this.plugin = plugin;
-		super.init(plugin);
+		super.init(this.plugin);
+		this.plugin.getConfig();
+		String dictionaryFile = this.config.dictionaryFile();
+		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
+			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
+				this.plugin.saveResource("dictionary_ru.json", false);
+			}
+		}
+		try {
+			this.mutes.reload();
+		} catch (IOException err) {
+			err.printStackTrace();
+		}
+		try {
+			this.automod.reload();
+			this.automod.reloadDictionary();
+		} catch (IOException err) {
+			err.printStackTrace();
+		}
+	}
+
+	void reloadConfig(FileConfiguration configuration) {
+		this.config.reload(configuration);
+		if (this.checkConfigUpdates()) {
+			this.plugin.saveConfig();
+		}
 	}
 
 	public ChatModeratorPlugin getPlugin() {
