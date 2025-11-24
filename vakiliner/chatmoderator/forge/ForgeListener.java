@@ -7,6 +7,7 @@ import com.mojang.brigadier.ParseResults;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -15,8 +16,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
-import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
+import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.forge.command.MuteCommand;
 import vakiliner.chatmoderator.forge.command.MuteListCommand;
@@ -54,9 +55,9 @@ class ForgeListener {
 	public void onServerChat(ServerChatEvent event) {
 		ChatPlayer player = this.manager.toChatPlayer(event.getPlayer());
 		String message = event.getMessage();
-		this.manager.onChat(player, event.getMessage(), () -> event.setCanceled(true), () -> {
+		this.manager.onChat(player, message, () -> event.setCanceled(true), () -> {
 			event.setCanceled(true);
-			ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
+			ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), ForgeParser.forge(ForgeHooks.newChatWithLinks(message)));
 			Set<ChatCommandSender> recipients = new HashSet<>();
 			recipients.add(this.manager.toChatCommandSender(this.manager.server));
 			for (ServerPlayerEntity recipient : this.manager.server.getPlayerList().getPlayers()) {
