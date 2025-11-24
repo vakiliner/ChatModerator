@@ -4,16 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import com.google.gson.Gson;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.ILoader;
 
 public class ChatModeratorModInitializer implements ModInitializer, ILoader {
@@ -38,30 +32,6 @@ public class ChatModeratorModInitializer implements ModInitializer, ILoader {
 		if (!MANAGER.getConfigPath().toFile().exists()) {
 			this.saveResource("config.json", false);
 		}
-	}
-
-	public void saveConfig() {
-		try {
-			Files.write(MANAGER.getConfigPath(), new Gson().toJson(MANAGER.config.config).getBytes(StandardCharsets.UTF_8));
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
-	}
-
-	public void reloadConfig() {
-		Path path = MANAGER.getConfigPath();
-		GsonConfig config;
-		if (path.toFile().exists()) {
-			try {
-				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				err.printStackTrace();
-				return;
-			}
-		} else {
-			config = null;
-		}
-		MANAGER.config.reload(config);
 	}
 
 	public void saveResource(String resourcePath, boolean replace) {

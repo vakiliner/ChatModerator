@@ -2,6 +2,8 @@ package vakiliner.chatmoderator.fabric;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -23,6 +26,7 @@ import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.fabric.FabricChatCommandSender;
 import vakiliner.chatcomponentapi.fabric.FabricParser;
+import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
@@ -41,6 +45,50 @@ public class FabricChatModerator extends ChatModerator {
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
 		super.init(modInitializer);
+		try {
+			this.reloadConfig();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+		String dictionaryFile = this.config.dictionaryFile();
+		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
+			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
+				this.modInitializer.saveResource("dictionary_ru.json", false);
+			}
+		}
+		try {
+			this.mutes.reload();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+		try {
+			this.automod.reload();
+			this.automod.reloadDictionary();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+	}
+
+	public void saveConfig() throws IOException {
+		Files.write(MANAGER.getConfigPath(), new Gson().toJson(this.config.config).getBytes(StandardCharsets.UTF_8));
+	}
+
+	public void reloadConfig() throws IOException {
+		Path path = MANAGER.getConfigPath();
+		GsonConfig config;
+		if (path.toFile().exists()) {
+			try {
+				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
+			} catch (IOException err) {
+				throw err;
+			}
+		} else {
+			config = null;
+		}
+		this.config.reload(config);
+		if (this.checkConfigUpdates()) {
+			this.saveConfig();
+		}
 	}
 
 	public ChatModeratorModInitializer getModInitializer() {
