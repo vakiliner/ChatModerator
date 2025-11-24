@@ -55,6 +55,7 @@ class ForgeListener {
 		ChatPlayer player = this.manager.toChatPlayer(event.getPlayer());
 		String message = event.getMessage();
 		this.manager.onChat(player, event.getMessage(), () -> event.setCanceled(true), () -> {
+			event.setCanceled(true);
 			ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
 			Set<ChatCommandSender> recipients = new HashSet<>();
 			recipients.add(this.manager.toChatCommandSender(this.manager.server));

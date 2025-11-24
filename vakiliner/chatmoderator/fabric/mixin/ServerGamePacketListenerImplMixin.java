@@ -33,6 +33,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		String message = packet.getMessage();
 		try {
 			manager.onChat(chatPlayer, message, callbackInfo::cancel, () -> {
+				callbackInfo.cancel();
 				ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", chatPlayer.getDisplayName(), new ChatTextComponent(message));
 				Set<ChatCommandSender> recipients = new HashSet<>();
 				MinecraftServer server = manager.getServer();
