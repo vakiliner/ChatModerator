@@ -50,7 +50,7 @@ public class FabricChatModerator extends ChatModerator {
 		} catch (IOException err) {
 			throw new RuntimeException(err);
 		}
-		super.setup(this.modInitializer);
+		this.setup(this.modInitializer);
 	}
 
 	public void saveConfig() throws IOException {
