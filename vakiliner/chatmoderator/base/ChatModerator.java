@@ -48,14 +48,33 @@ public abstract class ChatModerator {
 		if (!this.getAutoModerationRulesPath().toFile().exists()) {
 			loader.saveResource("auto_moderation_rules.json", false);
 		}
-		loader.reloadConfig();
-		int configVersion = this.getConfig().version();
-		if (configVersion != CONFIG_VERSION) {
-			if (configVersion < Short.MIN_VALUE || configVersion > CONFIG_VERSION) throw new IllegalStateException("Unsupported config version " + configVersion);
-			this.log("Updating config to new version " + CONFIG_VERSION);
-			switch (configVersion - Short.MIN_VALUE) {
+	}
+
+	protected void setup(ILoader loader) {
+		String dictionaryFile = this.getConfig().dictionaryFile();
+		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
+			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
+				loader.saveResource("dictionary_ru.json", false);
+			}
+		}
+		try {
+			this.mutes.reload();
+			this.automod.reload();
+			this.automod.reloadDictionary();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+	}
+
+	protected boolean checkConfigUpdates() {
+		Config config = this.getConfig();
+		int version = config.version();
+		if (version != CONFIG_VERSION) {
+			if (version < Short.MIN_VALUE || version > CONFIG_VERSION) throw new IllegalStateException("Unsupported config version " + version);
+			this.log("Updating config to a new version " + CONFIG_VERSION);
+			switch (version - Short.MIN_VALUE) {
 				case 0:
-					this.getConfig().showFailMessage(true);
+					config.showFailMessage(true);
 					Map<String, String> messages = new HashMap<>();
 					messages.put("fail_send_message", "Ваше сообщение не было отправлено");
 					messages.put("fail_send_command", "Не удалось использовать команду");
@@ -65,7 +84,7 @@ public abstract class ChatModerator {
 					messages.put("fail_reasons.long_message", "Слишком длинное сообщение");
 					messages.put("fail_reasons.automod_blocked_without_custom_message", "Публикация невозможна, поскольку сообщение содержит материалы, заблокированные этим сервером. Владельцы сервера также могут просматривать содержимое сообщений.");
 					messages.put("fail_reasons.automod_blocked_with_custom_message", "Содержимое сообщения заблокировано сервером. Сообщение от модераторов: «%s»");
-					this.getConfig().messages(messages);
+					config.messages(messages);
 					Path autoModerationRulesPath = this.getAutoModerationRulesPath();
 					if (autoModerationRulesPath.toFile().exists()) {
 						final JsonArray rules;
@@ -94,29 +113,13 @@ public abstract class ChatModerator {
 						}
 					}
 				case 1:
-					this.getConfig().logBlockedMessages(false);
-					this.getConfig().logBlockedCommands(false);
+					config.logBlockedMessages(false);
+					config.logBlockedCommands(false);
 			}
-			this.getConfig().version(CONFIG_VERSION);
-			loader.saveConfig();
+			config.version(CONFIG_VERSION);
+			return true;
 		}
-		String dictionaryFile = this.getConfig().dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
-				loader.saveResource("dictionary_ru.json", false);
-			}
-		}
-		try {
-			this.mutes.reload();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
-		try {
-			this.automod.reload();
-			this.automod.reloadDictionary();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
+		return false;
 	}
 
 	protected abstract void log(String message);
