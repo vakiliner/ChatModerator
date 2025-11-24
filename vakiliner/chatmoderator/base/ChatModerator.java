@@ -59,10 +59,6 @@ public abstract class ChatModerator {
 		}
 		try {
 			this.mutes.reload();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
-		try {
 			this.automod.reload();
 			this.automod.reloadDictionary();
 		} catch (IOException err) {
