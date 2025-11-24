@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -22,6 +23,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextDecoration.State;
+import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
@@ -226,6 +228,10 @@ public class PaperParser extends SpigotParser {
 		} else {
 			return ChatTextColor.color(color.value(), null);
 		}
+	}
+
+	public ChatPlayer toChatPlayer(Player player) {
+		return player != null ? new PaperChatPlayer(this, player) : null;
 	}
 
 	public ChatTeam toChatTeam(Team team) {
