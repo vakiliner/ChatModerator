@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import vakiliner.chatcomponentapi.ChatComponentAPIBukkitLoader;
@@ -35,7 +36,16 @@ public class BukkitChatModerator extends ChatModerator {
 
 	void init(ChatModeratorPlugin plugin) {
 		this.plugin = plugin;
-		super.init(plugin);
+		super.init(this.plugin);
+		this.plugin.getConfig();
+		this.setup(this.plugin);
+	}
+
+	void reloadConfig(FileConfiguration configuration) {
+		this.config.reload(configuration);
+		if (this.checkConfigUpdates()) {
+			this.plugin.saveConfig();
+		}
 	}
 
 	public ChatModeratorPlugin getPlugin() {

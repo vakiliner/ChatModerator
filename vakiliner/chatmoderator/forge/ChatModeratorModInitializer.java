@@ -9,8 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.config.ModConfig.Type;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import vakiliner.chatmoderator.base.ILoader;
 
 @Mod(ForgeChatModerator.ID)
@@ -32,6 +31,7 @@ public class ChatModeratorModInitializer implements ILoader {
 		this.modContainer = context.getActiveContainer();
 		this.classLoader = this.getClass().getClassLoader();
 		MANAGER.init(this);
+		FMLJavaModLoadingContext.get().getModEventBus().register(MANAGER);
 		MinecraftForge.EVENT_BUS.register(this.listener);
 		ForgeChatModerator.LOGGER.info("Готов. Ждёт активации сервера");
 	}
@@ -40,15 +40,6 @@ public class ChatModeratorModInitializer implements ILoader {
 		if (!MANAGER.getConfigPath().toFile().exists()) {
 			this.saveResource("config.toml", false);
 		}
-	}
-
-	public void saveConfig() {
-		ConfigImpl.configSpec.save();
-	}
-
-	@Deprecated
-	public void reloadConfig() {
-		this.modContainer.addConfig(new ModConfig(Type.COMMON, ConfigImpl.configSpec, this.modContainer, "ChatModerator/config.toml"));
 	}
 
 	public void saveResource(String resourcePath, boolean replace) {
