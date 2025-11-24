@@ -15,6 +15,11 @@ import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -29,6 +34,7 @@ import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
 
+@EventBusSubscriber(modid = ForgeChatModerator.ID, bus = EventBusSubscriber.Bus.MOD)
 public class ForgeChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
 	public static final ForgeParser PARSER = ChatComponentAPIForgeLoader.PARSER;
@@ -39,6 +45,8 @@ public class ForgeChatModerator extends ChatModerator {
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
 		super.init(modInitializer);
+		ModContainer modContainer = this.modInitializer.modContainer;
+		modContainer.addConfig(new ModConfig(ModConfig.Type.COMMON, ConfigImpl.configSpec, modContainer, "ChatModerator/config.toml"));
 	}
 
 	public ChatModeratorModInitializer getModInitializer() {
@@ -55,6 +63,34 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public ConfigImpl getConfig() {
 		return this.config;
+	}
+
+	@SubscribeEvent
+	public void onModConfigLoading(ModConfig.Loading reloading) {
+		if (reloading.getConfig().getSpec() == ConfigImpl.configSpec) {
+			this.checkConfigUpdates();
+		}
+	}
+
+	@SubscribeEvent
+	public void onFMLCommonSetup(FMLCommonSetupEvent event) {
+		String dictionaryFile = this.config.dictionaryFile();
+		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
+			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
+				this.modInitializer.saveResource("dictionary_ru.json", false);
+			}
+		}
+		try {
+			this.mutes.reload();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+		try {
+			this.automod.reload();
+			this.automod.reloadDictionary();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
 	}
 
 	protected File getDataFolder() {
