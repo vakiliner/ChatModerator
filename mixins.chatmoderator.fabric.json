@@ -4,7 +4,7 @@
 	"package": "vakiliner.chatmoderator.fabric.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [
-		"ServerGamePacketListenerImplMixin"
+		"PlayerListMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
