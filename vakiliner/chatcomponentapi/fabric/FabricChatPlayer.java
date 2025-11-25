@@ -20,6 +20,10 @@ public class FabricChatPlayer extends FabricChatOfflinePlayer implements ChatPla
 		return this.player;
 	}
 
+	public ChatComponent getDisplayName() {
+		return FabricParser.fabric(this.player.getDisplayName());
+	}
+
 	public ChatGameMode getGameMode() {
 		return ChatGameMode.getByValue(this.player.gameMode.getGameModeForPlayer().getId());
 	}

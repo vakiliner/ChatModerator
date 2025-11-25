@@ -17,7 +17,6 @@ import vakiliner.chatcomponentapi.ChatComponentAPIBukkitLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
-import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitChatCommandSender;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
 import vakiliner.chatmoderator.base.ChatModerator;
@@ -29,7 +28,6 @@ import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public class BukkitChatModerator extends ChatModerator {
-	public static final String SPECTATORS_CHAT = "chatmoderator.spectator_chat";
 	public static final BukkitParser PARSER = ChatComponentAPIBukkitLoader.PARSER;
 	public final ConfigImpl config = new ConfigImpl();
 	private ChatModeratorPlugin plugin;
@@ -98,18 +96,6 @@ public class BukkitChatModerator extends ChatModerator {
 		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.craftbukkit.BukkitChatPlayer) player).getPlayer(), checkResult, actions, !Bukkit.isPrimaryThread());
 		Bukkit.getPluginManager().callEvent(event);
 		return !event.isCancelled();
-	}
-
-	protected void spectatorsChat(ChatTranslateComponent component) {
-		Set<ChatCommandSender> recipients = new HashSet<>();
-		for (Permissible permissible : Bukkit.getPluginManager().getPermissionSubscriptions(SPECTATORS_CHAT)) {
-			if (permissible instanceof CommandSender && permissible.hasPermission(SPECTATORS_CHAT)) {
-				recipients.add(this.toChatCommandSender((CommandSender) permissible));
-			}
-		}
-		for (ChatCommandSender recipient : recipients) {
-			recipient.sendMessage(component);
-		}
 	}
 
 	public ChatOfflinePlayer getOfflinePlayerIfCached(String name) {

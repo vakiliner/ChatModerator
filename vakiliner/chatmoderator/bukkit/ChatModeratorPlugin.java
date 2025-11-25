@@ -34,7 +34,6 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 
 	public void onEnable() {
 		MANAGER.init(this);
-		Bukkit.getConsoleSender().addAttachment(this, "chatmoderator.spectator_chat", true);
 		Bukkit.getPluginManager().registerEvents(this.listener, this);
 		this.getCommand("mute").setExecutor(new MuteCommand(MANAGER));
 		this.getCommand("unmute").setExecutor(new UnmuteCommand(MANAGER));

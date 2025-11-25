@@ -151,11 +151,9 @@ public abstract class ChatModerator {
 
 	public abstract void broadcast(ChatComponent component, boolean admins);
 
-	protected abstract void spectatorsChat(ChatTranslateComponent component);
-
 	public abstract Collection<ChatPlayer> getOnlinePlayers();
 
-	public void onChat(ChatPlayer player, final String fullMessage, Runnable cancel) {
+	public void onChat(ChatPlayer player, final String fullMessage, Runnable cancel, Runnable spectatorsChatRunnable) {
 		boolean isCommand = fullMessage.startsWith("/");
 		final String message;
 		if (!isCommand) {
@@ -217,8 +215,7 @@ public abstract class ChatModerator {
 			return;
 		}
 		boolean spectatorsChat = this.getConfig().spectatorsChat() && player.getGameMode() == ChatGameMode.SPECTATOR;
-		String cancelReason = spectatorsChat && isCommand ? this.getConfig().message("fail_reasons.cannot_use_msg_command_in_spectator") : null;
-		if (cancelReason == null) cancelReason = this.checkMessage(player, message);
+		String cancelReason = spectatorsChat && isCommand ? this.getConfig().message("fail_reasons.cannot_use_msg_command_in_spectator") : this.checkMessage(player, message);
 		if (cancelReason != null) {
 			cancel.run();
 			if (this.getConfig().logBlockedMessages() && (!isCommand || this.getConfig().logBlockedCommands())) {
@@ -252,10 +249,7 @@ public abstract class ChatModerator {
 			player.sendMessage(error);
 			return;
 		}
-		if (spectatorsChat) {
-			cancel.run();
-			this.spectatorsChat(new ChatTranslateComponent("<%s> %s", "chat.type.text", ChatTextComponent.selector(player), new ChatTextComponent(fullMessage)));
-		}
+		if (spectatorsChat) spectatorsChatRunnable.run();
 	}
 
 	private String checkMessage(ChatPlayer player, String message) {

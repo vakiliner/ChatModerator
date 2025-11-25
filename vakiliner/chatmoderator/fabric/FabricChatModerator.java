@@ -23,7 +23,6 @@ import vakiliner.chatcomponentapi.ChatComponentAPIFabricLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
-import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.fabric.FabricChatCommandSender;
 import vakiliner.chatcomponentapi.fabric.FabricParser;
 import vakiliner.chatmoderator.api.GsonConfig;
@@ -132,19 +131,6 @@ public class FabricChatModerator extends ChatModerator {
 
 	public Collection<ChatPlayer> getOnlinePlayers() {
 		return this.server.getPlayerList().getPlayers().stream().map(this::toChatPlayer).collect(Collectors.toList());
-	}
-
-	protected void spectatorsChat(ChatTranslateComponent component) {
-		Set<ChatCommandSender> recipients = new HashSet<>();
-		recipients.add(this.toChatCommandSender(this.server));
-		for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
-			if (player.isSpectator()) {
-				recipients.add(this.toChatPlayer(player));
-			}
-		}
-		for (ChatCommandSender recipient : recipients) {
-			recipient.sendMessage(component);
-		}
 	}
 
 	public ChatPlayer toChatPlayer(ServerPlayer player) {

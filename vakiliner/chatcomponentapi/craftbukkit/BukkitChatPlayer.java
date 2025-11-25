@@ -6,6 +6,7 @@ import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.common.ChatGameMode;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 public class BukkitChatPlayer extends BukkitChatOfflinePlayer implements ChatPlayer {
 	public BukkitChatPlayer(BukkitParser parser, Player player) {
@@ -14,6 +15,10 @@ public class BukkitChatPlayer extends BukkitChatOfflinePlayer implements ChatPla
 
 	public Player getPlayer() {
 		return (Player) super.getPlayer();
+	}
+
+	public ChatComponent getDisplayName() {
+		return new ChatTextComponent(this.getPlayer().getDisplayName());
 	}
 
 	@SuppressWarnings("deprecation")
