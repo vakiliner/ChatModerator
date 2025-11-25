@@ -26,11 +26,12 @@ public abstract class ServerGamePacketListenerImplMixin {
 
 	@Inject(at = @At("INVOKE"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", cancellable = true)
 	void handleChat(ServerboundChatPacket packet, CallbackInfo callbackInfo) {
+		String message = packet.getMessage();
+		if (message.startsWith("/")) return;
 		ServerPlayer player = this.getPlayer();
 		if (player.getChatVisibility() == ChatVisiblity.HIDDEN) return;
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
 		ChatPlayer chatPlayer = manager.toChatPlayer(player);
-		String message = packet.getMessage();
 		try {
 			manager.onChat(chatPlayer, message, callbackInfo::cancel, () -> {
 				callbackInfo.cancel();
@@ -52,5 +53,11 @@ public abstract class ServerGamePacketListenerImplMixin {
 		} catch (Throwable err) {
 			FabricChatModerator.LOGGER.error("Failed to handle chat", err);
 		}
+	}
+
+	@Inject(at = @At("INVOKE"), method = "handleCommand", cancellable = true)
+	void handleCommand(String command, CallbackInfo callbackInfo) {
+		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
+		manager.onChat(manager.toChatPlayer(this.getPlayer()), command, callbackInfo::cancel, null);
 	}
 }
