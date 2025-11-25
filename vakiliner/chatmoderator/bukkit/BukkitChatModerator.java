@@ -93,7 +93,7 @@ public class BukkitChatModerator extends ChatModerator {
 	}
 
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
-		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.craftbukkit.BukkitChatPlayer) player).getPlayer(), checkResult, actions);
+		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.craftbukkit.BukkitChatPlayer) player).getPlayer(), checkResult, actions, !Bukkit.isPrimaryThread());
 		Bukkit.getPluginManager().callEvent(event);
 		return !event.isCancelled();
 	}
