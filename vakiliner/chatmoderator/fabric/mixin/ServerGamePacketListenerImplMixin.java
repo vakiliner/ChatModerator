@@ -58,6 +58,10 @@ public abstract class ServerGamePacketListenerImplMixin {
 	@Inject(at = @At("INVOKE"), method = "handleCommand", cancellable = true)
 	void handleCommand(String command, CallbackInfo callbackInfo) {
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		manager.onChat(manager.toChatPlayer(this.getPlayer()), command, callbackInfo::cancel, null);
+		try {
+			manager.onChat(manager.toChatPlayer(this.getPlayer()), command, callbackInfo::cancel, null);
+		} catch (Throwable err) {
+			FabricChatModerator.LOGGER.error("Failed to handle command", err);
+		}
 	}
 }
