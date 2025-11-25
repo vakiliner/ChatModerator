@@ -19,7 +19,13 @@ public class AutoModerationTriggerEvent extends Event implements Cancellable {
 	private boolean cancel = false;
 
 	public AutoModerationTriggerEvent(Player sender, CheckResult checkResult, MessageActions actions) {
-		super(true);
+		this.sender = sender;
+		this.checkResult = checkResult;
+		this.actions = actions;
+	}
+
+	public AutoModerationTriggerEvent(Player sender, CheckResult checkResult, MessageActions actions, boolean isAsync) {
+		super(isAsync);
 		this.sender = sender;
 		this.checkResult = checkResult;
 		this.actions = actions;
