@@ -128,21 +128,23 @@ public abstract class ChatModerator {
 
 	protected abstract File getDataFolder();
 
+	protected abstract Path getFolderPath();
+
 	public abstract Path getConfigPath();
 
 	public abstract String getName();
 
 	public Path getMutesPath() {
-		return this.getDataFolder().toPath().resolve("mutes.json");
+		return this.getFolderPath().resolve("mutes.json");
 	}
 
 	public Path getAutoModerationRulesPath() {
-		return this.getDataFolder().toPath().resolve("auto_moderation_rules.json");
+		return this.getFolderPath().resolve("auto_moderation_rules.json");
 	}
 
 	public Path getAutoModerationDictionaryPath() {
 		String name = this.getConfig().dictionaryFile();
-		return name != null ? this.getDataFolder().toPath().resolve(name) : null;
+		return name != null ? this.getFolderPath().resolve(name) : null;
 	}
 
 	public void broadcast(ChatComponent component) {
@@ -186,8 +188,8 @@ public abstract class ChatModerator {
 						if (i == -1) i = fullMessage.length();
 						String recipient = fullMessage.substring(Math.min(fullCommand.length() + 2, fullMessage.length()), i);
 						if (recipient.startsWith("@")) {
-							player.sendMessage(new ChatTranslateComponent("Selector not allowed", "argument.entity.selector.not_allowed", ChatNamedColor.RED));
 							cancel.run();
+							player.sendMessage(new ChatTranslateComponent("Selector not allowed", "argument.entity.selector.not_allowed", ChatNamedColor.RED));
 							return;
 						}
 						message = fullMessage.substring(Math.min(i + 1, fullMessage.length()));

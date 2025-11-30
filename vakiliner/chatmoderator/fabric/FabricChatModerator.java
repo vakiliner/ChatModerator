@@ -29,6 +29,7 @@ import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.fabric.event.AutoModerationTriggerCallback;
@@ -86,11 +87,11 @@ public class FabricChatModerator extends ChatModerator {
 		LOGGER.info(message);
 	}
 
-	public ConfigImpl getConfig() {
+	public Config getConfig() {
 		return this.config;
 	}
 
-	protected File getDataFolder() {
+	protected Path getFolderPath() {
 		Path path = FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
 		if (!path.toFile().exists()) {
 			try {
@@ -99,11 +100,15 @@ public class FabricChatModerator extends ChatModerator {
 				throw new RuntimeException("Creating data folder", err);
 			}
 		}
-		return path.toFile();
+		return path;
+	}
+
+	protected File getDataFolder() {
+		return this.getFolderPath().toFile();
 	}
 
 	public Path getConfigPath() {
-		return this.getDataFolder().toPath().resolve("config.json");
+		return this.getFolderPath().resolve("config.json");
 	}
 
 	public String getName() {

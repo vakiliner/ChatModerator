@@ -29,6 +29,7 @@ import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
@@ -60,7 +61,7 @@ public class ForgeChatModerator extends ChatModerator {
 		LOGGER.info(message);
 	}
 
-	public ConfigImpl getConfig() {
+	public Config getConfig() {
 		return this.config;
 	}
 
@@ -76,7 +77,7 @@ public class ForgeChatModerator extends ChatModerator {
 		this.setup(this.modInitializer);
 	}
 
-	protected File getDataFolder() {
+	protected Path getFolderPath() {
 		Path path = new File(".").toPath().resolve("config").resolve("ChatModerator");
 		if (!path.toFile().exists()) {
 			try {
@@ -85,11 +86,15 @@ public class ForgeChatModerator extends ChatModerator {
 				throw new RuntimeException("Creating data folder", err);
 			}
 		}
-		return path.toFile();
+		return path;
+	}
+
+	protected File getDataFolder() {
+		return this.getFolderPath().toFile();
 	}
 
 	public Path getConfigPath() {
-		return this.getDataFolder().toPath().resolve("config.toml");
+		return this.getFolderPath().resolve("config.toml");
 	}
 
 	public String getName() {
