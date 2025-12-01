@@ -92,7 +92,7 @@ public class PaperParser extends SpigotParser {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}
 		Style style = raw.style();
-		chatComponent.setColor(paperColor(style.color()));
+		chatComponent.setColor(paper(style.color()));
 		for (Map.Entry<TextDecoration, TextDecoration.State> entry : raw.decorations().entrySet()) {
 			TextDecoration.State isSetted = entry.getValue();
 			if (isSetted != TextDecoration.State.NOT_SET) {
@@ -181,7 +181,7 @@ public class PaperParser extends SpigotParser {
 		Style.Builder builder = Style.style();
 		ChatTextColor color = component.getColor();
 		if (color != null) {
-			builder.color(paperColor(color));
+			builder.color(paper(color));
 		}
 		for (Map.Entry<ChatComponentFormat, Boolean> entry : component.getFormatsRaw().entrySet()) {
 			Boolean isSetted = entry.getValue();
@@ -210,7 +210,7 @@ public class PaperParser extends SpigotParser {
 		return decoration != null ? ChatComponentFormat.getByName(decoration.toString()) : null;
 	}
 
-	public static TextColor paperColor(ChatTextColor color) {
+	public static TextColor paper(ChatTextColor color) {
 		if (color == null) {
 			return null;
 		} else if (color instanceof ChatNamedColor) {
@@ -220,7 +220,7 @@ public class PaperParser extends SpigotParser {
 		}
 	}
 
-	public static ChatTextColor paperColor(TextColor color) {
+	public static ChatTextColor paper(TextColor color) {
 		if (color == null) {
 			return null;
 		} else if (color instanceof NamedTextColor) {
@@ -228,6 +228,16 @@ public class PaperParser extends SpigotParser {
 		} else {
 			return ChatTextColor.color(color.value(), null);
 		}
+	}
+
+	@Deprecated
+	public static TextColor paperColor(ChatTextColor color) {
+		return paper(color);
+	}
+
+	@Deprecated
+	public static ChatTextColor paperColor(TextColor color) {
+		return paper(color);
 	}
 
 	public ChatPlayer toChatPlayer(Player player) {
