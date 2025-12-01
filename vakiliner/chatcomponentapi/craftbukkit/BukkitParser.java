@@ -24,7 +24,7 @@ public class BukkitParser extends BaseParser {
 		Method method;
 		try {
 			method = clazz.getMethod("sendMessage", UUID.class, String.class);
-		} catch (NoSuchMethodException err) {
+		} catch (NoSuchMethodException | SecurityException err) {
 			method = null;
 		}
 		sendMessageWithUUID = method != null;

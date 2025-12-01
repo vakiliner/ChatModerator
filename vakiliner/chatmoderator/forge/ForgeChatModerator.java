@@ -29,7 +29,6 @@ import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
-import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
@@ -61,7 +60,7 @@ public class ForgeChatModerator extends ChatModerator {
 		LOGGER.info(message);
 	}
 
-	public Config getConfig() {
+	public ConfigImpl getConfig() {
 		return this.config;
 	}
 
