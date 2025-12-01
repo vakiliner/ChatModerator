@@ -90,7 +90,7 @@ public class FabricChatModerator extends ChatModerator {
 		return this.config;
 	}
 
-	protected File getDataFolder() {
+	protected Path getFolderPath() {
 		Path path = FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
 		if (!path.toFile().exists()) {
 			try {
@@ -99,11 +99,15 @@ public class FabricChatModerator extends ChatModerator {
 				throw new RuntimeException("Creating data folder", err);
 			}
 		}
-		return path.toFile();
+		return path;
+	}
+
+	protected File getDataFolder() {
+		return this.getFolderPath().toFile();
 	}
 
 	public Path getConfigPath() {
-		return this.getDataFolder().toPath().resolve("config.json");
+		return this.getFolderPath().resolve("config.json");
 	}
 
 	public String getName() {

@@ -76,7 +76,7 @@ public class ForgeChatModerator extends ChatModerator {
 		this.setup(this.modInitializer);
 	}
 
-	protected File getDataFolder() {
+	protected Path getFolderPath() {
 		Path path = new File(".").toPath().resolve("config").resolve("ChatModerator");
 		if (!path.toFile().exists()) {
 			try {
@@ -85,11 +85,15 @@ public class ForgeChatModerator extends ChatModerator {
 				throw new RuntimeException("Creating data folder", err);
 			}
 		}
-		return path.toFile();
+		return path;
+	}
+
+	protected File getDataFolder() {
+		return this.getFolderPath().toFile();
 	}
 
 	public Path getConfigPath() {
-		return this.getDataFolder().toPath().resolve("config.toml");
+		return this.getFolderPath().resolve("config.toml");
 	}
 
 	public String getName() {

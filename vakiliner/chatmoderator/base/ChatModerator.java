@@ -128,21 +128,23 @@ public abstract class ChatModerator {
 
 	protected abstract File getDataFolder();
 
+	protected abstract Path getFolderPath();
+
 	public abstract Path getConfigPath();
 
 	public abstract String getName();
 
 	public Path getMutesPath() {
-		return this.getDataFolder().toPath().resolve("mutes.json");
+		return this.getFolderPath().resolve("mutes.json");
 	}
 
 	public Path getAutoModerationRulesPath() {
-		return this.getDataFolder().toPath().resolve("auto_moderation_rules.json");
+		return this.getFolderPath().resolve("auto_moderation_rules.json");
 	}
 
 	public Path getAutoModerationDictionaryPath() {
 		String name = this.getConfig().dictionaryFile();
-		return name != null ? this.getDataFolder().toPath().resolve(name) : null;
+		return name != null ? this.getFolderPath().resolve(name) : null;
 	}
 
 	public void broadcast(ChatComponent component) {

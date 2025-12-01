@@ -66,8 +66,12 @@ public class BukkitChatModerator extends ChatModerator {
 		return this.plugin.getDataFolder();
 	}
 
+	protected Path getFolderPath() {
+		return this.getDataFolder().toPath();
+	}
+
 	public Path getConfigPath() {
-		return this.plugin.getDataFolder().toPath().resolve("config.yml");
+		return this.getFolderPath().resolve("config.yml");
 	}
 
 	public String getName() {
