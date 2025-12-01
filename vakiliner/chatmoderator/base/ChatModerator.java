@@ -188,8 +188,8 @@ public abstract class ChatModerator {
 						if (i == -1) i = fullMessage.length();
 						String recipient = fullMessage.substring(Math.min(fullCommand.length() + 2, fullMessage.length()), i);
 						if (recipient.startsWith("@")) {
-							player.sendMessage(new ChatTranslateComponent("Selector not allowed", "argument.entity.selector.not_allowed", ChatNamedColor.RED));
 							cancel.run();
+							player.sendMessage(new ChatTranslateComponent("Selector not allowed", "argument.entity.selector.not_allowed", ChatNamedColor.RED));
 							return;
 						}
 						message = fullMessage.substring(Math.min(i + 1, fullMessage.length()));

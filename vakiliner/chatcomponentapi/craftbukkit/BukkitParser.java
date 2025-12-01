@@ -24,14 +24,14 @@ public class BukkitParser extends BaseParser {
 		Method method;
 		try {
 			method = clazz.getMethod("sendMessage", UUID.class, String.class);
-		} catch (NoSuchMethodException | SecurityException err) {
+		} catch (NoSuchMethodException err) {
 			method = null;
 		}
 		sendMessageWithUUID = method != null;
 	}
 
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
-		if (sendMessageWithUUID && type == ChatMessageType.CHAT) {
+		if (type == ChatMessageType.CHAT && sendMessageWithUUID) {
 			sender.sendMessage(uuid, component.toLegacyText());
 		} else {
 			sender.sendMessage(component.toLegacyText());
@@ -52,7 +52,7 @@ public class BukkitParser extends BaseParser {
 
 	public ChatOfflinePlayer toChatOfflinePlayer(OfflinePlayer player) {
 		if (player instanceof Player) {
-			return this.toChatPlayer(((Player) player));
+			return this.toChatPlayer((Player) player);
 		}
 		return player != null ? new BukkitChatOfflinePlayer(this, player) : null;
 	}
