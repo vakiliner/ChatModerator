@@ -55,7 +55,7 @@ class HoverEventContents implements IStyleParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <V> ChatHoverEvent<?> hoverEvent(HoverEvent event) {
+	public static <V> ChatHoverEvent<V> hoverEvent(HoverEvent event) {
 		if (event == null) return null;
 		HoverEvent.Action<?> action = event.getAction();
 		return new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(action.getName()), (V) fabricContent2(event.getValue(action)));
