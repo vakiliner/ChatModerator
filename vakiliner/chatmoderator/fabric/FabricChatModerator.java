@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -112,8 +113,9 @@ public class FabricChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		String name = this.modContainer.getMetadata().getName();
-		return name != null ? name : this.modContainer.getMetadata().getId();
+		ModMetadata metadata = this.modContainer.getMetadata();
+		String name = metadata.getName();
+		return name != null ? name : metadata.getId();
 	}
 
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {

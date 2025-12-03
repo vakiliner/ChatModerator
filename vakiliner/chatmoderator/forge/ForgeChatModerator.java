@@ -20,6 +20,7 @@ import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forgespi.language.IModInfo;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -98,8 +99,9 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		String displayName = this.modInitializer.modContainer.getModInfo().getDisplayName();
-		return displayName != null ? displayName : this.modInitializer.modContainer.getModId();
+		IModInfo modInfo = this.modInitializer.modContainer.getModInfo();
+		String displayName = modInfo.getDisplayName();
+		return displayName != null ? displayName : modInfo.getModId();
 	}
 
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
