@@ -20,6 +20,7 @@ import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forgespi.language.IModInfo;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -29,6 +30,7 @@ import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
@@ -60,7 +62,7 @@ public class ForgeChatModerator extends ChatModerator {
 		LOGGER.info(message);
 	}
 
-	public ConfigImpl getConfig() {
+	public Config getConfig() {
 		return this.config;
 	}
 
@@ -97,8 +99,9 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		String displayName = this.modInitializer.modContainer.getModInfo().getDisplayName();
-		return displayName != null ? displayName : this.modInitializer.modContainer.getModId();
+		IModInfo modInfo = this.modInitializer.modContainer.getModInfo();
+		String displayName = modInfo.getDisplayName();
+		return displayName != null ? displayName : modInfo.getModId();
 	}
 
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {

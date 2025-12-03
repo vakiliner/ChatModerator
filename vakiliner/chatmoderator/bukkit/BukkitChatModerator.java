@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.plugin.PluginDescriptionFile;
 import vakiliner.chatcomponentapi.ChatComponentAPIBukkitLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -75,8 +76,9 @@ public class BukkitChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		String prefix = this.plugin.getDescription().getPrefix();
-		return prefix != null ? prefix : this.plugin.getDescription().getName();
+		PluginDescriptionFile description = this.plugin.getDescription();
+		String prefix = description.getPrefix();
+		return prefix != null ? prefix : description.getName();
 	}
 
 	public void broadcast(ChatComponent chatComponent, boolean admins) {
@@ -119,7 +121,7 @@ public class BukkitChatModerator extends ChatModerator {
 
 	public ChatOfflinePlayer toChatOfflinePlayer(OfflinePlayer player) {
 		if (player instanceof Player) {
-			return this.toChatPlayer(((Player) player));
+			return this.toChatPlayer((Player) player);
 		}
 		return player != null ? new BukkitChatOfflinePlayer(this, player) : null;
 	}

@@ -36,7 +36,7 @@ public class MuteCommand {
 		return mute.requires((stack) -> {
 			return stack.hasPermission(3);
 		}).then(Commands.argument("target", GameProfileArgument.gameProfile()).suggests((context, builder) -> {
-			return SharedSuggestionProvider.suggest(manager.getOnlinePlayers().stream().filter((player) -> !player.isMuted()).map(ChatPlayer::getName).collect(Collectors.toList()), builder);
+			return SharedSuggestionProvider.suggest(ChatModeratorModInitializer.MANAGER.getOnlinePlayers().stream().filter((player) -> !player.isMuted()).map(ChatPlayer::getName).collect(Collectors.toList()), builder);
 		}).then(Commands.argument("duration", new ArgumentType<Integer>() {
 			public Integer parse(StringReader reader) throws CommandSyntaxException {
 				int start = reader.getCursor();
