@@ -41,7 +41,7 @@ import vakiliner.chatcomponentapi.spigot.SpigotParser;
 
 public class PaperParser extends SpigotParser {
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
-		if (sendMessageWithUUID && uuid != null) {
+		if (uuid != null && sendMessageWithUUID) {
 			sender.sendMessage(Identity.identity(uuid), paper(component), paper(type));
 		} else {
 			sender.sendMessage(paper(component), paper(type));
