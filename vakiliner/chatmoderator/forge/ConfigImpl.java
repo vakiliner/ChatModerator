@@ -32,9 +32,9 @@ class ConfigImpl implements Config {
 		this.maxMessageLength = builder.translation("null").defineInRange("max_message_length", 128, 0, 128);
 		this.maxMuteReasonLength = builder.translation("null").defineInRange("max_mute_reason_length", 64, 0, 64);
 		this.autoModerationEnabled = builder.translation("null").define("auto_moderation_enabled", false);
-		this.autoModerationUseThreadPool = builder.translation("null").define("fix_chat", false);
-		this.spectatorsChat = builder.translation("null").define("auto_moderation_use_thread_pool", false);
-		this.fixChat = builder.translation("null").define("spectators_chat", false);
+		this.autoModerationUseThreadPool = builder.translation("null").define("auto_moderation_use_thread_pool", false);
+		this.spectatorsChat = builder.translation("null").define("spectators_chat", false);
+		this.fixChat = builder.translation("null").define("fix_chat", false);
 		this.dictionaryFile = builder.translation("null").define("dictionary_file", "");
 		this.showFailMessage = builder.translation("null").define("show_fail_message", true);
 		this.logBlockedMessages = builder.translation("null").define("log_blocked_messages", false);
