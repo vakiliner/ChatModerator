@@ -61,14 +61,6 @@ class ConfigImpl implements Config {
 		this.configuration.set("spectators_chat", enabled);
 	}
 
-	public boolean fixChat() {
-		return this.configuration.getBoolean("fix_chat", false);
-	}
-
-	public void fixChat(boolean fix) {
-		this.configuration.set("fix_chat", fix);
-	}
-
 	public String dictionaryFile() {
 		return this.configuration.getString("dictionary_file", null);
 	}

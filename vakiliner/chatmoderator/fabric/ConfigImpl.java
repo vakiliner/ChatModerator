@@ -61,14 +61,6 @@ class ConfigImpl implements Config {
 		this.config.spectators_chat = enabled;
 	}
 
-	public boolean fixChat() {
-		return false;
-	}
-
-	public void fixChat(boolean fix) {
-		throw new UnsupportedOperationException("Unrelized");
-	}
-
 	public String dictionaryFile() {
 		return get(this.config.dictionary_file, null);
 	}

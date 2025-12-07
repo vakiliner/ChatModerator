@@ -27,10 +27,6 @@ public interface Config {
 
 	void spectatorsChat(boolean enabled);
 
-	boolean fixChat();
-
-	void fixChat(boolean fix);
-
 	String dictionaryFile();
 
 	void dictionaryFile(String name);
