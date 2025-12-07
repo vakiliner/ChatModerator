@@ -20,7 +20,6 @@ class ConfigImpl implements Config {
 	public final BooleanValue autoModerationEnabled;
 	public final BooleanValue autoModerationUseThreadPool;
 	public final BooleanValue spectatorsChat;
-	public final BooleanValue fixChat;
 	public final ConfigValue<String> dictionaryFile;
 	public final BooleanValue showFailMessage;
 	public final BooleanValue logBlockedMessages;
@@ -34,7 +33,6 @@ class ConfigImpl implements Config {
 		this.autoModerationEnabled = builder.translation("null").define("auto_moderation_enabled", false);
 		this.autoModerationUseThreadPool = builder.translation("null").define("auto_moderation_use_thread_pool", false);
 		this.spectatorsChat = builder.translation("null").define("spectators_chat", false);
-		this.fixChat = builder.translation("null").define("fix_chat", false);
 		this.dictionaryFile = builder.translation("null").define("dictionary_file", "");
 		this.showFailMessage = builder.translation("null").define("show_fail_message", true);
 		this.logBlockedMessages = builder.translation("null").define("log_blocked_messages", false);
@@ -88,14 +86,6 @@ class ConfigImpl implements Config {
 
 	public void spectatorsChat(boolean enabled) {
 		this.spectatorsChat.set(enabled);
-	}
-
-	public boolean fixChat() {
-		return false;
-	}
-
-	public void fixChat(boolean fix) {
-		throw new UnsupportedOperationException("Unrelized");
 	}
 
 	public String dictionaryFile() {
