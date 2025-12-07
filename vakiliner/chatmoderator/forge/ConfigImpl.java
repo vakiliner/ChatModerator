@@ -25,7 +25,7 @@ class ConfigImpl implements Config {
 	public final BooleanValue showFailMessage;
 	public final BooleanValue logBlockedMessages;
 	public final BooleanValue logBlockedCommands;
-	public final ConfigValue<String> rawMessages;
+	public final ConfigValue<String> messages;
 
 	public ConfigImpl(ForgeConfigSpec.Builder builder) {
 		this.version = builder.translation("null").worldRestart().defineInRange("version", Short.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -39,7 +39,7 @@ class ConfigImpl implements Config {
 		this.showFailMessage = builder.translation("null").define("show_fail_message", true);
 		this.logBlockedMessages = builder.translation("null").define("log_blocked_messages", false);
 		this.logBlockedCommands = builder.translation("null").define("log_blocked_commands", false);
-		this.rawMessages = builder.translation("null").define("messages", "{}");
+		this.messages = builder.translation("null").define("messages", "{}");
 	}
 
 	public int version() {
@@ -138,11 +138,11 @@ class ConfigImpl implements Config {
 	}
 
 	private Map<String, String> messages() {
-		return Objects.requireNonNull(new Gson().fromJson(this.rawMessages.get(), TypeToken.getParameterized(Map.class, String.class, String.class).getType()), "Config not have a messages property");
+		return Objects.requireNonNull(new Gson().fromJson(this.messages.get(), TypeToken.getParameterized(Map.class, String.class, String.class).getType()), "Config not have a messages property");
 	}
 
 	public void messages(Map<String, String> message) {
-		this.rawMessages.set(new Gson().toJson(message));
+		this.messages.set(new Gson().toJson(message));
 	}
 
 	static {
