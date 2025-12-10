@@ -41,7 +41,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		return new HandledPacket(message);
 	}
 
-	@Inject(at = @At("INVOKE"), method = "handleCommand", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "handleCommand", cancellable = true)
 	void handleCommand(String command, CallbackInfo callbackInfo) {
 		if (command.startsWith(A)) {
 			int i = command.indexOf(' ', A.length());
