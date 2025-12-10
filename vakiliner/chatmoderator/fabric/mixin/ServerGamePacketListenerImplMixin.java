@@ -8,16 +8,15 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
-import vakiliner.chatcomponentapi.fabric.FabricParser;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.fabric.ChatModeratorModInitializer;
 import vakiliner.chatmoderator.fabric.FabricChatModerator;
@@ -88,7 +87,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		if (message.startsWith("/") || callbackInfo.isCancelled()) return;
 		callbackInfo.cancel();
 		ChatComponent chatComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
-		manager.getServer().getPlayerList().broadcastMessage(FabricParser.fabric(chatComponent), ChatType.CHAT, player.getUniqueId());
+		FabricChatModerator.PARSER.broadcastMessage(manager.getServer().getPlayerList(), chatComponent, ChatMessageType.CHAT, player.getUniqueId());
 	}
 
 	private static class HandledPacket extends ServerboundChatPacket {

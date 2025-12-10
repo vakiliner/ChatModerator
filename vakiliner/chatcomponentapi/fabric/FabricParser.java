@@ -23,6 +23,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.scores.PlayerTeam;
 import vakiliner.chatcomponentapi.base.BaseParser;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
@@ -45,6 +46,7 @@ public class FabricParser extends BaseParser {
 	private static final IStyleParser STYLE_PARSER;
 	private static final Method SEND_MESSAGE_WITH_TYPE;
 	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
+	private static final Method BROADCAST_MESSAGE;
 	private static final Method SET_STYLE;
 	private static final Method APPEND;
 
@@ -63,27 +65,38 @@ public class FabricParser extends BaseParser {
 			throw new RuntimeException(err);
 		}
 		Method sendMessageWithType;
-		Method sendMessageWithoutType;
 		try {
 			sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class, UUID.class);
-		} catch (NoSuchMethodException err) {
+		} catch (NoSuchMethodException e) {
 			try {
 				sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class);
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		try {
-			sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class, UUID.class);
-		} catch (NoSuchMethodException err) {
-			try {
-				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class);
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
+			} catch (NoSuchMethodException err) {
+				throw new RuntimeException(err);
 			}
 		}
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
+		Method sendMessageWithoutType;
+		try {
+			sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class, UUID.class);
+		} catch (NoSuchMethodException e) {
+			try {
+				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class);
+			} catch (NoSuchMethodException err) {
+				throw new RuntimeException(err);
+			}
+		}
 		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
+		Method broadcastMessage;
+		try {
+			broadcastMessage = PlayerList.class.getMethod("method_14616", Component.class, ChatType.class, UUID.class);
+		} catch (NoSuchMethodException e) {
+			try {
+				broadcastMessage = PlayerList.class.getMethod("method_14616", Component.class, boolean.class);
+			} catch (NoSuchMethodException err) {
+				throw new RuntimeException(err);
+			}
+		}
+		BROADCAST_MESSAGE = broadcastMessage;
 	}
 
 	public void sendMessage(CommandSource commandSource, ChatComponent component, ChatMessageType type, UUID uuid) {
@@ -100,6 +113,18 @@ public class FabricParser extends BaseParser {
 				} else {
 					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component));
 				}
+			}
+		} catch (IllegalAccessException | InvocationTargetException err) {
+			throw new RuntimeException(err);
+		}
+	}
+
+	public void broadcastMessage(PlayerList playerList, ChatComponent component, ChatMessageType type, UUID uuid) {
+		try {
+			if (BROADCAST_MESSAGE.getParameterTypes().length == 3) {
+				BROADCAST_MESSAGE.invoke(playerList, fabric(component), fabric(type), uuid);
+			} else {
+				BROADCAST_MESSAGE.invoke(playerList, fabric(component), type == ChatMessageType.SYSTEM);
 			}
 		} catch (IllegalAccessException | InvocationTargetException err) {
 			throw new RuntimeException(err);
