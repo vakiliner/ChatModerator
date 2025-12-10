@@ -24,7 +24,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 	@Accessor("player")
 	public abstract ServerPlayer getPlayer();
 
-	@Inject(at = @At("INVOKE"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", cancellable = true)
 	void handleChat(ServerboundChatPacket packet, CallbackInfo callbackInfo) {
 		String message = packet.getMessage();
 		if (message.startsWith("/")) return;
@@ -55,7 +55,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		}
 	}
 
-	@Inject(at = @At("INVOKE"), method = "handleCommand", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "handleCommand", cancellable = true)
 	void handleCommand(String command, CallbackInfo callbackInfo) {
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
 		try {
