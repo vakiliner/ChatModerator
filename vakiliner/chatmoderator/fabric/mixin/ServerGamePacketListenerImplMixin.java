@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.server.MinecraftServer;
@@ -28,21 +28,17 @@ public abstract class ServerGamePacketListenerImplMixin {
 	@Accessor("player")
 	public abstract ServerPlayer getPlayer();
 
-	@Invoker("handleChat")
-	public abstract void handleChat(ServerboundChatPacket packet);
-
-	@Inject(at = @At("INVOKE"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", cancellable = true)
-	void handleChat(ServerboundChatPacket packet, CallbackInfo callbackInfo) {
-		if (packet instanceof HandledPacket) return;
+	@ModifyVariable(at = @At("HEAD"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", argsOnly = true)
+	ServerboundChatPacket handleChat(ServerboundChatPacket packet) {
+		if (packet instanceof HandledPacket) return packet;
 		String message = packet.getMessage();
 		if (message.startsWith("/")) {
-			if (!message.startsWith(A)) return;
+			if (!message.startsWith(A)) return new HandledPacket(message);
 			message = message.replaceFirst(A, A + "-c ");
 		} else {
 			message = A + "-m " + message;
 		}
-		this.handleChat(new HandledPacket(message));
-		callbackInfo.cancel();
+		return new HandledPacket(message);
 	}
 
 	@Inject(at = @At("INVOKE"), method = "handleCommand", cancellable = true)

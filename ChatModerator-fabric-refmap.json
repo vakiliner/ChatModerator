@@ -1,7 +1,6 @@
 {
 	"mappings": {
 		"vakiliner/chatmoderator/fabric/mixin/ServerGamePacketListenerImplMixin": {
-			"handleChat": "method_12048(Lnet/minecraft/class_2797;)V",
 			"handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V": "Lnet/minecraft/class_3244;method_12048(Lnet/minecraft/class_2797;)V",
 			"handleCommand": "Lnet/minecraft/class_3244;method_14370(Ljava/lang/String;)V",
 			"player": "field_14140:Lnet/minecraft/class_3222;"
@@ -10,7 +9,6 @@
 	"data": {
 		"named:intermediary": {
 			"vakiliner/chatmoderator/fabric/mixin/ServerGamePacketListenerImplMixin": {
-				"handleChat": "method_12048(Lnet/minecraft/class_2797;)V",
 				"handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V": "Lnet/minecraft/class_3244;method_12048(Lnet/minecraft/class_2797;)V",
 				"handleCommand": "Lnet/minecraft/class_3244;method_14370(Ljava/lang/String;)V",
 				"player": "field_14140:Lnet/minecraft/class_3222;"
