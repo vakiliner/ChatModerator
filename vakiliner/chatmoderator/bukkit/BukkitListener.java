@@ -1,7 +1,6 @@
 package vakiliner.chatmoderator.bukkit;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Iterator;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,10 +19,10 @@ public class BukkitListener implements Listener {
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
 		this.manager.onChat(this.manager.toChatPlayer(player), event.getMessage(), () -> event.setCancelled(true), () -> {
-			Collection<Player> recipients = new ArrayList<>();
-			for (Player recipient : event.getRecipients()) if (recipient.getGameMode() == GameMode.SPECTATOR) recipients.add(recipient);
-			event.getRecipients().clear();
-			event.getRecipients().addAll(recipients);
+			Iterator<Player> iterator = event.getRecipients().iterator();
+			while (iterator.hasNext()) {
+				if (iterator.next().getGameMode() != GameMode.SPECTATOR) iterator.remove();
+			}
 		});
 	}
 
