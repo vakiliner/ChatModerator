@@ -40,7 +40,10 @@ public abstract class ChatModerator {
 	public final AutoModeration automod = new AutoModeration(this);
 
 	public ChatModerator() {
-		ChatModerator.MANAGER = this;
+		synchronized (ChatModerator.class) {
+			if (ChatModerator.MANAGER != null) throw new IllegalStateException(ChatModerator.class.getSimpleName() + " already inited");
+			ChatModerator.MANAGER = this;
+		}
 	}
 
 	protected void init(ILoader loader) {
