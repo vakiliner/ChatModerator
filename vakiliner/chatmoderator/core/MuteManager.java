@@ -20,6 +20,7 @@ import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 public class MuteManager {
 	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
+	private final Map<String, MutedPlayer> byName = new HashMap<>();
 	private final ThreadSaveConfig threadSaveConfig = new ThreadSaveConfig(this);
 
 	public MuteManager(ChatModerator manager) {
@@ -31,6 +32,11 @@ public class MuteManager {
 		return this.map.get(uuid);
 	}
 
+	public MutedPlayer getByName(String name) {
+		return this.byName.get(name.toLowerCase());
+	}
+
+	@Deprecated
 	public MutedPlayer getMutedPlayer(String name) {
 		for (MutedPlayer mute : this.map.values()) {
 			if (mute.getName().equalsIgnoreCase(name)) return mute;
@@ -38,6 +44,7 @@ public class MuteManager {
 		return null;
 	}
 
+	@Deprecated
 	public MutedPlayer getMutedPlayerExact(String name) {
 		for (MutedPlayer mute : this.map.values()) {
 			if (mute.getName().equals(name)) return mute;
@@ -49,12 +56,24 @@ public class MuteManager {
 		return Collections.unmodifiableMap(this.map);
 	}
 
+	private synchronized boolean put(MutedPlayer mute) {
+		MutedPlayer put = this.map.putIfAbsent(mute.getUniqueId(), mute);
+		if (put == null) this.byName.putIfAbsent(mute.getName().toLowerCase(), mute);
+		return put == null;
+	}
+
+	private synchronized MutedPlayer remove(UUID uuid) {
+		MutedPlayer mute = this.map.remove(uuid);
+		if (mute != null) this.byName.remove(mute.getName().toLowerCase(), mute);
+		return mute;
+	}
+
 	public boolean mute(ChatOfflinePlayer player, String moderator, ModeratorType moderatorType, Integer duration, String reason) {
 		Date now = new Date();
-		synchronized (this.map) {
+		synchronized (this) {
 			MutedPlayer mute = this.map.get(player.getUniqueId());
 			if (mute != null && !mute.isExpired(now)) return false;
-			this.map.put(player.getUniqueId(), new MutedPlayer(player, moderator, moderatorType, now, duration, reason));
+			if (!this.put(new MutedPlayer(player, moderator, moderatorType, now, duration, reason))) return false;
 		}
 		this.threadSaveConfig.save();
 		return true;
@@ -62,18 +81,12 @@ public class MuteManager {
 
 	@Deprecated
 	public boolean unmute(String name) {
-		MutedPlayer mute = this.getMutedPlayer(name);
-		if (mute != null) {
-			return this.unmute(mute.getUniqueId());
-		}
-		return false;
+		MutedPlayer mute = this.getByName(name);
+		return mute != null && this.unmute(mute.getUniqueId());
 	}
 
 	public boolean unmute(UUID uuid) {
-		MutedPlayer mute;
-		synchronized (this.map) {
-			mute = this.map.remove(uuid);
-		}
+		MutedPlayer mute = this.remove(uuid);
 		if (mute != null) this.threadSaveConfig.save();
 		return mute != null && !mute.isExpired();
 	}
@@ -82,10 +95,10 @@ public class MuteManager {
 		Path path = this.manager.getMutesPath();
 		if (path.toFile().exists()) {
 			GsonMutes mutes = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonMutes.class);
-			synchronized (this.map) {
+			synchronized (this) {
 				this.map.clear();
 				for (GsonMutedPlayer mute : mutes) {
-					this.map.put(mute.uuid, mute.toMutedPlayer());
+					this.put(mute.toMutedPlayer());
 				}
 			}
 		}
@@ -94,7 +107,7 @@ public class MuteManager {
 	public void save() throws IOException {
 		Path path = this.manager.getMutesPath();
 		GsonMutes mutes = new GsonMutes();
-		synchronized (this.map) {
+		synchronized (this) {
 			for (MutedPlayer mute : this.map.values()) {
 				mutes.add(GsonMutedPlayer.fromMutedPlayer(mute));
 			}
