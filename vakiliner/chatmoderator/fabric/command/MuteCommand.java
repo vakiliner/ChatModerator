@@ -59,7 +59,7 @@ public class MuteCommand {
 			} catch (NumberFormatException err) {
 				a = 0;
 			}
-			if (a <= 0 || a % 0.1 != 0) {
+			if (a <= 0 || a * 10 % 1 != 0) {
 				throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidDouble().create(rawDuration);
 			}
 			duration = (int) (a * 60);
