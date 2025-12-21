@@ -115,7 +115,7 @@ public class MuteListCommand {
 		}
 		MutedPlayer mute = manager.mutes.get(gameProfile.getId());
 		ChatTextComponent component = new ChatTextComponent();
-		component.append(ChatTextComponent.selector(ChatModeratorModInitializer.MANAGER.toChatOfflinePlayer(gameProfile)));
+		component.append(ChatTextComponent.selector(manager.toChatOfflinePlayer(gameProfile)));
 		if (mute != null && !mute.isExpired()) {
 			ModeratorType moderatorType = mute.getModeratorType();
 			switch (moderatorType) {

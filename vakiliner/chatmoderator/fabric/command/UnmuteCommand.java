@@ -43,7 +43,7 @@ public class UnmuteCommand {
 		}
 		if (manager.mutes.unmute(gameProfile.getId())) {
 			ChatTextComponent component = new ChatTextComponent();
-			component.append(ChatTextComponent.selector(ChatModeratorModInitializer.MANAGER.toChatOfflinePlayer(gameProfile)));
+			component.append(ChatTextComponent.selector(manager.toChatOfflinePlayer(gameProfile)));
 			component.append(new ChatTextComponent(" теперь снова может общаться"));
 			stack.sendSuccess(FabricParser.fabric(component), true);
 			return 1;
