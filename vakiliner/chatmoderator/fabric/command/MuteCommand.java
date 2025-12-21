@@ -78,13 +78,6 @@ public class MuteCommand {
 
 	private static int mutePlayer(CommandSourceStack stack, Collection<GameProfile> collection, Integer duration, String reason) throws CommandSyntaxException {
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		ChatOfflinePlayer player = manager.toChatOfflinePlayer(collection.iterator().next());
-		if (player == null) {
-			throw GameProfileArgument.ERROR_UNKNOWN_PLAYER.create();
-		}
-		if (player.isBypassMutes()) {
-			throw PLAYER_BYPASS_MUTES.create();
-		}
 		Entity entity = stack.getEntity();
 		final ModeratorType moderatorType;
 		if (entity == null) {
@@ -94,14 +87,29 @@ public class MuteCommand {
 		} else {
 			moderatorType = ModeratorType.UNKNOWN;
 		}
-		if (manager.mutes.mute(player, entity != null ? entity.getName().getString() : "CONSOLE", moderatorType, duration, reason)) {
-			ChatTextComponent component = new ChatTextComponent();
-			component.append(ChatTextComponent.selector(player));
-			component.append(new ChatTextComponent(" заглушён"));
-			stack.sendSuccess(FabricParser.fabric(component), true);
-			return 1;
+		boolean bypassMutes = true;
+		int i = 0;
+		for (GameProfile profile : collection) {
+			ChatOfflinePlayer player = manager.toChatOfflinePlayer(profile);
+			if (player.isBypassMutes()) {
+				continue;
+			} else {
+				bypassMutes = false;
+			}
+			if (manager.mutes.mute(player, stack.getTextName(), moderatorType, duration, reason)) {
+				ChatTextComponent component = new ChatTextComponent(player.getName() + " заглушён");
+				stack.sendSuccess(FabricParser.fabric(component), true);
+				i++;
+			}
+		}
+		if (i == 0) {
+			if (bypassMutes) {
+				throw PLAYER_BYPASS_MUTES.create();
+			} else {
+				throw ERROR_ALREADY_MUTED.create();
+			}
 		} else {
-			throw ERROR_ALREADY_MUTED.create();
+			return i;
 		}
 	}
 }

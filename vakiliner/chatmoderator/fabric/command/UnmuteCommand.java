@@ -37,18 +37,18 @@ public class UnmuteCommand {
 
 	private static int unmutePlayer(CommandSourceStack stack, Collection<GameProfile> collection) throws CommandSyntaxException {
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		GameProfile gameProfile = collection.iterator().next();
-		if (gameProfile == null) {
-			throw GameProfileArgument.ERROR_UNKNOWN_PLAYER.create();
+		int i = 0;
+		for (GameProfile profile : collection) {
+			if (manager.mutes.unmute(profile.getId())) {
+				ChatTextComponent component = new ChatTextComponent(profile.getName() + " теперь снова может общаться");
+				stack.sendSuccess(FabricParser.fabric(component), true);
+				i++;
+			}
 		}
-		if (manager.mutes.unmute(gameProfile.getId())) {
-			ChatTextComponent component = new ChatTextComponent();
-			component.append(ChatTextComponent.selector(manager.toChatOfflinePlayer(gameProfile)));
-			component.append(new ChatTextComponent(" теперь снова может общаться"));
-			stack.sendSuccess(FabricParser.fabric(component), true);
-			return 1;
-		} else {
+		if (i == 0) {
 			throw ERROR_NOT_MUTED.create();
+		} else {
+			return i;
 		}
 	}
 }
