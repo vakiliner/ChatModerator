@@ -128,11 +128,11 @@ public class MuteManager {
 }
 
 class ThreadSaveConfig extends Thread {
-	private final MuteManager mute;
+	private final MuteManager manager;
 	private boolean save;
 
-	public ThreadSaveConfig(MuteManager mute) {
-		this.mute = mute;
+	public ThreadSaveConfig(MuteManager manager) {
+		this.manager = manager;
 	}
 
 	public void run() {
@@ -143,7 +143,7 @@ class ThreadSaveConfig extends Thread {
 					this.save = false;
 				}
 				try {
-					this.mute.save();
+					this.manager.save();
 				} catch (IOException err) {
 					err.printStackTrace();
 				}
