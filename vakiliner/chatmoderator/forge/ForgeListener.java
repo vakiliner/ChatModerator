@@ -16,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
@@ -43,13 +44,17 @@ class ForgeListener {
 	}
 
 	@SubscribeEvent
-	public void onServerStopped(FMLServerStoppedEvent event) {
-		this.manager.server = null;
+	public void onServerStopping(FMLServerStoppingEvent event) {
 		try {
 			this.manager.mutes.stop();
 		} catch (IOException err) {
 			throw new RuntimeException(err);
 		}
+	}
+
+	@SubscribeEvent
+	public void onServerStopped(FMLServerStoppedEvent event) {
+		this.manager.server = null;
 	}
 
 	@SubscribeEvent
