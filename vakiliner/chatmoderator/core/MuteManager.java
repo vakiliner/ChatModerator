@@ -22,7 +22,7 @@ public class MuteManager {
 	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
 	private final Map<String, MutedPlayer> byName = new HashMap<>();
-	private ThreadSaveConfig threadSaveConfig = new ThreadSaveConfig(this);
+	private ThreadSaveConfig threadSaveConfig;
 	private File file;
 
 	public MuteManager(ChatModerator manager) {
