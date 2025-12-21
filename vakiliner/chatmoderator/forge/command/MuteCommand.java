@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.forge.command;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -37,30 +38,7 @@ public class MuteCommand {
 			return stack.hasPermission(3);
 		}).then(Commands.argument("target", GameProfileArgument.gameProfile()).suggests((context, builder) -> {
 			return ISuggestionProvider.suggest(manager.getOnlinePlayers().stream().filter((player) -> !player.isMuted()).map(ChatPlayer::getName).collect(Collectors.toList()), builder);
-		}).then(Commands.argument("duration", new ArgumentType<Integer>() {
-			public Integer parse(StringReader reader) throws CommandSyntaxException {
-				int start = reader.getCursor();
-				String string = reader.readUnquotedString();
-				if (string.equals("infinite")) {
-					return 0;
-				}
-				if (string.isEmpty()) {
-					reader.setCursor(start);
-					throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedDouble().createWithContext(reader);
-				}
-				double duration;
-				try {
-					duration = Double.parseDouble(string);
-				} catch (NumberFormatException err) {
-					duration = 0;
-				}
-				if (duration <= 0 || duration * 10 % 1 != 0) {
-					reader.setCursor(start);
-					throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidDouble().createWithContext(reader, string);
-				}
-				return (int) (duration * 60);
-			}
-		}).suggests((context, builder) -> {
+		}).then(Commands.argument("duration", new DurationArgumentType()).suggests((context, builder) -> {
 			return ISuggestionProvider.suggest(Collections.singleton("infinite"), builder);
 		}).then(Commands.argument("reason", StringArgumentType.greedyString()).executes((context) -> {
 			Collection<GameProfile> collection = GameProfileArgument.getGameProfiles(context, "target");
@@ -102,6 +80,37 @@ public class MuteCommand {
 			return 1;
 		} else {
 			throw ERROR_ALREADY_MUTED.create();
+		}
+	}
+
+	public static class DurationArgumentType implements ArgumentType<Integer> {
+		private static final Collection<String> EXAMPLES = Arrays.asList("1", "60", "0.5", "infinite");
+
+		public Integer parse(StringReader reader) throws CommandSyntaxException {
+			int start = reader.getCursor();
+			String string = reader.readUnquotedString();
+			if (string.equals("infinite")) {
+				return 0;
+			}
+			if (string.isEmpty()) {
+				reader.setCursor(start);
+				throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedDouble().createWithContext(reader);
+			}
+			double duration;
+			try {
+				duration = Double.parseDouble(string);
+			} catch (NumberFormatException err) {
+				duration = 0;
+			}
+			if (duration <= 0 || duration * 10 % 1 != 0) {
+				reader.setCursor(start);
+				throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidDouble().createWithContext(reader, string);
+			}
+			return (int) (duration * 60);
+		}
+
+		public Collection<String> getExamples() {
+			return EXAMPLES;
 		}
 	}
 }
