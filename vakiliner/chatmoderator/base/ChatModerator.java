@@ -36,8 +36,8 @@ public abstract class ChatModerator {
 	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
-	public final MuteManager mutes = new MuteManager(this);
 	public final AutoModeration automod = new AutoModeration(this);
+	public final MuteManager mutes = new MuteManager(this);
 
 	public ChatModerator() {
 		synchronized (ChatModerator.class) {
