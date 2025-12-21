@@ -1,10 +1,10 @@
 package vakiliner.chatmoderator.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,14 +18,15 @@ import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 
 public class MuteManager {
+	@SuppressWarnings("unused")
 	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
 	private final Map<String, MutedPlayer> byName = new HashMap<>();
-	private final ThreadSaveConfig threadSaveConfig = new ThreadSaveConfig(this);
+	private ThreadSaveConfig threadSaveConfig = new ThreadSaveConfig(this);
+	private File file;
 
 	public MuteManager(ChatModerator manager) {
 		this.manager = manager;
-		this.threadSaveConfig.start();
 	}
 
 	public MutedPlayer get(UUID uuid) {
@@ -91,10 +92,30 @@ public class MuteManager {
 		return mute != null && !mute.isExpired();
 	}
 
+	public synchronized void setup(File file) throws IOException {
+		if (this.threadSaveConfig != null) {
+			throw new IllegalStateException("Thread not stopped");
+		}
+		this.threadSaveConfig = new ThreadSaveConfig(this);
+		this.threadSaveConfig.start();
+		this.reload(this.file = file);
+	}
+
+	public synchronized void stop() throws IOException {
+		this.threadSaveConfig.interrupt();
+		this.threadSaveConfig = null;
+		this.save();
+		this.file = null;
+		this.map.clear();
+	}
+
 	public void reload() throws IOException {
-		Path path = this.manager.getMutesPath();
-		if (path.toFile().exists()) {
-			GsonMutes mutes = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonMutes.class);
+		this.reload(this.file);
+	}
+
+	public void reload(File file) throws IOException {
+		if (file.exists()) {
+			GsonMutes mutes = new Gson().fromJson(new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8), GsonMutes.class);
 			synchronized (this) {
 				this.map.clear();
 				for (GsonMutedPlayer mute : mutes) {
@@ -105,23 +126,26 @@ public class MuteManager {
 	}
 
 	public void save() throws IOException {
-		Path path = this.manager.getMutesPath();
+		this.save(this.file);
+	}
+
+	public void save(File file) throws IOException {
 		GsonMutes mutes = new GsonMutes();
 		synchronized (this) {
 			for (MutedPlayer mute : this.map.values()) {
 				mutes.add(GsonMutedPlayer.fromMutedPlayer(mute));
 			}
 		}
-		Files.write(path, new Gson().toJson(mutes).getBytes(StandardCharsets.UTF_8));
+		Files.write(file.toPath(), new Gson().toJson(mutes).getBytes(StandardCharsets.UTF_8));
 	}
 }
 
 class ThreadSaveConfig extends Thread {
-	private final MuteManager mute;
+	private final MuteManager manager;
 	private boolean save;
 
-	public ThreadSaveConfig(MuteManager mute) {
-		this.mute = mute;
+	public ThreadSaveConfig(MuteManager manager) {
+		this.manager = manager;
 	}
 
 	public void run() {
@@ -132,7 +156,7 @@ class ThreadSaveConfig extends Thread {
 					this.save = false;
 				}
 				try {
-					this.mute.save();
+					this.manager.save();
 				} catch (IOException err) {
 					err.printStackTrace();
 				}

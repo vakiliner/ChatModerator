@@ -36,11 +36,14 @@ public abstract class ChatModerator {
 	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
-	public final MuteManager mutes = new MuteManager(this);
 	public final AutoModeration automod = new AutoModeration(this);
+	public final MuteManager mutes = new MuteManager(this);
 
 	public ChatModerator() {
-		ChatModerator.MANAGER = this;
+		synchronized (ChatModerator.class) {
+			if (ChatModerator.MANAGER != null) throw new IllegalStateException(ChatModerator.class.getSimpleName() + " already inited");
+			ChatModerator.MANAGER = this;
+		}
 	}
 
 	protected void init(ILoader loader) {
@@ -58,7 +61,6 @@ public abstract class ChatModerator {
 			}
 		}
 		try {
-			this.mutes.reload();
 			this.automod.reload();
 			this.automod.reloadDictionary();
 		} catch (IOException err) {
