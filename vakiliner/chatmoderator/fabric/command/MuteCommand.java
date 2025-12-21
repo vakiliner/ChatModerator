@@ -53,16 +53,16 @@ public class MuteCommand {
 		if (rawDuration.equals("infinite")) {
 			duration = null;
 		} else {
-			double a;
+			double d;
 			try {
-				a = Double.parseDouble(rawDuration);
+				d = Double.parseDouble(rawDuration);
 			} catch (NumberFormatException err) {
-				a = 0;
+				d = 0;
 			}
-			if (a <= 0 || a * 10 % 1 != 0) {
+			if (d <= 0 || d * 10 % 1 != 0) {
 				throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidDouble().create(rawDuration);
 			}
-			duration = (int) (a * 60);
+			duration = (int) (d * 60);
 		}
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
 		ChatOfflinePlayer player = manager.toChatOfflinePlayer(collection.iterator().next());
