@@ -18,6 +18,7 @@ import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
+import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.core.MutedPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 import vakiliner.chatmoderator.forge.ChatModeratorModInitializer;
@@ -35,7 +36,7 @@ public class MuteListCommand {
 			return ISuggestionProvider.suggest(manager.mutes.map().values().stream().map(MutedPlayer::getName).collect(Collectors.toList()), builder);
 		}).executes((context) -> {
 			Collection<GameProfile> collection = GameProfileArgument.getGameProfiles(context, "target");
-			return getMute(context.getSource(), collection.iterator().next());
+			return getMute(context.getSource(), collection);
 		}))).then(Commands.argument("page", IntegerArgumentType.integer(0)).executes((context) -> {
 			int page = IntegerArgumentType.getInteger(context, "page");
 			return listMutes(context.getSource(), page);
@@ -88,6 +89,7 @@ public class MuteListCommand {
 					case AUTOMOD:
 						component.append(new ChatTextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
 						break;
+					case UNKNOWN:
 					default:
 						component.append(new ChatTextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
 						break;
@@ -108,57 +110,60 @@ public class MuteListCommand {
 		return component;
 	}
 
-	private static int getMute(CommandSource stack, GameProfile gameProfile) throws CommandSyntaxException {	
+	private static int getMute(CommandSource stack, Collection<GameProfile> collection) throws CommandSyntaxException {
 		ForgeChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		if (gameProfile == null) {
-			throw GameProfileArgument.ERROR_UNKNOWN_PLAYER.create();
-		}
-		MutedPlayer mute = manager.mutes.get(gameProfile.getId());
-		ChatTextComponent component = new ChatTextComponent();
-		component.append(ChatTextComponent.selector(manager.toChatOfflinePlayer(gameProfile)));
-		if (mute != null && !mute.isExpired()) {
-			ModeratorType moderatorType = mute.getModeratorType();
-			switch (moderatorType) {
-				case PLAYER:
-				case SERVER:
-				case PLUGIN:
-					switch (moderatorType) {
-						case PLAYER:
-							component.append(new ChatTextComponent(" заглушён модератором " + mute.getModeratorName()));
-							break;
-						case SERVER:
-							component.append(new ChatTextComponent(" заглушён сервером"));
-							break;
-						case PLUGIN:
-							component.append(new ChatTextComponent(" заглушён плагином " + mute.getModeratorName()));
-							break;
-						default: throw new RuntimeException();
-					}
-					String reason = mute.getReason();
-					if (reason != null) {
-						component.append(new ChatTextComponent("\nПричина: "));
-						component.append(new ChatTextComponent(reason));
-					}
-					break;
-				case AUTOMOD:
-					component.append(new ChatTextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
-					break;
-				default:
-					component.append(new ChatTextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
-					break;
-			}
-			Date expiration = mute.getExpirationAt();
-			if (expiration != null) {
-				component.append(new ChatTextComponent("\nЗаглушён временно, до: " + expiration.toString()));
+		int i = 0;
+		Date now = new Date();
+		for (GameProfile profile : collection) {
+			ChatOfflinePlayer player = manager.toChatOfflinePlayer(profile);
+			MutedPlayer mute = player.getMute(false);
+			ChatTextComponent component = new ChatTextComponent();
+			component.append(new ChatTextComponent(player.getName()));
+			if (mute != null && !mute.isExpired(now)) {
+				ModeratorType moderatorType = mute.getModeratorType();
+				switch (moderatorType) {
+					case PLAYER:
+					case SERVER:
+					case PLUGIN:
+						switch (moderatorType) {
+							case PLAYER:
+								component.append(new ChatTextComponent(" заглушён модератором " + mute.getModeratorName()));
+								break;
+							case SERVER:
+								component.append(new ChatTextComponent(" заглушён сервером"));
+								break;
+							case PLUGIN:
+								component.append(new ChatTextComponent(" заглушён плагином " + mute.getModeratorName()));
+								break;
+							default: throw new RuntimeException();
+						}
+						String reason = mute.getReason();
+						if (reason != null) {
+							component.append(new ChatTextComponent("\nПричина: "));
+							component.append(new ChatTextComponent(reason));
+						}
+						break;
+					case AUTOMOD:
+						component.append(new ChatTextComponent(" заглушён правилом автомодерации: " + mute.getModeratorName()));
+						break;
+					case UNKNOWN:
+					default:
+						component.append(new ChatTextComponent(" заглушён неизвестным источником: " + mute.getModeratorName()));
+						break;
+				}
+				Date expiration = mute.getExpirationAt();
+				if (expiration != null) {
+					component.append(new ChatTextComponent("\nЗаглушён временно, до: " + expiration.toString()));
+				} else {
+					component.append(new ChatTextComponent("\nЗаглушён навсегда"));
+				}
+				stack.sendSuccess(ForgeParser.forge(component), false);
+				i++;
 			} else {
-				component.append(new ChatTextComponent("\nЗаглушён навсегда"));
+				component.append(new ChatTextComponent(" не заглушён"));
+				stack.sendSuccess(ForgeParser.forge(component), false);
 			}
-			stack.sendSuccess(ForgeParser.forge(component), false);
-			return 1;
-		} else {
-			component.append(new ChatTextComponent(" не заглушён"));
-			stack.sendSuccess(ForgeParser.forge(component), false);
-			return 0;
 		}
+		return i;
 	}
 }
