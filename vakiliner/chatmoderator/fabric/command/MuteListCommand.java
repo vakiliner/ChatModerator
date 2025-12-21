@@ -33,7 +33,8 @@ public class MuteListCommand {
 		}).executes((context) -> {
 			return listMutes(context.getSource(), 1);
 		}).then(get.then(Commands.argument("target", GameProfileArgument.gameProfile()).suggests((context, builder) -> {
-			return SharedSuggestionProvider.suggest(ChatModeratorModInitializer.MANAGER.mutes.map().values().stream().map(MutedPlayer::getName).collect(Collectors.toList()), builder);
+			Date now = new Date();
+			return SharedSuggestionProvider.suggest(ChatModeratorModInitializer.MANAGER.mutes.map().values().stream().filter((mute) -> !mute.isExpired(now)).map(MutedPlayer::getName).collect(Collectors.toList()), builder);
 		}).executes((context) -> {
 			Collection<GameProfile> collection = GameProfileArgument.getGameProfiles(context, "target");
 			return getMute(context.getSource(), collection);

@@ -28,7 +28,7 @@ public class UnmuteCommand {
 			return stack.hasPermission(3);
 		}).then(Commands.argument("target", GameProfileArgument.gameProfile()).suggests((context, builder) -> {
 			Date now = new Date();
-			return ISuggestionProvider.suggest(manager.mutes.map().values().stream().filter((player) -> !player.isExpired(now)).map(MutedPlayer::getName).collect(Collectors.toList()), builder);
+			return ISuggestionProvider.suggest(manager.mutes.map().values().stream().filter((mute) -> !mute.isExpired(now)).map(MutedPlayer::getName).collect(Collectors.toList()), builder);
 		}).executes((context) -> {
 			Collection<GameProfile> collection = GameProfileArgument.getGameProfiles(context, "target");
 			return unmutePlayer(context.getSource(), collection);
