@@ -44,7 +44,7 @@ public class MuteListCommand implements TabExecutor {
 			}
 			MutedPlayer mute = this.manager.mutes.get(player.getUniqueId());
 			ChatTextComponent result = new ChatTextComponent();
-			result.append(ChatTextComponent.selector(player));
+			result.append(new ChatTextComponent(player.getName()));
 			if (mute == null || mute.isExpired(now)) {
 				result.append(new ChatTextComponent(" не заглушён"));
 			} else {

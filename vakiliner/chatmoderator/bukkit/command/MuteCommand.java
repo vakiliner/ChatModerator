@@ -65,10 +65,7 @@ public class MuteCommand implements TabExecutor {
 			moderatorType = ModeratorType.UNKNOWN;
 		}
 		if (this.manager.mutes.mute(target, sender.getName(), moderatorType, duration, reason)) {
-			ChatTextComponent component = new ChatTextComponent();
-			component.append(ChatTextComponent.selector(target));
-			component.append(new ChatTextComponent(" больше не может общаться"));
-			sender.sendMessage(component);
+			sender.sendMessage(new ChatTextComponent(target.getName() + " больше не может общаться"));
 		} else {
 			sender.sendMessage(new ChatTextComponent("This player is already muted", ChatNamedColor.RED));
 		}
