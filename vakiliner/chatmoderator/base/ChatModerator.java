@@ -36,11 +36,14 @@ public abstract class ChatModerator {
 	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
-	public final MuteManager mutes = new MuteManager(this);
 	public final AutoModeration automod = new AutoModeration(this);
+	public final MuteManager mutes = new MuteManager(this);
 
 	public ChatModerator() {
-		ChatModerator.MANAGER = this;
+		synchronized (ChatModerator.class) {
+			if (ChatModerator.MANAGER != null) throw new IllegalStateException(ChatModerator.class.getSimpleName() + " already inited");
+			ChatModerator.MANAGER = this;
+		}
 	}
 
 	protected void init(ILoader loader) {
@@ -58,7 +61,6 @@ public abstract class ChatModerator {
 			}
 		}
 		try {
-			this.mutes.reload();
 			this.automod.reload();
 			this.automod.reloadDictionary();
 		} catch (IOException err) {
@@ -226,7 +228,7 @@ public abstract class ChatModerator {
 			if (this.getConfig().showFailMessage()) {
 				final ChatComponent messageComponent;
 				if (!isCommand) {
-					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", ChatTextComponent.selector(player), new ChatTextComponent(fullMessage));
+					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(fullMessage));
 				} else {
 					messageComponent = new ChatTextComponent(fullMessage);
 				}
@@ -334,7 +336,7 @@ public abstract class ChatModerator {
 					}
 					if (logAdmins) {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
-						log.append(ChatTextComponent.selector(player));
+						log.append(player.getDisplayName());
 						ChatTextComponent getMessage = new ChatTextComponent(", ");
 						ChatTextComponent showMessage = new ChatTextComponent("показать сообщение");
 						showMessage.setUnderlined(true);

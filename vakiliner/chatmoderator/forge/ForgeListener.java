@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.forge;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import com.mojang.brigadier.CommandDispatcher;
@@ -15,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
@@ -34,13 +36,25 @@ class ForgeListener {
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) {
 		this.manager.server = event.getServer();
+		try {
+			this.manager.mutes.setup(this.manager.getMutesPath().toFile());
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+	}
+
+	@SubscribeEvent
+	public void onServerStopping(FMLServerStoppingEvent event) {
+		try {
+			this.manager.mutes.stop();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
 	}
 
 	@SubscribeEvent
 	public void onServerStopped(FMLServerStoppedEvent event) {
-		if (this.manager.server == event.getServer()) {
-			this.manager.server = null;
-		}
+		this.manager.server = null;
 	}
 
 	@SubscribeEvent

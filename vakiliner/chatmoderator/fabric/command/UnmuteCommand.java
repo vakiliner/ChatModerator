@@ -28,7 +28,7 @@ public class UnmuteCommand {
 			return stack.hasPermission(3);
 		}).then(Commands.argument("target", GameProfileArgument.gameProfile()).suggests((context, builder) -> {
 			Date now = new Date();
-			return SharedSuggestionProvider.suggest(ChatModeratorModInitializer.MANAGER.mutes.map().values().stream().filter((player) -> !player.isExpired(now)).map(MutedPlayer::getName).collect(Collectors.toList()), builder);
+			return SharedSuggestionProvider.suggest(ChatModeratorModInitializer.MANAGER.mutes.map().values().stream().filter((mute) -> !mute.isExpired(now)).map(MutedPlayer::getName).collect(Collectors.toList()), builder);
 		}).executes((context) -> {
 			Collection<GameProfile> collection = GameProfileArgument.getGameProfiles(context, "target");
 			return unmutePlayer(context.getSource(), collection);
@@ -37,18 +37,17 @@ public class UnmuteCommand {
 
 	private static int unmutePlayer(CommandSourceStack stack, Collection<GameProfile> collection) throws CommandSyntaxException {
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		GameProfile gameProfile = collection.iterator().next();
-		if (gameProfile == null) {
-			throw GameProfileArgument.ERROR_UNKNOWN_PLAYER.create();
+		int i = 0;
+		for (GameProfile profile : collection) {
+			if (manager.mutes.unmute(profile.getId())) {
+				stack.sendSuccess(FabricParser.fabric(new ChatTextComponent(profile.getName() + " теперь снова может общаться")), true);
+				i++;
+			}
 		}
-		if (manager.mutes.unmute(gameProfile.getId())) {
-			ChatTextComponent component = new ChatTextComponent();
-			component.append(ChatTextComponent.selector(ChatModeratorModInitializer.MANAGER.toChatOfflinePlayer(gameProfile)));
-			component.append(new ChatTextComponent(" теперь снова может общаться"));
-			stack.sendSuccess(FabricParser.fabric(component), true);
-			return 1;
-		} else {
+		if (i == 0) {
 			throw ERROR_NOT_MUTED.create();
+		} else {
+			return i;
 		}
 	}
 }

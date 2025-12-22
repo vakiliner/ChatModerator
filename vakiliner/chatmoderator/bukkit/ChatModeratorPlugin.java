@@ -34,6 +34,11 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 
 	public void onEnable() {
 		MANAGER.init(this);
+		try {
+			MANAGER.mutes.setup(MANAGER.getMutesPath().toFile());
+		} catch (IOException err) {
+			err.printStackTrace();
+		}
 		Bukkit.getPluginManager().registerEvents(this.listener, this);
 		this.getCommand("mute").setExecutor(new MuteCommand(MANAGER));
 		this.getCommand("unmute").setExecutor(new UnmuteCommand(MANAGER));
@@ -43,7 +48,7 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 
 	public void onDisable() {
 		try {
-			MANAGER.mutes.save();
+			MANAGER.mutes.stop();
 		} catch (IOException err) {
 			err.printStackTrace();
 		}

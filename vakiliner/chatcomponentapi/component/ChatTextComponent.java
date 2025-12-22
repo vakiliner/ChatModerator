@@ -48,6 +48,7 @@ public class ChatTextComponent extends ChatComponent {
 		return this.text;
 	}
 
+	@Deprecated
 	public static ChatTextComponent selector(ChatOfflinePlayer player) {
 		final ChatTextComponent component;
 		ChatTeam team = player.getTeam();
@@ -74,6 +75,7 @@ public class ChatTextComponent extends ChatComponent {
 		return component;
 	}
 
+	@Deprecated
 	public static ChatTextComponent team(ChatTeam team) {
 		ChatTextComponent component = new ChatTextComponent();
 		component.setColor(team.getColor());
