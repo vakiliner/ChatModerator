@@ -84,7 +84,7 @@ public class MuteCommand {
 				bypassMutes = false;
 			}
 			if (manager.mutes.mute(player, stack.getTextName(), moderatorType, duration, reason)) {
-				stack.sendSuccess(FabricParser.fabric(new ChatTextComponent(player.getName() + " заглушён")), true);
+				stack.sendSuccess(FabricParser.fabric(new ChatTextComponent(player.getName() + " больше не может общаться")), true);
 				i++;
 			}
 		}
