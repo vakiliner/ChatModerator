@@ -8,7 +8,10 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 import com.google.gson.Gson;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
@@ -21,7 +24,7 @@ public class MuteManager {
 	@SuppressWarnings("unused")
 	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
-	private final Map<String, MutedPlayer> byName = new HashMap<>();
+	private final Map<String, Set<UUID>> byName = new HashMap<>();
 	private ThreadSaveConfig threadSaveConfig;
 	private File file;
 
@@ -34,7 +37,16 @@ public class MuteManager {
 	}
 
 	public MutedPlayer getByName(String name) {
-		return this.byName.get(name.toLowerCase());
+		Set<UUID> set = this.byName.get(name.toLowerCase());
+		UUID uuid;
+		if (set != null) try {
+			uuid = set.iterator().next();
+		} catch (NoSuchElementException err) {
+			uuid = null;
+		} else {
+			uuid = null;
+		}
+		return uuid != null ? this.get(uuid) : null;
 	}
 
 	@Deprecated
@@ -59,13 +71,29 @@ public class MuteManager {
 
 	private synchronized boolean put(MutedPlayer mute) {
 		MutedPlayer put = this.map.putIfAbsent(mute.getUniqueId(), mute);
-		if (put == null) this.byName.putIfAbsent(mute.getName().toLowerCase(), mute);
+		if (put == null) {
+			String key = mute.getName().toLowerCase();
+			Set<UUID> set = this.byName.get(key);
+			if (set == null) {
+				this.byName.put(key, set = new HashSet<>());
+			}
+			set.add(mute.getUniqueId());
+		}
 		return put == null;
 	}
 
 	private synchronized MutedPlayer remove(UUID uuid) {
 		MutedPlayer mute = this.map.remove(uuid);
-		if (mute != null) this.byName.remove(mute.getName().toLowerCase(), mute);
+		if (mute != null) {
+			String key = mute.getName().toLowerCase();
+			Set<UUID> set = this.byName.get(key);
+			if (set != null) {
+				set.remove(mute.getUniqueId());
+				if (set.isEmpty()) {
+					this.byName.remove(key, mute);
+				}
+			}
+		};
 		return mute;
 	}
 
