@@ -35,6 +35,10 @@ public class ChatNamedColor extends ChatTextColor {
 		return this.asFormat.getName();
 	}
 
+	public String toString() {
+		return this.getName();
+	}
+
 	public static ChatNamedColor getByFormat(ChatTextFormat format) {
 		return BY_FORMAT.get(format);
 	}

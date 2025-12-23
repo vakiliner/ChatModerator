@@ -66,6 +66,6 @@ public class ChatTextColor {
 	}
 
 	public String toString() {
-		return this.asFormat.toString();
+		return String.format("#%06X", this.value);
 	}
 }
