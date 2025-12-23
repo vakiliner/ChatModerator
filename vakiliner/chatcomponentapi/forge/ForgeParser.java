@@ -197,11 +197,11 @@ public class ForgeParser extends BaseParser {
 	}
 
 	public static TextFormatting forge(ChatTextFormat format) {
-		return format != null ? TextFormatting.getByCode(format.getChar()) : null;
+		return format != null ? TextFormatting.getByName(format.name()) : null;
 	}
 
 	public static ChatTextFormat forge(TextFormatting formatting) {
-		return formatting != null ? ChatTextFormat.getByChar(formatting.toString().charAt(1)) : null;
+		return formatting != null ? ChatTextFormat.getByName(formatting.getName()) : null;
 	}
 
 	public static Color forgeColor(ChatTextColor color) {
