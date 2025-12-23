@@ -172,6 +172,6 @@ public class SpigotParser extends BukkitParser {
 	}
 
 	public static ChatTextFormat spigot(ChatColor color) {
-		return color != null ? ChatTextFormat.getByChar(color.toString().charAt(1)) : null;
+		return color != null ? ChatTextFormat.getByName(color.getName()) : null;
 	}
 }
