@@ -24,6 +24,7 @@ public class ChatModeratorModInitializer implements ModInitializer, ILoader {
 		MANAGER.init(this);
 		CommandRegistrationCallback.EVENT.register(this.listener);
 		ServerLifecycleEvents.SERVER_STARTING.register(this.listener);
+		ServerLifecycleEvents.SERVER_STOPPING.register(this.listener);
 		ServerLifecycleEvents.SERVER_STOPPED.register(this.listener);
 		FabricChatModerator.LOGGER.info("Готов. Ждёт активации сервера");
 	}
