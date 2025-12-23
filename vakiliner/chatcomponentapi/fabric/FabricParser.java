@@ -233,11 +233,11 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static ChatFormatting fabric(ChatTextFormat format) {
-		return format != null ? ChatFormatting.getByCode(format.getChar()) : null;
+		return format != null ? ChatFormatting.getByName(format.name()) : null;
 	}
 
 	public static ChatTextFormat fabric(ChatFormatting formatting) {
-		return formatting != null ? ChatTextFormat.getByChar(formatting.toString().charAt(1)) : null;
+		return formatting != null ? ChatTextFormat.getByName(formatting.getName()) : null;
 	}
 
 	public ChatPlayer toChatPlayer(ServerPlayer player) {
