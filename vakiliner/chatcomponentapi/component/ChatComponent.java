@@ -99,7 +99,7 @@ public abstract class ChatComponent {
 			}
 		}
 		if (reset) {
-			text.append(parentColor);
+			text.append(parentColor.asFormat());
 			for (ChatComponentFormat format : parentFormats) {
 				text.append(format);
 			}
