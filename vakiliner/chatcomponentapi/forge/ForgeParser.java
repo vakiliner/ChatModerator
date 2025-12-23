@@ -91,7 +91,7 @@ public class ForgeParser extends BaseParser {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}
 		Style style = raw.getStyle();
-		chatComponent.setColor(forgeColor(style.getColor()));
+		chatComponent.setColor(forge(style.getColor()));
 		chatComponent.setBold(((StyleMixin) style).getBold());
 		chatComponent.setItalic(((StyleMixin) style).getItalic());
 		chatComponent.setStrikethrough(((StyleMixin) style).getStrikethrough());
@@ -179,7 +179,7 @@ public class ForgeParser extends BaseParser {
 	public static Style forgeStyle(ChatComponent component) {
 		Objects.requireNonNull(component);
 		Style style = Style.EMPTY;
-		Color color = forgeColor(component.getColorRaw());
+		Color color = forge(component.getColorRaw());
 		if (color != null) {
 			style = style.withColor(color);
 		}
@@ -204,12 +204,22 @@ public class ForgeParser extends BaseParser {
 		return formatting != null ? ChatTextFormat.getByChar(formatting.toString().charAt(1)) : null;
 	}
 
-	public static Color forgeColor(ChatTextColor color) {
-		return color != null ? Color.fromRgb(color.value()) : null;
+	public static Color forge(ChatTextColor color) {
+		return color != null ? Color.parseColor(color.toString()) : null;
 	}
 
+	public static ChatTextColor forge(Color color) {
+		return color != null ? ChatTextColor.of(color.toString()) : null;
+	}
+
+	@Deprecated
+	public static Color forgeColor(ChatTextColor color) {
+		return forge(color);
+	}
+
+	@Deprecated
 	public static ChatTextColor forgeColor(Color color) {
-		return color != null ? ChatTextColor.color(color.getValue(), null) : null;
+		return forge(color);
 	}
 
 	public ChatPlayer toChatPlayer(ServerPlayerEntity player) {
