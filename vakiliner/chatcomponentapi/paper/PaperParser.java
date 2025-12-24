@@ -32,7 +32,7 @@ import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
-import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
+import vakiliner.chatcomponentapi.component.ChatComponentModified;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -50,8 +50,8 @@ public class PaperParser extends SpigotParser {
 
 	public static Component paper(ChatComponent raw) {
 		if (raw == null) return null;
-		if (raw instanceof ChatComponentWithLegacyText) {
-			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		if (raw instanceof ChatComponentModified) {
+			raw = ((ChatComponentModified) raw).getComponent();
 		}
 		final ComponentBuilder<?, ?> builder;
 		Style style = paperStyle(raw);

@@ -52,13 +52,13 @@ public abstract class ChatComponent {
 	public abstract ChatComponent clone();
 
 	public String toLegacyText() {
-		return this.toLegacyText(ChatNamedColor.RESET, Collections.unmodifiableSet(new HashSet<>()));
+		return this.toLegacyText(ChatNamedColor.RESET, Collections.emptySet());
 	}
 
 	protected String toLegacyText(final ChatTextColor parentColor, final Set<ChatComponentFormat> parentFormats) {
 		StringBuilder text = new StringBuilder();
 		Set<ChatComponentFormat> formats = new HashSet<>(parentFormats);
-		ChatTextColor color = this.color;
+		ChatTextColor color = this.getColorRaw();
 		if (color == null) color = parentColor;
 		boolean reset = !color.equals(parentColor);
 		for (Map.Entry<ChatComponentFormat, Boolean> entry : this.getFormatsRaw().entrySet()) {
@@ -79,20 +79,17 @@ public abstract class ChatComponent {
 			for (ChatComponentFormat format : formats) {
 				text.append(format.asTextFormat());
 			}
-		} else {
-			for (ChatComponentFormat format : formats) {
-				if (!parentFormats.contains(format)) {
-					text.append(format.asTextFormat());
-				}
+		} else for (ChatComponentFormat format : formats) {
+			if (!parentFormats.contains(format)) {
+				text.append(format.asTextFormat());
 			}
 		}
 		text.append(this.getLegacyText(color, formats));
-		List<ChatComponent> extra = this.extra;
+		List<ChatComponent> extra = this.getExtra();
 		if (extra != null) for (ChatComponent component : extra) {
 			text.append(component.toLegacyText(color, formats));
 		}
-		reset = !color.equals(parentColor);
-		if (!reset) for (ChatComponentFormat format : formats) {
+		if (!(reset = !color.equals(parentColor))) for (ChatComponentFormat format : formats) {
 			if (!parentFormats.contains(format)) {
 				reset = true;
 				break;
@@ -103,11 +100,9 @@ public abstract class ChatComponent {
 			for (ChatComponentFormat format : parentFormats) {
 				text.append(format);
 			}
-		} else {
-			for (ChatComponentFormat format : parentFormats) {
-				if (!formats.contains(format)) {
-					text.append(format);
-				}
+		} else for (ChatComponentFormat format : parentFormats) {
+			if (!formats.contains(format)) {
+				text.append(format);
 			}
 		}
 		return text.toString();
@@ -115,98 +110,28 @@ public abstract class ChatComponent {
 
 	protected abstract String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats);
 
-	public ChatTextColor getColor() {
-		ChatTextColor color = this.color;
-		if (color != null) {
-			return color;
-		} else {
-			ChatComponent parent = this.parent;
-			return parent != null ? parent.getColor() : ChatNamedColor.RESET;
-		}
-	}
-
 	public ChatTextColor getColorRaw() {
 		return this.color;
-	}
-
-	public boolean isBold() {
-		Boolean bold = this.bold;
-		if (bold != null) {
-			return bold;
-		} else {
-			ChatComponent parent = this.parent;
-			return parent != null && parent.isBold();
-		}
 	}
 
 	public Boolean isBoldRaw() {
 		return this.bold;
 	}
 
-	public boolean isItalic() {
-		Boolean italic = this.italic;
-		if (italic != null) {
-			return italic;
-		} else {
-			ChatComponent parent = this.parent;
-			return parent != null && parent.isItalic();
-		}
-	}
-
 	public Boolean isItalicRaw() {
 		return this.italic;
-	}
-
-	public boolean isUnderlined() {
-		Boolean underlined = this.underlined;
-		if (underlined != null) {
-			return underlined;
-		} else {
-			ChatComponent parent = this.parent;
-			return parent != null && parent.isUnderlined();
-		}
 	}
 
 	public Boolean isUnderlinedRaw() {
 		return this.underlined;
 	}
 
-	public boolean isStrikethrough() {
-		Boolean strikethrough = this.strikethrough;
-		if (strikethrough != null) {
-			return strikethrough;
-		} else {
-			ChatComponent parent = this.parent;
-			return parent != null && parent.isStrikethrough();
-		}
-	}
-
 	public Boolean isStrikethroughRaw() {
 		return this.strikethrough;
 	}
 
-	public boolean isObfuscated() {
-		Boolean obfuscated = this.obfuscated;
-		if (obfuscated != null) {
-			return obfuscated;
-		} else {
-			ChatComponent parent = this.parent;
-			return parent != null && parent.isObfuscated();
-		}
-	}
-
 	public Boolean isObfuscatedRaw() {
 		return this.obfuscated;
-	}
-
-	public Map<ChatComponentFormat, Boolean> getFormatsRaw() {
-		Map<ChatComponentFormat, Boolean> map = new HashMap<>();
-		map.put(ChatComponentFormat.BOLD, this.bold);
-		map.put(ChatComponentFormat.ITALIC, this.italic);
-		map.put(ChatComponentFormat.UNDERLINED, this.underlined);
-		map.put(ChatComponentFormat.STRIKETHROUGH, this.strikethrough);
-		map.put(ChatComponentFormat.OBFUSCATED, this.obfuscated);
-		return map;
 	}
 
 	public String getInsertion() {
@@ -226,6 +151,66 @@ public abstract class ChatComponent {
 		return extra != null ? Collections.unmodifiableList(extra) : null;
 	}
 
+	public ChatTextColor getColor() {
+		ChatTextColor color = this.getColorRaw();
+		if (color != null) {
+			return color;
+		} else {
+			ChatComponent parent = this.parent;
+			return parent != null ? parent.getColor() : ChatNamedColor.RESET;
+		}
+	}
+
+	public boolean isBold() {
+		Boolean bold = this.isBoldRaw();
+		if (bold != null) {
+			return bold;
+		} else {
+			ChatComponent parent = this.parent;
+			return parent != null && parent.isBold();
+		}
+	}
+
+	public boolean isItalic() {
+		Boolean italic = this.isItalicRaw();
+		if (italic != null) {
+			return italic;
+		} else {
+			ChatComponent parent = this.parent;
+			return parent != null && parent.isItalic();
+		}
+	}
+
+	public boolean isUnderlined() {
+		Boolean underlined = this.isUnderlinedRaw();
+		if (underlined != null) {
+			return underlined;
+		} else {
+			ChatComponent parent = this.parent;
+			return parent != null && parent.isUnderlined();
+		}
+	}
+
+	public boolean isStrikethrough() {
+		Boolean strikethrough = this.isStrikethroughRaw();
+		if (strikethrough != null) {
+			return strikethrough;
+		} else {
+			ChatComponent parent = this.parent;
+			return parent != null && parent.isStrikethrough();
+		}
+	}
+
+	public boolean isObfuscated() {
+		Boolean obfuscated = this.isObfuscatedRaw();
+		if (obfuscated != null) {
+			return obfuscated;
+		} else {
+			ChatComponent parent = this.parent;
+			return parent != null && parent.isObfuscated();
+		}
+	}
+
 	public Boolean getFormatRaw(ChatComponentFormat format) {
 		switch (format) {
 			case BOLD: return this.isBoldRaw();
@@ -233,8 +218,16 @@ public abstract class ChatComponent {
 			case UNDERLINED: return this.isUnderlinedRaw();
 			case STRIKETHROUGH: return this.isStrikethroughRaw();
 			case OBFUSCATED: return this.isObfuscatedRaw();
-			default: throw new IllegalArgumentException();
+			default: throw new IllegalArgumentException("Invalid ChatComponentFormat");
 		}
+	}
+
+	public Map<ChatComponentFormat, Boolean> getFormatsRaw() {
+		Map<ChatComponentFormat, Boolean> map = new HashMap<>();
+		for (ChatComponentFormat format : ChatComponentFormat.values()) {
+			map.put(format, this.getFormatRaw(format));
+		}
+		return map;
 	}
 
 	public void setColor(ChatTextColor color) {
@@ -298,7 +291,13 @@ public abstract class ChatComponent {
 			case OBFUSCATED:
 				this.setObfuscated(isSet);
 				break;
-			default: throw new IllegalArgumentException();
+			default: throw new IllegalArgumentException("Invalid ChatComponentFormat");
+		}
+	}
+
+	public void setFormats(Map<ChatComponentFormat, Boolean> map) {
+		for (Map.Entry<ChatComponentFormat, Boolean> entry : map.entrySet()) {
+			this.setFormat(entry.getKey(), entry.getValue());
 		}
 	}
 

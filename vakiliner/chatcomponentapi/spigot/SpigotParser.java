@@ -17,7 +17,7 @@ import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
+import vakiliner.chatcomponentapi.component.ChatComponentModified;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -57,8 +57,8 @@ public class SpigotParser extends BukkitParser {
 
 	public static BaseComponent spigot(ChatComponent raw) {
 		final BaseComponent component;
-		if (raw instanceof ChatComponentWithLegacyText) {
-			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		if (raw instanceof ChatComponentModified) {
+			raw = ((ChatComponentModified) raw).getComponent();
 		}
 		if (raw == null) {
 			return null;
