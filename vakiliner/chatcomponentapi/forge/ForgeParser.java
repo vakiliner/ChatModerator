@@ -74,14 +74,14 @@ public class ForgeParser extends BaseParser {
 			component = new StringTextComponent(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
-			component = new TranslationTextComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(ForgeParser::forge).toArray());
+			component = new TranslationTextComponent(chatComponent.getKey(), chatComponent.getWith().stream().map((c) -> forge(c, isConsole)).toArray());
 		} else {
 			throw new IllegalArgumentException("Could not parse ITextComponent from " + raw.getClass());
 		}
 		component.setStyle(forgeStyle(raw));
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
-			component.append(forge(chatComponent));
+			component.append(forge(chatComponent, isConsole));
 		}
 		return component;
 	}

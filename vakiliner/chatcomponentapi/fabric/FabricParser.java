@@ -153,7 +153,7 @@ public class FabricParser extends BaseParser {
 			component = new TextComponent(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
-			component = new TranslatableComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(FabricParser::fabric).toArray());
+			component = new TranslatableComponent(chatComponent.getKey(), chatComponent.getWith().stream().map((c) -> fabric(c, isConsole)).toArray());
 		} else if (raw instanceof ChatSelectorComponent) {
 			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
 			component = new SelectorComponent(chatComponent.getSelector());
@@ -168,7 +168,7 @@ public class FabricParser extends BaseParser {
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
 			try {
-				APPEND.invoke(component, fabric(chatComponent));
+				APPEND.invoke(component, fabric(chatComponent, isConsole));
 			} catch (IllegalAccessException | InvocationTargetException err) {
 				throw new RuntimeException(err);
 			}

@@ -69,14 +69,14 @@ public class PaperParser extends SpigotParser {
 		List<Component> children = new ArrayList<>();
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
-			children.add(paper(chatComponent));
+			children.add(paper(chatComponent, isConsole));
 		}
 		if (raw instanceof ChatTextComponent) {
 			ChatTextComponent chatComponent = (ChatTextComponent) raw;
 			builder = Component.text().content(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
-			builder = Component.translatable().key(chatComponent.getKey()).args(chatComponent.getWith().stream().map(PaperParser::paper).collect(Collectors.toList()));
+			builder = Component.translatable().key(chatComponent.getKey()).args(chatComponent.getWith().stream().map((c) -> paper(c, isConsole)).collect(Collectors.toList()));
 		} else if (raw instanceof ChatSelectorComponent) {
 			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
 			builder = Component.selector().pattern(chatComponent.getSelector());

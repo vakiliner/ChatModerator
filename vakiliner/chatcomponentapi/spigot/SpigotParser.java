@@ -78,7 +78,7 @@ public class SpigotParser extends BukkitParser {
 			component = new TextComponent(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
-			component = new TranslatableComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(SpigotParser::spigot).toArray());
+			component = new TranslatableComponent(chatComponent.getKey(), chatComponent.getWith().stream().map((c) -> spigot(c, isConsole)).toArray());
 		} else if (raw instanceof ChatSelectorComponent) {
 			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
 			component = new SelectorComponent(chatComponent.getSelector());
@@ -95,7 +95,7 @@ public class SpigotParser extends BukkitParser {
 		component.setHoverEvent(spigot(raw.getHoverEvent()));
 		List<ChatComponent> children = raw.getExtra();
 		if (children != null) {
-			component.setExtra(children.stream().map(SpigotParser::spigot).collect(Collectors.toList()));
+			component.setExtra(children.stream().map((c) -> spigot(c, isConsole)).collect(Collectors.toList()));
 		}
 		return component;
 	}
