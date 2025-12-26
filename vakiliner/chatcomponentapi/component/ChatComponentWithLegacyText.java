@@ -15,8 +15,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 	}
 
 	public ChatComponentWithLegacyText(ChatComponent component, ChatComponent legacyComponent) {
-		this(component, () -> legacyComponent);
-		this.setLegacyComponent(legacyComponent);
+		super(component);
+		this.getLegacyComponent = () -> this.legacyComponent;
+		this.legacyComponent = Objects.requireNonNull(legacyComponent);
+		this.legacyComponent.setParent(this);
 	}
 
 	public ChatComponentWithLegacyText(ChatComponent component, String legacyText) {
@@ -28,8 +30,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		this.getLegacyComponent = component.getLegacyComponent;
 		ChatComponent legacyComponent = component.legacyComponent;
 		if (legacyComponent != null) {
-			this.setLegacyComponent(legacyComponent.clone());
+			legacyComponent = legacyComponent.clone();
+			legacyComponent.setParent(this);
 		}
+		this.legacyComponent = legacyComponent;
 	}
 
 	public ChatComponent getLegacyComponent() {
@@ -40,14 +44,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 			if (this.legacyComponent != null) {
 				return this.legacyComponent;
 			}
-			return this.setLegacyComponent(this.getLegacyComponent.get());
+			this.legacyComponent = this.getLegacyComponent.get().clone();
+			this.legacyComponent.setParent(this);
+			return this.legacyComponent;
 		}
-	}
-
-	private ChatComponent setLegacyComponent(ChatComponent legacyComponent) {
-		this.legacyComponent = Objects.requireNonNull(legacyComponent);
-		this.legacyComponent.setParent(this);
-		return this.legacyComponent;
 	}
 
 	public ChatComponent clone() {
@@ -55,10 +55,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 	}
 
 	public String toLegacyText() {
-		return this.legacyComponent.toLegacyText();
+		return this.getLegacyComponent().toLegacyText();
 	}
 
 	public String toLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
-		return this.legacyComponent.toLegacyText(parentColor, parentFormats);
+		return this.getLegacyComponent().toLegacyText(parentColor, parentFormats);
 	}
 }
