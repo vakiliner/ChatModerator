@@ -38,6 +38,7 @@ import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
@@ -49,14 +50,22 @@ public class ForgeParser extends BaseParser {
 			ServerPlayerEntity player = (ServerPlayerEntity) commandSource;
 			player.sendMessage(forge(component), forge(type), uuid != null ? uuid : Util.NIL_UUID);
 		} else {
-			commandSource.sendMessage(forge(component), uuid != null ? uuid : Util.NIL_UUID);
+			commandSource.sendMessage(forge(component, commandSource instanceof MinecraftServer), uuid != null ? uuid : Util.NIL_UUID);
 		}
 	}
 
 	public static ITextComponent forge(ChatComponent raw) {
+		return forge(raw, false);
+	}
+
+	public static ITextComponent forge(ChatComponent raw, boolean isConsole) {
 		final TextComponent component;
 		if (raw instanceof ChatComponentModified) {
-			raw = ((ChatComponentModified) raw).getComponent();
+			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
+				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
+			} else {
+				raw = ((ChatComponentModified) raw).getComponent();
+			}
 		}
 		if (raw == null) {
 			return null;

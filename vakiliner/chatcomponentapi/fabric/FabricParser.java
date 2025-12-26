@@ -36,6 +36,7 @@ import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -108,10 +109,11 @@ public class FabricParser extends BaseParser {
 					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, fabric(component), fabric(type));
 				}
 			} else {
+				boolean isConsole = commandSource instanceof MinecraftServer;
 				if (SEND_MESSAGE_WITHOUT_TYPE.getParameterTypes().length == 2) {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component), uuid != null ? uuid : Util.NIL_UUID);
+					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component, isConsole), uuid != null ? uuid : Util.NIL_UUID);
 				} else {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component));
+					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component, isConsole));
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException err) {
@@ -132,9 +134,17 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static Component fabric(ChatComponent raw) {
+		return fabric(raw, false);
+	}
+
+	public static Component fabric(ChatComponent raw, boolean isConsole) {
 		final BaseComponent component;
 		if (raw instanceof ChatComponentModified) {
-			raw = ((ChatComponentModified) raw).getComponent();
+			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
+				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
+			} else {
+				raw = ((ChatComponentModified) raw).getComponent();
+			}
 		}
 		if (raw == null) {
 			return null;
