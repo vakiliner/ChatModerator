@@ -1,51 +1,31 @@
 package vakiliner.chatcomponentapi.component;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 
 public class ChatComponentWithLegacyText extends ChatComponentModified {
-	private final Supplier<ChatComponent> getLegacy;
+	private final Supplier<ChatComponent> getLegacyComponent;
 	private ChatComponent legacyComponent;
-	@Deprecated
-	private String legacyText;
 
-	@Deprecated
-	public ChatComponentWithLegacyText(ChatComponent component, String legacyText) {
+	public ChatComponentWithLegacyText(ChatComponent component, Supplier<ChatComponent> getLegacyComponent) {
 		super(component);
-		this.getLegacy = () -> new ChatTextComponent(this.legacyText);
-		this.legacyText = legacyText;
+		this.getLegacyComponent = getLegacyComponent;
 	}
 
-	@Deprecated
-	public ChatComponentWithLegacyText(ChatComponent component, Supplier<String> getLegacyText) {
-		super(component);
-		Objects.requireNonNull(getLegacyText);
-		this.getLegacy = () -> new ChatTextComponent(this.legacyText = getLegacyText.get());
+	public ChatComponentWithLegacyText(ChatComponent component, ChatComponent legacyComponent) {
+		this(component, () -> legacyComponent);
+		this.legacyComponent = legacyComponent;
+	}
+
+	public ChatComponentWithLegacyText(ChatComponent component, String legacyText) {
+		this(component, new ChatTextComponent(legacyText));
 	}
 
 	public ChatComponentWithLegacyText(ChatComponentWithLegacyText component) {
 		super(component);
-		this.getLegacy = component.getLegacy;
+		this.getLegacyComponent = component.getLegacyComponent;
 		this.legacyComponent = component.legacyComponent;
-	}
-
-	@Deprecated
-	public String getLegacyText() {
-		if (this.legacyText != null) {
-			return this.legacyText;
-		}
-		synchronized (this) {
-			if (this.legacyText != null) {
-				return this.legacyText;
-			}
-			ChatComponent lecagyComponent = this.getLegacyComponent();
-			if (this.legacyText != null) {
-				return this.legacyText;
-			}
-			return this.legacyText = lecagyComponent.toLegacyText();
-		}
 	}
 
 	public ChatComponent getLegacyComponent() {
@@ -56,7 +36,7 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 			if (this.legacyComponent != null) {
 				return this.legacyComponent;
 			}
-			return this.legacyComponent = this.getLegacy.get();
+			return this.legacyComponent = this.getLegacyComponent.get();
 		}
 	}
 
@@ -64,7 +44,11 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		return new ChatComponentWithLegacyText(this);
 	}
 
+	public String toLegacyText() {
+		return this.legacyComponent.toLegacyText();
+	}
+
 	public String toLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
-		return Objects.requireNonNull(this.getLegacyText());
+		return this.legacyComponent.toLegacyText(parentColor, parentFormats);
 	}
 }
