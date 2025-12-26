@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
@@ -301,14 +302,21 @@ public abstract class ChatComponent {
 		}
 	}
 
+	protected synchronized void setParent(ChatComponent parent) {
+		if (this.parent != null) throw new IllegalArgumentException("Component already has parent");
+		this.parent = Objects.requireNonNull(parent);
+	}
+
 	public void append(ChatComponent component) {
 		if (component == this) throw new IllegalArgumentException("This component cannot be added");
 		if (component.parent != null) throw new IllegalArgumentException("Component already has parent");
 		List<ChatComponent> extra = this.extra;
-		if (extra == null) {
-			extra = this.extra = new ArrayList<>();
+		if (extra == null) synchronized (this) {
+			if ((extra = this.extra) == null) {
+				extra = this.extra = new ArrayList<>();
+			}
 		}
-		component.parent = this;
+		component.setParent(this);
 		extra.add(component);
 	}
 
@@ -322,7 +330,7 @@ public abstract class ChatComponent {
 
 	@Deprecated
 	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
-		return new ChatComponentWithLegacyText(this, getLegacyText.get());
+		return this.withLegacyText(getLegacyText.get());
 	}
 
 	public ChatComponentWithLegacyText withLegacyText(String legacyText) {

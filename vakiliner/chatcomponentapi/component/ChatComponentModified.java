@@ -15,10 +15,12 @@ public abstract class ChatComponentModified extends ChatComponent {
 			throw new IllegalArgumentException(component.getClass().getSimpleName() + " cannot be used as a component");
 		}
 		this.component = Objects.requireNonNull(component);
+		this.component.setParent(this);
 	}
 
 	protected ChatComponentModified(ChatComponentModified component) {
 		this.component = component.component.clone();
+		this.component.setParent(this);
 	}
 
 	public final ChatComponent getComponent() {
@@ -33,8 +35,8 @@ public abstract class ChatComponentModified extends ChatComponent {
 		return this.component.getLegacyText(parentColor, parentFormats);
 	}
 
-	public ChatTextColor getColor() {
-		return this.component.getColor();
+	public ChatTextColor getColorRaw() {
+		return this.component.getColorRaw();
 	}
 
 	public Boolean isBoldRaw() {

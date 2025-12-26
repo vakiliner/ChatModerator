@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.component;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
@@ -10,12 +11,12 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 
 	public ChatComponentWithLegacyText(ChatComponent component, Supplier<ChatComponent> getLegacyComponent) {
 		super(component);
-		this.getLegacyComponent = getLegacyComponent;
+		this.getLegacyComponent = Objects.requireNonNull(getLegacyComponent);
 	}
 
 	public ChatComponentWithLegacyText(ChatComponent component, ChatComponent legacyComponent) {
 		this(component, () -> legacyComponent);
-		this.legacyComponent = legacyComponent;
+		this.setLegacyComponent(legacyComponent);
 	}
 
 	public ChatComponentWithLegacyText(ChatComponent component, String legacyText) {
@@ -25,7 +26,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 	public ChatComponentWithLegacyText(ChatComponentWithLegacyText component) {
 		super(component);
 		this.getLegacyComponent = component.getLegacyComponent;
-		this.legacyComponent = component.legacyComponent;
+		ChatComponent legacyComponent = component.legacyComponent;
+		if (legacyComponent != null) {
+			this.setLegacyComponent(legacyComponent.clone());
+		}
 	}
 
 	public ChatComponent getLegacyComponent() {
@@ -36,8 +40,14 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 			if (this.legacyComponent != null) {
 				return this.legacyComponent;
 			}
-			return this.legacyComponent = this.getLegacyComponent.get();
+			return this.setLegacyComponent(this.getLegacyComponent.get());
 		}
+	}
+
+	private ChatComponent setLegacyComponent(ChatComponent legacyComponent) {
+		this.legacyComponent = Objects.requireNonNull(legacyComponent);
+		this.legacyComponent.setParent(this);
+		return this.legacyComponent;
 	}
 
 	public ChatComponent clone() {
