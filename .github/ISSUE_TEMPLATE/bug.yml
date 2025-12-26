@@ -38,7 +38,7 @@ body:
     validations:
       required: false
   - type: textarea
-    id: information
+    id: build-info
     attributes:
       label: Информация о сборке
       description: |-
@@ -53,5 +53,12 @@ body:
         Платформа: Forge
         Среда: Клиент | Сервер
         Версия Forge: 36.2.42
+      value: |-
+        Версия мода: `0.1.2`
+        Версия Minecraft: `1.16.5`
+        Платформа: **CraftBukkit**, **Spigot**, **Paper**, **Fabric**, **Forge**
+        Среда: Клиент | Сервер | Оба
+        Версия Fabric Loader: `0.18.3`
+        Версия Forge: `36.2.42`
     validations:
       required: true
