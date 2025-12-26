@@ -121,12 +121,17 @@ public abstract class ChatComponentModified extends ChatComponent {
 		this.component.append(component);
 	}
 
-	public ChatComponentWithLegacyText withLegacyText(Supplier<ChatComponent> getLegacyComponent) {
-		return this.component.withLegacyText(getLegacyComponent);
+	public ChatComponentWithLegacyText withLegacyComponent(Supplier<ChatComponent> getLegacyComponent) {
+		return this.component.withLegacyComponent(getLegacyComponent);
 	}
 
-	public ChatComponentWithLegacyText withLegacyText(ChatComponent legacyComponent) {
-		return this.component.withLegacyText(legacyComponent);
+	public ChatComponentWithLegacyText withLegacyComponent(ChatComponent legacyComponent) {
+		return this.component.withLegacyComponent(legacyComponent);
+	}
+
+	@Deprecated
+	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
+		return this.component.withLegacyText(getLegacyText);
 	}
 
 	public ChatComponentWithLegacyText withLegacyText(String legacyText) {

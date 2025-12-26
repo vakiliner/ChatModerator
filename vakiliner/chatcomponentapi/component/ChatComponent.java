@@ -312,12 +312,17 @@ public abstract class ChatComponent {
 		extra.add(component);
 	}
 
-	public ChatComponentWithLegacyText withLegacyText(Supplier<ChatComponent> getLegacyComponent) {
+	public ChatComponentWithLegacyText withLegacyComponent(Supplier<ChatComponent> getLegacyComponent) {
 		return new ChatComponentWithLegacyText(this, getLegacyComponent);
 	}
 
-	public ChatComponentWithLegacyText withLegacyText(ChatComponent legacyComponent) {
+	public ChatComponentWithLegacyText withLegacyComponent(ChatComponent legacyComponent) {
 		return new ChatComponentWithLegacyText(this, legacyComponent);
+	}
+
+	@Deprecated
+	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
+		return new ChatComponentWithLegacyText(this, getLegacyText.get());
 	}
 
 	public ChatComponentWithLegacyText withLegacyText(String legacyText) {
