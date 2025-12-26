@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 import net.kyori.adventure.audience.MessageType;
@@ -33,6 +34,7 @@ import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -41,17 +43,26 @@ import vakiliner.chatcomponentapi.spigot.SpigotParser;
 
 public class PaperParser extends SpigotParser {
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
+		boolean isConsole = sender instanceof ConsoleCommandSender;
 		if (uuid != null && sendMessageWithUUID) {
-			sender.sendMessage(Identity.identity(uuid), paper(component), paper(type));
+			sender.sendMessage(Identity.identity(uuid), paper(component, isConsole), paper(type));
 		} else {
-			sender.sendMessage(paper(component), paper(type));
+			sender.sendMessage(paper(component, isConsole), paper(type));
 		}
 	}
 
 	public static Component paper(ChatComponent raw) {
+		return paper(raw, false);
+	}
+
+	public static Component paper(ChatComponent raw, boolean isConsole) {
 		if (raw == null) return null;
 		if (raw instanceof ChatComponentModified) {
-			raw = ((ChatComponentModified) raw).getComponent();
+			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
+				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
+			} else {
+				raw = ((ChatComponentModified) raw).getComponent();
+			}
 		}
 		final ComponentBuilder<?, ?> builder;
 		Style style = paperStyle(raw);

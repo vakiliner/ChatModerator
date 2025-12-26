@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 import net.md_5.bungee.api.ChatColor;
@@ -18,6 +19,7 @@ import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
+import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -47,18 +49,27 @@ public class SpigotParser extends BukkitParser {
 				player.spigot().sendMessage(spigot(type), spigot(component));
 			}
 		} else {
+			boolean isConsole = sender instanceof ConsoleCommandSender;
 			if (sendMessageWithUUID) {
-				sender.spigot().sendMessage(uuid, spigot(component));
+				sender.spigot().sendMessage(uuid, spigot(component, isConsole));
 			} else {
-				sender.spigot().sendMessage(spigot(component));
+				sender.spigot().sendMessage(spigot(component, isConsole));
 			}
 		}
 	}
 
 	public static BaseComponent spigot(ChatComponent raw) {
+		return spigot(raw, false);
+	}
+
+	public static BaseComponent spigot(ChatComponent raw, boolean isConsole) {
 		final BaseComponent component;
 		if (raw instanceof ChatComponentModified) {
-			raw = ((ChatComponentModified) raw).getComponent();
+			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
+				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
+			} else {
+				raw = ((ChatComponentModified) raw).getComponent();
+			}
 		}
 		if (raw == null) {
 			return null;

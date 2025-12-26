@@ -6,26 +6,32 @@ import java.util.function.Supplier;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 
 public class ChatComponentWithLegacyText extends ChatComponentModified {
-	private final Supplier<String> getLegacyText;
+	private final Supplier<ChatComponent> getLegacy;
+	private ChatComponent legacyComponent;
+	@Deprecated
 	private String legacyText;
 
+	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, String legacyText) {
 		super(component);
-		this.getLegacyText = null;
+		this.getLegacy = () -> new ChatTextComponent(this.legacyText);
 		this.legacyText = legacyText;
 	}
 
+	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, Supplier<String> getLegacyText) {
 		super(component);
-		this.getLegacyText = Objects.requireNonNull(getLegacyText);
+		Objects.requireNonNull(getLegacyText);
+		this.getLegacy = () -> new ChatTextComponent(this.legacyText = getLegacyText.get());
 	}
 
 	public ChatComponentWithLegacyText(ChatComponentWithLegacyText component) {
 		super(component);
-		this.getLegacyText = component.getLegacyText;
-		this.legacyText = component.legacyText;
+		this.getLegacy = component.getLegacy;
+		this.legacyComponent = component.legacyComponent;
 	}
 
+	@Deprecated
 	public String getLegacyText() {
 		if (this.legacyText != null) {
 			return this.legacyText;
@@ -34,7 +40,23 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 			if (this.legacyText != null) {
 				return this.legacyText;
 			}
-			return this.legacyText = this.getLegacyText.get();
+			ChatComponent lecagyComponent = this.getLegacyComponent();
+			if (this.legacyText != null) {
+				return this.legacyText;
+			}
+			return this.legacyText = lecagyComponent.toLegacyText();
+		}
+	}
+
+	public ChatComponent getLegacyComponent() {
+		if (this.legacyComponent != null) {
+			return this.legacyComponent;
+		}
+		synchronized (this) {
+			if (this.legacyComponent != null) {
+				return this.legacyComponent;
+			}
+			return this.legacyComponent = this.getLegacy.get();
 		}
 	}
 
