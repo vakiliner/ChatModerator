@@ -37,6 +37,7 @@ import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
+import vakiliner.chatcomponentapi.component.ChatComponentModified;
 import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -49,14 +50,22 @@ public class ForgeParser extends BaseParser {
 			ServerPlayerEntity player = (ServerPlayerEntity) commandSource;
 			player.sendMessage(forge(component), forge(type), uuid != null ? uuid : Util.NIL_UUID);
 		} else {
-			commandSource.sendMessage(forge(component), uuid != null ? uuid : Util.NIL_UUID);
+			commandSource.sendMessage(forge(component, commandSource instanceof MinecraftServer), uuid != null ? uuid : Util.NIL_UUID);
 		}
 	}
 
 	public static ITextComponent forge(ChatComponent raw) {
+		return forge(raw, false);
+	}
+
+	public static ITextComponent forge(ChatComponent raw, boolean isConsole) {
 		final TextComponent component;
-		if (raw instanceof ChatComponentWithLegacyText) {
-			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		if (raw instanceof ChatComponentModified) {
+			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
+				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
+			} else {
+				raw = ((ChatComponentModified) raw).getComponent();
+			}
 		}
 		if (raw == null) {
 			return null;
@@ -65,14 +74,14 @@ public class ForgeParser extends BaseParser {
 			component = new StringTextComponent(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
-			component = new TranslationTextComponent(chatComponent.getKey(), chatComponent.getWith().stream().map(ForgeParser::forge).toArray());
+			component = new TranslationTextComponent(chatComponent.getKey(), chatComponent.getWith().stream().map((c) -> forge(c, isConsole)).toArray());
 		} else {
 			throw new IllegalArgumentException("Could not parse ITextComponent from " + raw.getClass());
 		}
 		component.setStyle(forgeStyle(raw));
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
-			component.append(forge(chatComponent));
+			component.append(forge(chatComponent, isConsole));
 		}
 		return component;
 	}

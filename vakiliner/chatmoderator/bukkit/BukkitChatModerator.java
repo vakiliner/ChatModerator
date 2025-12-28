@@ -17,7 +17,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import vakiliner.chatcomponentapi.ChatComponentAPIBukkitLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitChatCommandSender;
 import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
 import vakiliner.chatmoderator.base.ChatModerator;
@@ -89,9 +88,7 @@ public class BukkitChatModerator extends ChatModerator {
 				recipients.add(this.toChatCommandSender((CommandSender) permissible));
 			}
 		}
-		recipients.forEach((recipient) -> {
-			recipient.sendMessage(recipient.isConsole() ? new ChatTextComponent(chatComponent.toLegacyText()) : chatComponent);
-		});
+		recipients.forEach((recipient) -> recipient.sendMessage(chatComponent));
 	}
 
 	public Collection<ChatPlayer> getOnlinePlayers() {
