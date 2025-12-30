@@ -21,7 +21,7 @@ public class ForgeChatOfflinePlayer extends vakiliner.chatcomponentapi.forge.For
 	}
 
 	public boolean isBypassModeration() {
-		return this.manager.server.isSingleplayerOwner(this.gameProfile);
+		return this.server.isSingleplayerOwner(this.gameProfile);
 	}
 
 	public boolean isBypassMutes() {

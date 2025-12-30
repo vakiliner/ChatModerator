@@ -8,6 +8,7 @@ import com.mojang.brigadier.ParseResults;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -73,8 +74,9 @@ class ForgeListener {
 			event.setCanceled(true);
 			ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), ForgeParser.forge(ForgeHooks.newChatWithLinks(message)));
 			Set<ChatCommandSender> recipients = new HashSet<>();
-			recipients.add(this.manager.toChatCommandSender(this.manager.server));
-			for (ServerPlayerEntity recipient : this.manager.server.getPlayerList().getPlayers()) {
+			MinecraftServer server = event.getPlayer().getServer();
+			recipients.add(this.manager.toChatCommandSender(server));
+			for (ServerPlayerEntity recipient : server.getPlayerList().getPlayers()) {
 				if (recipient.isSpectator()) {
 					recipients.add(this.manager.toChatPlayer(recipient));
 				}

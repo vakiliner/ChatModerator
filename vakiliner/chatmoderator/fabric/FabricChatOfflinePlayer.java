@@ -21,7 +21,7 @@ public class FabricChatOfflinePlayer extends vakiliner.chatcomponentapi.fabric.F
 	}
 
 	public boolean isBypassModeration() {
-		return this.manager.server.isSingleplayerOwner(this.gameProfile);
+		return this.server.isSingleplayerOwner(this.gameProfile);
 	}
 
 	public boolean isBypassMutes() {
