@@ -21,6 +21,7 @@ class ConfigImpl implements Config {
 	public final BooleanValue autoModerationUseThreadPool;
 	public final BooleanValue spectatorsChat;
 	public final ConfigValue<String> dictionaryFile;
+	public final ConfigValue<String> mutesPath;
 	public final BooleanValue showFailMessage;
 	public final BooleanValue logBlockedMessages;
 	public final BooleanValue logBlockedCommands;
@@ -34,6 +35,7 @@ class ConfigImpl implements Config {
 		this.autoModerationUseThreadPool = builder.translation("null").define("auto_moderation_use_thread_pool", false);
 		this.spectatorsChat = builder.translation("null").define("spectators_chat", false);
 		this.dictionaryFile = builder.translation("null").define("dictionary_file", "");
+		this.mutesPath = builder.translation("null").define("mutes_path", "./mutes.json");
 		this.showFailMessage = builder.translation("null").define("show_fail_message", true);
 		this.logBlockedMessages = builder.translation("null").define("log_blocked_messages", false);
 		this.logBlockedCommands = builder.translation("null").define("log_blocked_commands", false);
@@ -95,6 +97,14 @@ class ConfigImpl implements Config {
 
 	public void dictionaryFile(String name) {
 		this.dictionaryFile.set(name);
+	}
+
+	public String mutesPath() {
+		return this.mutesPath.get();
+	}
+
+	public void mutesPath(String path) {
+		this.mutesPath.set(path);
 	}
 
 	public boolean showFailMessage() {

@@ -31,6 +31,10 @@ public interface Config {
 
 	void dictionaryFile(String name);
 
+	String mutesPath();
+
+	void mutesPath(String path);
+
 	boolean showFailMessage();
 
 	void showFailMessage(boolean show);

@@ -69,6 +69,14 @@ class ConfigImpl implements Config {
 		this.config.dictionary_file = name;
 	}
 
+	public String mutesPath() {
+		return get(this.config.mutes_path, "./mutes.json");
+	}
+
+	public void mutesPath(String path) {
+		this.config.mutes_path = path;
+	}
+
 	public boolean showFailMessage() {
 		return get(this.config.show_fail_message, true);
 	}
