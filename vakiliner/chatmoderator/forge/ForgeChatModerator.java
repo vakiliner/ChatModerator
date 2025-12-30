@@ -130,6 +130,11 @@ public class ForgeChatModerator extends ChatModerator {
 		return player != null ? new ForgeChatPlayer(this, player) : null;
 	}
 
+	public ChatOfflinePlayer toChatOfflinePlayer(MinecraftServer server, GameProfile gameProfile) {
+		return gameProfile != null ? new ForgeChatOfflinePlayer(this, server, gameProfile) : null;
+	}
+
+	@Deprecated
 	public ChatOfflinePlayer toChatOfflinePlayer(GameProfile gameProfile) {
 		return gameProfile != null ? new ForgeChatOfflinePlayer(this, gameProfile) : null;
 	}
