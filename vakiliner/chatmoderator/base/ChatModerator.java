@@ -33,7 +33,7 @@ import vakiliner.chatmoderator.core.automod.EventType;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public abstract class ChatModerator {
-	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
+	public static final int CONFIG_VERSION = Short.MIN_VALUE + 3;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
 	public final AutoModeration automod = new AutoModeration(this);
@@ -117,6 +117,8 @@ public abstract class ChatModerator {
 				case 1:
 					config.logBlockedMessages(false);
 					config.logBlockedCommands(false);
+				case 2:
+					config.mutesPath("./mutes.json");
 			}
 			config.version(CONFIG_VERSION);
 			return true;
@@ -137,7 +139,7 @@ public abstract class ChatModerator {
 	public abstract String getName();
 
 	public Path getMutesPath() {
-		return this.getFolderPath().resolve("mutes.json");
+		return this.getFolderPath().resolve(this.getConfig().mutesPath());
 	}
 
 	public Path getAutoModerationRulesPath() {
