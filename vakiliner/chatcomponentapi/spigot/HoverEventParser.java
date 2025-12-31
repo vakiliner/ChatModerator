@@ -54,10 +54,10 @@ class HoverEventParser {
 			}
 		} else if (raw instanceof Entity) {
 			Entity content = (Entity) raw;
-			return new ChatHoverEvent.ShowEntity(new ChatId(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName()));
+			return new ChatHoverEvent.ShowEntity(ChatId.parse(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName()));
 		} else if (raw instanceof Item) {
 			Item content = (Item) raw;
-			return new ChatHoverEvent.ShowItem(new ChatId(content.getId()), content.getCount());
+			return new ChatHoverEvent.ShowItem(ChatId.parse(content.getId()), content.getCount());
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
 		}
