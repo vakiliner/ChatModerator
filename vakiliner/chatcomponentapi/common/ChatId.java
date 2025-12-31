@@ -4,6 +4,7 @@ public class ChatId {
 	private final String namespace;
 	private final String value;
 
+	@Deprecated
 	public ChatId(String string) {
 		int index = string.indexOf(':');
 		this.namespace = index > 0 ? string.substring(0, index) : "minecraft";
@@ -25,5 +26,16 @@ public class ChatId {
 
 	public String toString() {
 		return this.namespace + ':' + this.value;
+	}
+
+	public static ChatId parse(String string) {
+		return parse(string, "minecraft");
+	}
+
+	public static ChatId parse(String string, String defaultNamespace) {
+		int index = string.indexOf(':');
+		String namespace = index > 0 ? string.substring(0, index) : defaultNamespace;
+		String value = index >= 0 ? string.substring(index + 1) : string;
+		return new ChatId(namespace, value);
 	}
 }
