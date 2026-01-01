@@ -14,6 +14,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.GameProfileArgument;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -65,6 +66,7 @@ public class MuteCommand {
 			duration = (int) (d * 60);
 		}
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
+		MinecraftServer server = stack.getServer();
 		Entity entity = stack.getEntity();
 		final ModeratorType moderatorType;
 		if (entity == null) {
@@ -77,7 +79,7 @@ public class MuteCommand {
 		boolean bypassMutes = true;
 		int i = 0;
 		for (GameProfile profile : collection) {
-			ChatOfflinePlayer player = manager.toChatOfflinePlayer(profile);
+			ChatOfflinePlayer player = manager.toChatOfflinePlayer(server, profile);
 			if (player.isBypassMutes()) {
 				continue;
 			} else {
