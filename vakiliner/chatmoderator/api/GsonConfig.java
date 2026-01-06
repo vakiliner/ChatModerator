@@ -10,6 +10,7 @@ public class GsonConfig {
 	public Boolean auto_moderation_use_thread_pool;
 	public Boolean spectators_chat;
 	public String dictionary_file;
+	public String mutes_path;
 	public Boolean show_fail_message;
 	public Boolean log_blocked_messages;
 	public Boolean log_blocked_commands;
