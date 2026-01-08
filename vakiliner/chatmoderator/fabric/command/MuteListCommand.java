@@ -13,6 +13,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.GameProfileArgument;
+import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -113,10 +114,11 @@ public class MuteListCommand {
 
 	private static int getMute(CommandSourceStack stack, Collection<GameProfile> collection) throws CommandSyntaxException {
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
+		MinecraftServer server = stack.getServer();
 		int i = 0;
 		Date now = new Date();
 		for (GameProfile profile : collection) {
-			ChatOfflinePlayer player = manager.toChatOfflinePlayer(profile);
+			ChatOfflinePlayer player = manager.toChatOfflinePlayer(server, profile);
 			MutedPlayer mute = player.getMute(false);
 			ChatTextComponent component = new ChatTextComponent();
 			component.append(new ChatTextComponent(player.getName()));

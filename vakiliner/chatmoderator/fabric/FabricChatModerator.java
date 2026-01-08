@@ -143,6 +143,11 @@ public class FabricChatModerator extends ChatModerator {
 		return player != null ? new FabricChatPlayer(this, player) : null;
 	}
 
+	public ChatOfflinePlayer toChatOfflinePlayer(MinecraftServer server, GameProfile gameProfile) {
+		return gameProfile != null ? new FabricChatOfflinePlayer(this, server, gameProfile) : null;
+	}
+
+	@Deprecated
 	public ChatOfflinePlayer toChatOfflinePlayer(GameProfile gameProfile) {
 		return gameProfile != null ? new FabricChatOfflinePlayer(this, gameProfile) : null;
 	}
