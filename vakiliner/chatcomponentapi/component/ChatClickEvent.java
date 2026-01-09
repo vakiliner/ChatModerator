@@ -30,6 +30,17 @@ public class ChatClickEvent {
 		return this.value;
 	}
 
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatClickEvent)) {
+			return false;
+		} else {
+			ChatClickEvent other = (ChatClickEvent) obj;
+			return this.action == other.action && this.value.equals(other.value);
+		}
+	}
+
 	public static enum Action {
 		OPEN_URL("open_url"),
 		OPEN_FILE("open_file", false),

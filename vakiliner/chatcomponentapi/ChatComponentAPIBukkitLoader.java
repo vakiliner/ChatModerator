@@ -5,16 +5,9 @@ import vakiliner.chatcomponentapi.paper.PaperParser;
 import vakiliner.chatcomponentapi.spigot.SpigotParser;
 
 public class ChatComponentAPIBukkitLoader {
-	public static BukkitParser PARSER;
+	public static final BukkitParser PARSER;
 
 	static {
-		load0();
-	}
-
-	private static synchronized BukkitParser load0() {
-		if (PARSER != null) {
-			return PARSER;
-		}
 		BukkitParser impl;
 		try {
 			impl = new PaperParser();
@@ -25,14 +18,11 @@ public class ChatComponentAPIBukkitLoader {
 				impl = new BukkitParser();
 			}
 		}
-		return PARSER = impl;
+		PARSER = impl;
 	}
 
 	@Deprecated
 	public static BukkitParser load() {
-		if (PARSER == null) {
-			return load0();
-		}
 		return PARSER;
 	}
 
