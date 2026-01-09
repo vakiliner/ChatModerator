@@ -131,12 +131,22 @@ public abstract class ChatComponentModified extends ChatComponent {
 		return this.component.withLegacyComponent(legacyComponent);
 	}
 
-	@Deprecated
 	public ChatComponentWithLegacyText withLegacyText(Supplier<String> getLegacyText) {
 		return this.component.withLegacyText(getLegacyText);
 	}
 
 	public ChatComponentWithLegacyText withLegacyText(String legacyText) {
 		return this.component.withLegacyText(legacyText);
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatComponentModified)) {
+			return false;
+		} else {
+			ChatComponentModified other = (ChatComponentModified) obj;
+			return this.component.equals(other.component);
+		}
 	}
 }
