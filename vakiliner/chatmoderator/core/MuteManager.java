@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -109,6 +110,8 @@ public class MuteManager {
 					this.map.put(mute.uuid, mute.toMutedPlayer());
 				}
 			}
+		} else if (!file.getParentFile().exists()) {
+			throw new NoSuchFileException(file.toString());
 		}
 	}
 
