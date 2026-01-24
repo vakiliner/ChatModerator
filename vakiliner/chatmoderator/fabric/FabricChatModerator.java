@@ -121,6 +121,7 @@ public class FabricChatModerator extends ChatModerator {
 		return AutoModerationTriggerCallback.EVENT.invoker().trigger(((vakiliner.chatcomponentapi.fabric.FabricChatPlayer) player).getPlayer(), checkResult, actions, true);
 	}
 
+	@Deprecated
 	public MinecraftServer getServer() {
 		return this.server;
 	}

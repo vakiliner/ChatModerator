@@ -15,7 +15,7 @@ public class ForgeChatOfflinePlayer extends vakiliner.chatcomponentapi.forge.For
 
 	@Deprecated
 	public ForgeChatOfflinePlayer(ForgeChatModerator manager, GameProfile gameProfile) {
-		this(manager, manager.getServer(), gameProfile);
+		this(manager, manager.server, gameProfile);
 	}
 
 	public MutedPlayer getMute(boolean ignoreExpired) {

@@ -108,6 +108,7 @@ public class ForgeChatModerator extends ChatModerator {
 		return !MinecraftForge.EVENT_BUS.post(event);
 	}
 
+	@Deprecated
 	public MinecraftServer getServer() {
 		return this.server;
 	}

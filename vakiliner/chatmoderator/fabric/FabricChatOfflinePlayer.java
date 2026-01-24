@@ -15,7 +15,7 @@ public class FabricChatOfflinePlayer extends vakiliner.chatcomponentapi.fabric.F
 
 	@Deprecated
 	public FabricChatOfflinePlayer(FabricChatModerator manager, GameProfile gameProfile) {
-		this(manager, manager.getServer(), gameProfile);
+		this(manager, manager.server, gameProfile);
 	}
 
 	public MutedPlayer getMute(boolean ignoreExpired) {
