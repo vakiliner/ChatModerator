@@ -69,7 +69,7 @@ public class ChatHoverEventSerializer implements JsonSerializer<ChatHoverEvent<?
 			final UUID id;
 			final ChatComponent name;
 			if (object.has("type")) {
-				type = new ChatId(object.get("type").getAsString());
+				type = ChatId.parse(object.get("type").getAsString());
 			} else {
 				type = null;
 			}
@@ -98,7 +98,7 @@ public class ChatHoverEventSerializer implements JsonSerializer<ChatHoverEvent<?
 
 		public ChatHoverEvent.ShowItem deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
 			JsonObject object = element.getAsJsonObject();
-			final ChatId item = new ChatId(object.get("item").getAsString());
+			final ChatId item = ChatId.parse(object.get("item").getAsString());
 			final Integer count;
 			if (object.has("Count")) {
 				JsonPrimitive Count = object.getAsJsonPrimitive("Count");

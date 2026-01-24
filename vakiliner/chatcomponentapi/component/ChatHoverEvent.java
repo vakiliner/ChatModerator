@@ -43,6 +43,17 @@ public class ChatHoverEvent<V> {
 		}
 	}
 
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatHoverEvent)) {
+			return false;
+		} else {
+			ChatHoverEvent<?> other = (ChatHoverEvent<?>) obj;
+			return this.action == other.action && this.contents.equals(other.contents);
+		}
+	}
+
 	public static class Action<V> {
 		private static final Map<String, Action<?>> BY_NAME = Maps.newHashMap();
 		public static final Action<ChatComponent> SHOW_TEXT = new Action<>("show_text", ChatComponent.class);
