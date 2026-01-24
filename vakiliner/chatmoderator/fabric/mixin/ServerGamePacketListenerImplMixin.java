@@ -25,6 +25,9 @@ import vakiliner.chatmoderator.fabric.FabricChatModerator;
 public abstract class ServerGamePacketListenerImplMixin {
 	private static final String A = "/all ";
 
+	@Accessor("server")
+	public abstract MinecraftServer getServer();
+
 	@Accessor("player")
 	public abstract ServerPlayer getPlayer();
 
@@ -65,7 +68,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 				callbackInfo.cancel();
 				ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
 				Set<ChatCommandSender> recipients = new HashSet<>();
-				MinecraftServer server = manager.getServer();
+				MinecraftServer server = this.getServer();
 				recipients.add(manager.toChatCommandSender(server));
 				for (ServerPlayer recipient : server.getPlayerList().getPlayers()) {
 					if (recipient.isSpectator()) {
@@ -83,7 +86,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		if (message.startsWith("/") || callbackInfo.isCancelled()) return;
 		callbackInfo.cancel();
 		ChatComponent chatComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
-		FabricChatModerator.PARSER.broadcastMessage(manager.getServer().getPlayerList(), chatComponent, ChatMessageType.CHAT, player.getUniqueId());
+		FabricChatModerator.PARSER.broadcastMessage(this.getServer().getPlayerList(), chatComponent, ChatMessageType.CHAT, player.getUniqueId());
 	}
 
 	private static class HandledPacket extends ServerboundChatPacket {

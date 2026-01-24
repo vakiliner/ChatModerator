@@ -121,6 +121,7 @@ public class FabricChatModerator extends ChatModerator {
 		return AutoModerationTriggerCallback.EVENT.invoker().trigger(((vakiliner.chatcomponentapi.fabric.FabricChatPlayer) player).getPlayer(), checkResult, actions, true);
 	}
 
+	@Deprecated
 	public MinecraftServer getServer() {
 		return this.server;
 	}
@@ -143,6 +144,11 @@ public class FabricChatModerator extends ChatModerator {
 		return player != null ? new FabricChatPlayer(this, player) : null;
 	}
 
+	public ChatOfflinePlayer toChatOfflinePlayer(MinecraftServer server, GameProfile gameProfile) {
+		return gameProfile != null ? new FabricChatOfflinePlayer(this, server, gameProfile) : null;
+	}
+
+	@Deprecated
 	public ChatOfflinePlayer toChatOfflinePlayer(GameProfile gameProfile) {
 		return gameProfile != null ? new FabricChatOfflinePlayer(this, gameProfile) : null;
 	}
