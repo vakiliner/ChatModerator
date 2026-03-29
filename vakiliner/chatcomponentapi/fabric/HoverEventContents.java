@@ -97,10 +97,10 @@ class HoverEventContents implements IStyleParser {
 	}
 
 	public static TextColor fabric(ChatTextColor color) {
-		return color != null ? TextColor.fromRgb(color.value()) : null;
+		return color != null ? TextColor.parseColor(color.toString()) : null;
 	}
 
 	public static ChatTextColor fabric(TextColor color) {
-		return color != null ? ChatTextColor.color(color.getValue(), null) : null;
+		return color != null ? ChatTextColor.of(color.toString()) : null;
 	}
 }

@@ -3,7 +3,7 @@
 	"max_message_length": 80,
 	"max_mute_reason_length": 50,
 	"auto_moderation_enabled": true,
-	"auto_moderation_use_thread_pool": true,
+	"auto_moderation_use_thread_pool": false,
 	"spectators_chat": false,
 	"dictionary_file": "dictionary_ru.json",
 	"show_fail_message": true,

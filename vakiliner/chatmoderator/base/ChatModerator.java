@@ -228,7 +228,7 @@ public abstract class ChatModerator {
 			if (this.getConfig().showFailMessage()) {
 				final ChatComponent messageComponent;
 				if (!isCommand) {
-					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", ChatTextComponent.selector(player), new ChatTextComponent(fullMessage));
+					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(fullMessage));
 				} else {
 					messageComponent = new ChatTextComponent(fullMessage);
 				}
@@ -336,7 +336,7 @@ public abstract class ChatModerator {
 					}
 					if (logAdmins) {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
-						log.append(ChatTextComponent.selector(player));
+						log.append(player.getDisplayName());
 						ChatTextComponent getMessage = new ChatTextComponent(", ");
 						ChatTextComponent showMessage = new ChatTextComponent("показать сообщение");
 						showMessage.setUnderlined(true);

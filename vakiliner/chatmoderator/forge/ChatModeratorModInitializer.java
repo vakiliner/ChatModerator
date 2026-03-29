@@ -33,7 +33,7 @@ public class ChatModeratorModInitializer implements ILoader {
 		MANAGER.init(this);
 		FMLJavaModLoadingContext.get().getModEventBus().register(MANAGER);
 		MinecraftForge.EVENT_BUS.register(this.listener);
-		ForgeChatModerator.LOGGER.info("Готов. Ждёт активации сервера");
+		ForgeChatModerator.LOGGER.info("Ready. Waiting for the server to start");
 	}
 
 	public void saveDefaultConfig() {

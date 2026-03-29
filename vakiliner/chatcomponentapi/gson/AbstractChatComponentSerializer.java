@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -26,7 +25,7 @@ public abstract class AbstractChatComponentSerializer<Component extends ChatComp
 		ChatClickEvent clickEvent = component.getClickEvent();
 		ChatHoverEvent<?> hoverEvent = component.getHoverEvent();
 		List<ChatComponent> extra = component.getExtra();
-		if (color != null) object.addProperty("color", color instanceof ChatNamedColor ? ((ChatNamedColor) color).getName() : '#' + Integer.toString(color.value(), 16));
+		if (color != null) object.addProperty("color", color.toString());
 		if (bold != null) object.addProperty("bold", bold);
 		if (italic != null) object.addProperty("italic", italic);
 		if (underlined != null) object.addProperty("underlined", underlined);

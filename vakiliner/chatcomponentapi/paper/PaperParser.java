@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 import net.kyori.adventure.audience.MessageType;
@@ -32,6 +33,7 @@ import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
+import vakiliner.chatcomponentapi.component.ChatComponentModified;
 import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
@@ -41,31 +43,40 @@ import vakiliner.chatcomponentapi.spigot.SpigotParser;
 
 public class PaperParser extends SpigotParser {
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
+		boolean isConsole = sender instanceof ConsoleCommandSender;
 		if (uuid != null && sendMessageWithUUID) {
-			sender.sendMessage(Identity.identity(uuid), paper(component), paper(type));
+			sender.sendMessage(Identity.identity(uuid), paper(component, isConsole), paper(type));
 		} else {
-			sender.sendMessage(paper(component), paper(type));
+			sender.sendMessage(paper(component, isConsole), paper(type));
 		}
 	}
 
 	public static Component paper(ChatComponent raw) {
+		return paper(raw, false);
+	}
+
+	public static Component paper(ChatComponent raw, boolean isConsole) {
 		if (raw == null) return null;
-		if (raw instanceof ChatComponentWithLegacyText) {
-			raw = ((ChatComponentWithLegacyText) raw).getComponent();
+		if (raw instanceof ChatComponentModified) {
+			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
+				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
+			} else {
+				raw = ((ChatComponentModified) raw).getComponent();
+			}
 		}
 		final ComponentBuilder<?, ?> builder;
 		Style style = paperStyle(raw);
 		List<Component> children = new ArrayList<>();
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
-			children.add(paper(chatComponent));
+			children.add(paper(chatComponent, isConsole));
 		}
 		if (raw instanceof ChatTextComponent) {
 			ChatTextComponent chatComponent = (ChatTextComponent) raw;
 			builder = Component.text().content(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
 			ChatTranslateComponent chatComponent = (ChatTranslateComponent) raw;
-			builder = Component.translatable().key(chatComponent.getKey()).args(chatComponent.getWith().stream().map(PaperParser::paper).collect(Collectors.toList()));
+			builder = Component.translatable().key(chatComponent.getKey()).args(chatComponent.getWith().stream().map((c) -> paper(c, isConsole)).collect(Collectors.toList()));
 		} else if (raw instanceof ChatSelectorComponent) {
 			ChatSelectorComponent chatComponent = (ChatSelectorComponent) raw;
 			builder = Component.selector().pattern(chatComponent.getSelector());

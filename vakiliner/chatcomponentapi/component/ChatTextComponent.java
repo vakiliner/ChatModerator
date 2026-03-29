@@ -14,6 +14,7 @@ public class ChatTextComponent extends ChatComponent {
 		this("");
 	}
 
+	@Deprecated
 	public ChatTextComponent(ChatTextColor color) {
 		this("", color);
 	}
@@ -48,6 +49,18 @@ public class ChatTextComponent extends ChatComponent {
 		return this.text;
 	}
 
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatTextComponent)) {
+			return false;
+		} else  {
+			ChatTextComponent other = (ChatTextComponent) obj;
+			return super.equals(other) && this.text.equals(other.text);
+		}
+	}
+
+	@Deprecated
 	public static ChatTextComponent selector(ChatOfflinePlayer player) {
 		final ChatTextComponent component;
 		ChatTeam team = player.getTeam();
@@ -74,6 +87,7 @@ public class ChatTextComponent extends ChatComponent {
 		return component;
 	}
 
+	@Deprecated
 	public static ChatTextComponent team(ChatTeam team) {
 		ChatTextComponent component = new ChatTextComponent();
 		component.setColor(team.getColor());

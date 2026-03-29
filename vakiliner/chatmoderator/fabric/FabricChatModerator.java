@@ -23,7 +23,6 @@ import net.minecraft.server.level.ServerPlayer;
 import vakiliner.chatcomponentapi.ChatComponentAPIFabricLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.fabric.FabricChatCommandSender;
 import vakiliner.chatcomponentapi.fabric.FabricParser;
 import vakiliner.chatmoderator.api.GsonConfig;
@@ -122,17 +121,18 @@ public class FabricChatModerator extends ChatModerator {
 		return AutoModerationTriggerCallback.EVENT.invoker().trigger(((vakiliner.chatcomponentapi.fabric.FabricChatPlayer) player).getPlayer(), checkResult, actions, true);
 	}
 
+	@Deprecated
 	public MinecraftServer getServer() {
 		return this.server;
 	}
 
 	public void broadcast(ChatComponent component, boolean adminMessage) {
-		Set<ChatPlayer> admins = new HashSet<>();
+		Set<ChatCommandSender> admins = new HashSet<>();
+		admins.add(this.toChatCommandSender(this.server));
 		for (ChatPlayer player : this.getOnlinePlayers()) {
 			if (adminMessage && !player.isOp()) continue;
 			admins.add(player);
 		}
-		this.toChatCommandSender(this.server).sendMessage(new ChatTextComponent(component.toLegacyText()));
 		admins.forEach((p) -> p.sendMessage(component));
 	}
 
@@ -144,6 +144,11 @@ public class FabricChatModerator extends ChatModerator {
 		return player != null ? new FabricChatPlayer(this, player) : null;
 	}
 
+	public ChatOfflinePlayer toChatOfflinePlayer(MinecraftServer server, GameProfile gameProfile) {
+		return gameProfile != null ? new FabricChatOfflinePlayer(this, server, gameProfile) : null;
+	}
+
+	@Deprecated
 	public ChatOfflinePlayer toChatOfflinePlayer(GameProfile gameProfile) {
 		return gameProfile != null ? new FabricChatOfflinePlayer(this, gameProfile) : null;
 	}
