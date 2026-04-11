@@ -138,12 +138,15 @@ public class AutoModeration {
 	}
 
 	private void reloadDictionary(File file, Path path) throws IOException {
-		if (file != null && file.exists()) {
+		if (file == null) return;
+		if (file.exists()) {
 			GsonDictionary dictionary = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonDictionary.class);
 			synchronized (this.cleaner) {
 				this.cleaner.clear();
 				this.cleaner.putAll(dictionary);
 			}
+		} else if (!file.getParentFile().exists()) {
+			throw new NoSuchFileException(file.toString());
 		}
 	}
 

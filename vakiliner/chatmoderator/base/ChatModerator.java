@@ -128,7 +128,9 @@ public abstract class ChatModerator {
 					config.logBlockedMessages(false);
 					config.logBlockedCommands(false);
 				case 2:
-					config.mutesPath("./mutes.json");
+					config.folderPath(null);
+					config.autoModerationRulesPath("auto_moderation_rules.json");
+					config.mutesPath("mutes.json");
 			}
 			config.version(CONFIG_VERSION);
 			return true;
