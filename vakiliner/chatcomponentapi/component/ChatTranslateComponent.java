@@ -80,4 +80,15 @@ public class ChatTranslateComponent extends ChatComponent {
 			return Utils.stringFormat(this.legacyText, with.stream().map((component) -> component.toLegacyText(parentColor, parentFormats)).toArray());
 		}
 	}
+
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatTranslateComponent)) {
+			return false;
+		} else  {
+			ChatTranslateComponent other = (ChatTranslateComponent) obj;
+			return super.equals(other) && this.key.equals(other.key) && Objects.equals(this.legacyText, other.legacyText) && this.with.equals(other.with);
+		}
+	}
 }

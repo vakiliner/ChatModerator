@@ -120,7 +120,7 @@ public class ForgeParser extends BaseParser {
 		return event != null ? new ChatClickEvent(ChatClickEvent.Action.getByName(event.getAction().getName()), event.getValue()) : null;
 	}
 
-	@SuppressWarnings({ "unchecked", "null" })
+	@SuppressWarnings("unchecked")
 	public static <V> HoverEvent forge(ChatHoverEvent<?> event) {
 		return event != null ? new HoverEvent(HoverEvent.Action.getByName(event.getAction().getName()), forgeContent(event.getContents())) : null;
 	}

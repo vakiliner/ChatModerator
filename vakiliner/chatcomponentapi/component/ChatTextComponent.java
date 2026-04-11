@@ -14,6 +14,7 @@ public class ChatTextComponent extends ChatComponent {
 		this("");
 	}
 
+	@Deprecated
 	public ChatTextComponent(ChatTextColor color) {
 		this("", color);
 	}
@@ -46,6 +47,17 @@ public class ChatTextComponent extends ChatComponent {
 
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.text;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatTextComponent)) {
+			return false;
+		} else  {
+			ChatTextComponent other = (ChatTextComponent) obj;
+			return super.equals(other) && this.text.equals(other.text);
+		}
 	}
 
 	@Deprecated

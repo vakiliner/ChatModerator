@@ -43,7 +43,7 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 		this.getCommand("mute").setExecutor(new MuteCommand(MANAGER));
 		this.getCommand("unmute").setExecutor(new UnmuteCommand(MANAGER));
 		this.getCommand("mutes").setExecutor(new MuteListCommand(MANAGER));
-		this.getLogger().info("Плагин запущен");
+		this.getLogger().info("Plugin enabled");
 	}
 
 	public void onDisable() {
@@ -52,7 +52,7 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
-		this.getLogger().info("Плагин выключен");
+		this.getLogger().info("Plugin disabled");
 	}
 
 	public void reloadConfig() {

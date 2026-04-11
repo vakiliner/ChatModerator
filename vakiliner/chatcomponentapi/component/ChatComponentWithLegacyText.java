@@ -21,6 +21,7 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		this.legacyComponent.setParent(this);
 	}
 
+	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, String legacyText) {
 		this(component, new ChatTextComponent(legacyText));
 	}
@@ -60,5 +61,16 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 
 	public String toLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.getLegacyComponent().toLegacyText(parentColor, parentFormats);
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (!(obj instanceof ChatComponentWithLegacyText)) {
+			return false;
+		} else {
+			ChatComponentWithLegacyText other = (ChatComponentWithLegacyText) obj;
+			return this.component.equals(other.component) && this.getLegacyComponent().equals(other.getLegacyComponent());
+		}
 	}
 }

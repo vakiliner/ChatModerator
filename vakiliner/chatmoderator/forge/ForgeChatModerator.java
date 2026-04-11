@@ -108,6 +108,7 @@ public class ForgeChatModerator extends ChatModerator {
 		return !MinecraftForge.EVENT_BUS.post(event);
 	}
 
+	@Deprecated
 	public MinecraftServer getServer() {
 		return this.server;
 	}
@@ -130,6 +131,11 @@ public class ForgeChatModerator extends ChatModerator {
 		return player != null ? new ForgeChatPlayer(this, player) : null;
 	}
 
+	public ChatOfflinePlayer toChatOfflinePlayer(MinecraftServer server, GameProfile gameProfile) {
+		return gameProfile != null ? new ForgeChatOfflinePlayer(this, server, gameProfile) : null;
+	}
+
+	@Deprecated
 	public ChatOfflinePlayer toChatOfflinePlayer(GameProfile gameProfile) {
 		return gameProfile != null ? new ForgeChatOfflinePlayer(this, gameProfile) : null;
 	}
