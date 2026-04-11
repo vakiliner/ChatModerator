@@ -35,7 +35,7 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 	public void onEnable() {
 		MANAGER.init(this);
 		try {
-			MANAGER.mutes.setup(MANAGER.getMutesPath().toFile());
+			MANAGER.mutes.setup();
 		} catch (IOException err) {
 			err.printStackTrace();
 		}

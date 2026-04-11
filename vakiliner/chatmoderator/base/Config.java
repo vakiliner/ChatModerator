@@ -27,13 +27,31 @@ public interface Config {
 
 	void spectatorsChat(boolean enabled);
 
-	String dictionaryFile();
+	String folderPath();
 
-	void dictionaryFile(String name);
+	void folderPath(String path);
 
 	String mutesPath();
 
 	void mutesPath(String path);
+
+	String autoModerationRulesPath();
+
+	void autoModerationRulesPath(String path);
+
+	String dictionaryPath();
+
+	void dictionaryPath(String path);
+
+	@Deprecated
+	default String dictionaryFile() {
+		return this.dictionaryPath();
+	}
+
+	@Deprecated
+	default void dictionaryFile(String name) {
+		this.dictionaryPath(name);
+	}
 
 	boolean showFailMessage();
 

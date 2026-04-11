@@ -1,6 +1,5 @@
 package vakiliner.chatmoderator.bukkit;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
@@ -62,16 +61,12 @@ public class BukkitChatModerator extends ChatModerator {
 		return this.config;
 	}
 
-	protected File getDataFolder() {
-		return this.plugin.getDataFolder();
-	}
-
-	protected Path getFolderPath() {
-		return this.getDataFolder().toPath();
+	protected Path getDefaultFolderPath() {
+		return this.plugin.getDataFolder().toPath();
 	}
 
 	public Path getConfigPath() {
-		return this.getFolderPath().resolve("config.yml");
+		return this.getDefaultFolderPath().resolve("config.yml");
 	}
 
 	public String getName() {

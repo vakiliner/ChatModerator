@@ -1,9 +1,11 @@
 package vakiliner.chatmoderator.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +39,15 @@ public class AutoModeration {
 
 	public AutoModeration(ChatModerator manager) {
 		this.manager = manager;
+	}
+
+	public Path getFilePath() {
+		return this.manager.getFolderPath().resolve(this.manager.getConfig().autoModerationRulesPath());
+	}
+
+	public Path getDictionaryPath() {
+		String name = this.manager.getConfig().dictionaryPath();
+		return name != null ? this.manager.getFolderPath().resolve(name) : null;
 	}
 
 	public CheckResult checkMessage(ChatPlayer player, String message) {
@@ -89,8 +100,19 @@ public class AutoModeration {
 	}
 
 	public void reload() throws IOException {
-		Path path = this.manager.getAutoModerationRulesPath();
-		if (path.toFile().exists()) {
+		this.reload(this.getFilePath());
+	}
+
+	public void reload(File file) throws IOException {
+		this.reload(file, file.toPath());
+	}
+
+	public void reload(Path path) throws IOException {
+		this.reload(path.toFile(), path);
+	}
+
+	private void reload(File file, Path path) throws IOException {
+		if (file.exists()) {
 			GsonAutoMod automod = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonAutoMod.class);
 			synchronized (this.rules) {
 				this.rules.clear();
@@ -98,12 +120,25 @@ public class AutoModeration {
 					this.rules.add(rule.toAutoModerationRule());
 				}
 			}
+		} else if (!file.getParentFile().exists()) {
+			throw new NoSuchFileException(file.toString());
 		}
 	}
 
 	public void reloadDictionary() throws IOException {
-		Path path = this.manager.getAutoModerationDictionaryPath();
-		if (path != null && path.toFile().exists()) {
+		this.reloadDictionary(this.getDictionaryPath());
+	}
+
+	public void reloadDictionary(File file) throws IOException {
+		this.reloadDictionary(file, file.toPath());
+	}
+
+	public void reloadDictionary(Path path) throws IOException {
+		this.reloadDictionary(path.toFile(), path);
+	}
+
+	private void reloadDictionary(File file, Path path) throws IOException {
+		if (file != null && file.exists()) {
 			GsonDictionary dictionary = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonDictionary.class);
 			synchronized (this.cleaner) {
 				this.cleaner.clear();

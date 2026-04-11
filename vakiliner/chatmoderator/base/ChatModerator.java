@@ -1,6 +1,5 @@
 package vakiliner.chatmoderator.base;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -48,15 +47,26 @@ public abstract class ChatModerator {
 
 	protected void init(ILoader loader) {
 		loader.saveDefaultConfig();
-		if (!this.getAutoModerationRulesPath().toFile().exists()) {
-			loader.saveResource("auto_moderation_rules.json", false);
-		}
 	}
 
 	protected void setup(ILoader loader) {
-		String dictionaryFile = this.getConfig().dictionaryFile();
+		Config config = this.getConfig();
+		if (config.folderPath() == null) {
+			Path path = this.getDefaultFolderPath();
+			if (!path.toFile().exists()) try {
+				Files.createDirectories(path);
+			} catch (IOException err) {
+				throw new RuntimeException("Creating data folder", err);
+			}
+		}
+		if (config.autoModerationRulesPath().equals("auto_moderation_rules.json")) {
+			if (!this.automod.getFilePath().toFile().exists()) {
+				loader.saveResource("auto_moderation_rules.json", false);
+			}
+		}
+		String dictionaryFile = config.dictionaryPath();
 		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
+			if (!this.automod.getDictionaryPath().toFile().exists()) {
 				loader.saveResource("dictionary_ru.json", false);
 			}
 		}
@@ -130,25 +140,34 @@ public abstract class ChatModerator {
 
 	public abstract Config getConfig();
 
-	protected abstract File getDataFolder();
+	protected abstract Path getDefaultFolderPath();
 
-	protected abstract Path getFolderPath();
+	public Path getFolderPath() {
+		Path path = this.getDefaultFolderPath();
+		String folderPath = this.getConfig().folderPath();
+		if (folderPath != null) {
+			return path.resolve(folderPath);
+		}
+		return path;
+	}
 
 	public abstract Path getConfigPath();
 
 	public abstract String getName();
 
+	@Deprecated
 	public Path getMutesPath() {
-		return this.getFolderPath().resolve(this.getConfig().mutesPath());
+		return this.mutes.getFilePath();
 	}
 
+	@Deprecated
 	public Path getAutoModerationRulesPath() {
-		return this.getFolderPath().resolve("auto_moderation_rules.json");
+		return this.automod.getFilePath();
 	}
 
+	@Deprecated
 	public Path getAutoModerationDictionaryPath() {
-		String name = this.getConfig().dictionaryFile();
-		return name != null ? this.getFolderPath().resolve(name) : null;
+		return this.automod.getDictionaryPath();
 	}
 
 	public void broadcast(ChatComponent component) {

@@ -4,8 +4,10 @@ max_mute_reason_length: 50
 auto_moderation_enabled: true
 auto_moderation_use_thread_pool: false
 spectators_chat: false
+folder_path: null
+mutes_path: mutes.json
+auto_moderation_rules_path: auto_moderation_rules.json
 dictionary_file: dictionary_ru.json
-mutes_path: ./mutes.json
 show_fail_message: true
 log_blocked_messages: false
 log_blocked_commands: false
