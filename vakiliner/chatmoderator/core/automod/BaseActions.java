@@ -19,4 +19,10 @@ public class BaseActions {
 	public synchronized void logAdmins(boolean logAdmins) {
 		this.logAdmins = logAdmins;
 	}
+
+	public GsonAutoModerationRule.Actions toGson() {
+		GsonAutoModerationRule.Actions data = new GsonAutoModerationRule.Actions();
+		data.log_admins = this.logAdmins;
+		return data;
+	}
 }

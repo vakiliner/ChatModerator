@@ -24,6 +24,6 @@ public class GsonAutoModerationRule {
 	}
 
 	public static GsonAutoModerationRule fromAutoModerationRule(BaseAutoModerationRule rule) {
-		throw new UnsupportedOperationException();
+		return rule.toGson();
 	}
 }

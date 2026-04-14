@@ -46,25 +46,21 @@ public abstract class ChatModerator {
 		}
 	}
 
-	protected void init(ILoader loader) {
-		loader.saveDefaultConfig();
-		if (!this.getAutoModerationRulesPath().toFile().exists()) {
-			loader.saveResource("auto_moderation_rules.json", false);
-		}
-	}
-
-	protected void setup(ILoader loader) {
-		String dictionaryFile = this.getConfig().dictionaryFile();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.getAutoModerationDictionaryPath().toFile().exists()) {
-				loader.saveResource("dictionary_ru.json", false);
-			}
-		}
+	protected void setup() {
 		try {
+			this.mutes.setup(this.getMutesPath().toFile());
 			this.automod.reload();
 			this.automod.reloadDictionary();
 		} catch (IOException err) {
 			throw new RuntimeException(err);
+		}
+	}
+
+	protected void stop() {
+		try {
+			this.mutes.stop();
+		} catch (IOException err) {
+			err.printStackTrace();
 		}
 	}
 

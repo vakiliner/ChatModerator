@@ -19,7 +19,7 @@ public abstract class BaseAutoModerationRule {
 		}
 		this.automod = automod;
 		this.name = Objects.requireNonNull(name);
-		this.actions = this.eventType.createActions(null);
+		this.actions = this.eventType.createActions();
 	}
 
 	public BaseAutoModerationRule(AutoModeration automod, GsonAutoModerationRule rule) {
@@ -61,4 +61,14 @@ public abstract class BaseAutoModerationRule {
 	}
 
 	public abstract MatchResult checkText(ChatPlayer player, String rawMessage);
+
+	public GsonAutoModerationRule toGson() {
+		GsonAutoModerationRule data = new GsonAutoModerationRule();
+		data.name = this.name;
+		data.event_type = this.eventType.asInt();
+		data.trigger_type = this.getTriggerType().asInt();
+		data.enabled = this.enabled;
+		data.actions = this.actions.toGson();
+		return data;
+	}
 }
