@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.server.MinecraftServer;
@@ -40,7 +39,6 @@ public class FabricChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
 	public static final FabricParser PARSER = ChatComponentAPIFabricLoader.PARSER;
 	public final ConfigImpl config = new ConfigImpl();
-	private final ModContainer modContainer = FabricLoader.getInstance().getModContainer(ID).get();
 	protected MinecraftServer server;
 	private ChatModeratorModInitializer modInitializer;
 
@@ -141,7 +139,7 @@ public class FabricChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		ModMetadata metadata = this.modContainer.getMetadata();
+		ModMetadata metadata = this.modInitializer.modContainer.getMetadata();
 		String name = metadata.getName();
 		return name != null ? name : metadata.getId();
 	}

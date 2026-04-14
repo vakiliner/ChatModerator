@@ -20,8 +20,6 @@ import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.forgespi.language.IModInfo;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
@@ -41,7 +39,6 @@ public class ForgeChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
 	public static final ForgeParser PARSER = ChatComponentAPIForgeLoader.PARSER;
 	public final ConfigImpl config = new ConfigImpl();
-	private final ModContainer modContainer = ModLoadingContext.get().getActiveContainer();
 	protected MinecraftServer server;
 	private ChatModeratorModInitializer modInitializer;
 
@@ -142,7 +139,7 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		IModInfo modInfo = this.modContainer.getModInfo();
+		IModInfo modInfo = this.modInitializer.modContainer.getModInfo();
 		String displayName = modInfo.getDisplayName();
 		return displayName != null ? displayName : modInfo.getModId();
 	}
