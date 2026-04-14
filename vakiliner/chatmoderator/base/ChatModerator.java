@@ -58,6 +58,8 @@ public abstract class ChatModerator {
 			} catch (IOException err) {
 				throw new RuntimeException("Creating data folder", err);
 			}
+		} else if (!this.getFolderPath().toFile().exists()) {
+			throw new RuntimeException("Folder " + config.folderPath() + " not exists");
 		}
 		if (config.autoModerationRulesPath().equals("auto_moderation_rules.json")) {
 			if (!this.automod.getFilePath().toFile().exists()) {
