@@ -164,7 +164,7 @@ public class AutoModeration {
 	}
 
 	public void saveDictionary() throws IOException {
-		this.save(this.manager.getAutoModerationDictionaryPath());
+		this.saveDictionary(this.manager.getAutoModerationDictionaryPath());
 	}
 
 	public void saveDictionary(Path path) throws IOException {
