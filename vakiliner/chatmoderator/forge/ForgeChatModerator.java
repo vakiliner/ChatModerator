@@ -136,7 +136,7 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	public Path getConfigPath() {
-		return this.getFolderPath().resolve("config.toml");
+		return this.getFolderPath().resolve("config.json");
 	}
 
 	public String getName() {
