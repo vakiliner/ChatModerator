@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import vakiliner.chatmoderator.api.GsonAutoMod;
 import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 import vakiliner.chatmoderator.api.GsonDictionary;
@@ -125,20 +126,6 @@ public class AutoModeration {
 		}
 	}
 
-	public void save() throws IOException {
-		this.save(this.manager.getAutoModerationRulesPath());
-	}
-
-	public void save(Path path) throws IOException {
-		GsonAutoMod automod = new GsonAutoMod();
-		synchronized (this.rules) {
-			for (BaseAutoModerationRule rule : this.rules) {
-				automod.add(GsonAutoModerationRule.fromAutoModerationRule(rule));
-			}
-		}
-		Files.write(path, new Gson().toJson(automod).getBytes(StandardCharsets.UTF_8));
-	}
-
 	public void reloadDictionary() throws IOException {
 		Path path = this.manager.getAutoModerationDictionaryPath();
 		if (path == null) return;
@@ -161,6 +148,20 @@ public class AutoModeration {
 			}
 			this.saveDictionary();
 		}
+	}
+
+	public void save() throws IOException {
+		this.save(this.manager.getAutoModerationRulesPath());
+	}
+
+	public void save(Path path) throws IOException {
+		GsonAutoMod automod = new GsonAutoMod();
+		synchronized (this.rules) {
+			for (BaseAutoModerationRule rule : this.rules) {
+				automod.add(GsonAutoModerationRule.fromAutoModerationRule(rule));
+			}
+		}
+		Files.write(path, new GsonBuilder().setPrettyPrinting().create().toJson(automod).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public void saveDictionary() throws IOException {

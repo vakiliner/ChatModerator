@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -60,7 +61,7 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	public void saveConfig() throws IOException {
-		Files.write(this.getConfigPath(), new Gson().toJson(this.config.config).getBytes(StandardCharsets.UTF_8));
+		Files.write(this.getConfigPath(), new GsonBuilder().setPrettyPrinting().create().toJson(this.config.config).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public void reloadConfig() throws IOException {
