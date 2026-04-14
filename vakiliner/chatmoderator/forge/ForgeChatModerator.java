@@ -120,11 +120,11 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	protected Path getDefaultFolderPath() {
-		return new File(".").toPath().resolve("config").resolve("ChatModerator");
+		return new File("config").toPath().resolve("ChatModerator");
 	}
 
 	public Path getConfigPath() {
-		return this.getFolderPath().resolve("config.json");
+		return new File("config").toPath().resolve(this.modInitializer.modContainer.getModId() + ".json");
 	}
 
 	public String getName() {
