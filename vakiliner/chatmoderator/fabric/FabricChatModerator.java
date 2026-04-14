@@ -85,7 +85,7 @@ public class FabricChatModerator extends ChatModerator {
 			this.config.autoModerationEnabled(true);
 			this.config.autoModerationUseThreadPool(false);
 			this.config.spectatorsChat(false);
-			this.config.dictionaryFile("dictionary_ru.json");
+			this.config.dictionaryPath("dictionary_ru.json");
 			this.config.showFailMessage(true);
 			this.config.logBlockedMessages(false);
 			this.config.logBlockedCommands(false);
@@ -119,20 +119,8 @@ public class FabricChatModerator extends ChatModerator {
 		return this.config;
 	}
 
-	protected Path getFolderPath() {
-		Path path = FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
-		if (!path.toFile().exists()) {
-			try {
-				Files.createDirectories(path);
-			} catch (IOException err) {
-				throw new RuntimeException("Creating data folder", err);
-			}
-		}
-		return path;
-	}
-
-	protected File getDataFolder() {
-		return this.getFolderPath().toFile();
+	protected Path getDefaultFolderPath() {
+		return FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
 	}
 
 	public Path getConfigPath() {
