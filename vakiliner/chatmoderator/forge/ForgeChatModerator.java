@@ -85,6 +85,9 @@ public class ForgeChatModerator extends ChatModerator {
 			this.config.autoModerationEnabled(true);
 			this.config.autoModerationUseThreadPool(false);
 			this.config.spectatorsChat(false);
+			this.config.folderPath(null);
+			this.config.mutesPath("mutes.json");
+			this.config.autoModerationRulesPath("auto_moderation_rules.json");
 			this.config.dictionaryPath("dictionary_ru.json");
 			this.config.showFailMessage(true);
 			this.config.logBlockedMessages(false);
