@@ -1,4 +1,4 @@
-package vakiliner.chatmoderator.fabric;
+package vakiliner.chatmoderator.forge;
 
 import java.util.HashMap;
 import java.util.Map;
