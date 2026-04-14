@@ -1,134 +1,104 @@
-package vakiliner.chatmoderator.forge;
+package vakiliner.chatmoderator.fabric;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.tuple.Pair;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.Config;
 
 class ConfigImpl implements Config {
-	static final ForgeConfigSpec configSpec;
-	static final ConfigImpl config;
-	public final IntValue version;
-	public final IntValue maxMessageLength;
-	public final IntValue maxMuteReasonLength;
-	public final BooleanValue autoModerationEnabled;
-	public final BooleanValue autoModerationUseThreadPool;
-	public final BooleanValue spectatorsChat;
-	public final ConfigValue<String> dictionaryFile;
-	public final ConfigValue<String> mutesPath;
-	public final BooleanValue showFailMessage;
-	public final BooleanValue logBlockedMessages;
-	public final BooleanValue logBlockedCommands;
-	public final ConfigValue<String> messages;
+	protected GsonConfig config;
 
-	public ConfigImpl(ForgeConfigSpec.Builder builder) {
-		this.version = builder.translation("null").worldRestart().defineInRange("version", Short.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
-		this.maxMessageLength = builder.translation("null").defineInRange("max_message_length", 128, 0, 128);
-		this.maxMuteReasonLength = builder.translation("null").defineInRange("max_mute_reason_length", 64, 0, 64);
-		this.autoModerationEnabled = builder.translation("null").define("auto_moderation_enabled", false);
-		this.autoModerationUseThreadPool = builder.translation("null").define("auto_moderation_use_thread_pool", false);
-		this.spectatorsChat = builder.translation("null").define("spectators_chat", false);
-		this.dictionaryFile = builder.translation("null").define("dictionary_file", "");
-		this.mutesPath = builder.translation("null").define("mutes_path", "./mutes.json");
-		this.showFailMessage = builder.translation("null").define("show_fail_message", true);
-		this.logBlockedMessages = builder.translation("null").define("log_blocked_messages", false);
-		this.logBlockedCommands = builder.translation("null").define("log_blocked_commands", false);
-		this.messages = builder.translation("null").define("messages", "{}");
+	void reload(GsonConfig config) {
+		this.config = config;
 	}
 
 	public int version() {
-		return this.version.get();
+		return get(this.config.version, (int) Short.MIN_VALUE);
 	}
 
 	public void version(int version) {
-		this.version.set(version);
+		this.config.version = version;
 	}
 
 	public int maxMessageLength() {
-		return this.maxMessageLength.get();
+		return get(this.config.max_message_length, 128);
 	}
 
 	public void maxMessageLength(int length) {
-		this.maxMessageLength.set(length);
+		this.config.max_message_length = length;
 	}
 
 	public int maxMuteReasonLength() {
-		return this.maxMuteReasonLength.get();
+		return get(this.config.max_mute_reason_length, 64);
 	}
 
 	public void maxMuteReasonLength(int length) {
-		this.maxMuteReasonLength.set(length);
+		this.config.max_mute_reason_length = length;
 	}
 
 	public boolean autoModerationEnabled() {
-		return this.autoModerationEnabled.get();
+		return get(this.config.auto_moderation_enabled, false);
 	}
 
 	public void autoModerationEnabled(boolean enabled) {
-		this.autoModerationEnabled.set(enabled);
+		this.config.auto_moderation_enabled = enabled;
 	}
 
 	public boolean autoModerationUseThreadPool() {
-		return this.autoModerationUseThreadPool.get();
+		return get(this.config.auto_moderation_use_thread_pool, false);
 	}
 
 	public void autoModerationUseThreadPool(boolean enabled) {
-		this.autoModerationUseThreadPool.set(enabled);
+		this.config.auto_moderation_use_thread_pool = enabled;
 	}
 
 	public boolean spectatorsChat() {
-		return this.spectatorsChat.get();
+		return get(this.config.spectators_chat, false);
 	}
 
 	public void spectatorsChat(boolean enabled) {
-		this.spectatorsChat.set(enabled);
+		this.config.spectators_chat = enabled;
 	}
 
 	public String dictionaryFile() {
-		String file = this.dictionaryFile.get();
-		return file.isEmpty() ? null : file;
+		return get(this.config.dictionary_file, null);
 	}
 
 	public void dictionaryFile(String name) {
-		this.dictionaryFile.set(name);
+		this.config.dictionary_file = name;
 	}
 
 	public String mutesPath() {
-		return this.mutesPath.get();
+		return get(this.config.mutes_path, "./mutes.json");
 	}
 
 	public void mutesPath(String path) {
-		this.mutesPath.set(path);
+		this.config.mutes_path = path;
 	}
 
 	public boolean showFailMessage() {
-		return this.showFailMessage.get();
+		return get(this.config.show_fail_message, true);
 	}
 
 	public void showFailMessage(boolean show) {
-		this.showFailMessage.set(show);
+		this.config.show_fail_message = show;
 	}
 
 	public boolean logBlockedMessages() {
-		return this.logBlockedMessages.get();
+		return get(this.config.log_blocked_messages, false);
 	}
 
 	public void logBlockedMessages(boolean log) {
-		this.logBlockedMessages.set(log);
+		this.config.log_blocked_messages = log;
 	}
 
 	public boolean logBlockedCommands() {
-		return this.logBlockedCommands.get();
+		return get(this.config.log_blocked_commands, false);
 	}
 
 	public void logBlockedCommands(boolean log) {
-		this.logBlockedCommands.set(log);
+		this.config.log_blocked_commands = log;
 	}
 
 	public String message(String key, boolean required) {
@@ -138,16 +108,14 @@ class ConfigImpl implements Config {
 	}
 
 	private Map<String, String> messages() {
-		return Objects.requireNonNull(new Gson().fromJson(this.messages.get(), TypeToken.getParameterized(Map.class, String.class, String.class).getType()), "Config not have a messages property");
+		return Objects.requireNonNull(this.config.messages, "Config not have a messages property");
 	}
 
 	public void messages(Map<String, String> message) {
-		this.messages.set(new Gson().toJson(message));
+		this.config.messages = new HashMap<>(message);
 	}
 
-	static {
-		Pair<ConfigImpl, ForgeConfigSpec> pair = new ForgeConfigSpec.Builder().configure(ConfigImpl::new);
-		configSpec = pair.getRight();
-		config = pair.getLeft();
+	private static <V> V get(V nullable, V orDefault) {
+		return nullable != null ? nullable : orDefault;
 	}
 }

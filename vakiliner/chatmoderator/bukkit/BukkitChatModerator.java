@@ -33,9 +33,12 @@ public class BukkitChatModerator extends ChatModerator {
 
 	void init(ChatModeratorPlugin plugin) {
 		this.plugin = plugin;
-		super.init(this.plugin);
-		this.plugin.getConfig();
-		this.setup(this.plugin);
+		this.plugin.reloadConfig();
+		this.setup();
+	}
+
+	void stop(ChatModeratorPlugin plugin) {
+		this.stop();
 	}
 
 	void reloadConfig(FileConfiguration configuration) {

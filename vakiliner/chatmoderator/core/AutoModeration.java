@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import vakiliner.chatmoderator.api.GsonAutoMod;
 import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 import vakiliner.chatmoderator.api.GsonDictionary;
@@ -28,8 +30,10 @@ import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.automod.BaseAutoModerationRule;
 import vakiliner.chatmoderator.core.automod.EventType;
+import vakiliner.chatmoderator.core.automod.KeywordAutoModerationRule;
 import vakiliner.chatmoderator.core.automod.MatchResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
+import vakiliner.chatmoderator.core.automod.KeywordAutoModerationRule.TriggerMetadata;
 
 public class AutoModeration {
 	private final ChatModerator manager;
@@ -122,6 +126,27 @@ public class AutoModeration {
 			}
 		} else if (!file.getParentFile().exists()) {
 			throw new NoSuchFileException(file.toString());
+		} else if (this.manager.getConfig().autoModerationRulesPath().equals("auto_moderation_rules.json")) {
+			KeywordAutoModerationRule test1 = new KeywordAutoModerationRule(this, "Test 1", EventType.MESSAGE);
+			MessageActions test1actions = (MessageActions) test1.getActions();
+			test1actions.blockAction("Тест");
+			test1actions.muteTime(60);
+			test1actions.muteReason("Тест");
+			test1actions.logAdmins(true);
+			TriggerMetadata test1triggerMetadata = test1.getTriggerMetadata();
+			test1triggerMetadata.setKeywordFilter(Arrays.asList("Hello World"));
+			KeywordAutoModerationRule test2 = new KeywordAutoModerationRule(this, "Test 2", EventType.MESSAGE);
+			MessageActions test2actions = (MessageActions) test2.getActions();
+			test2actions.blockAction("");
+			TriggerMetadata test2triggerMetadata = test2.getTriggerMetadata();
+			test2triggerMetadata.setKeywordFilter(Arrays.asList("word1", "word2*", "*word3", "*word4*", "word6 word6", "word7 word7*", "*word8 word8", "*word9 word9*"));
+			test2triggerMetadata.setRegexPatterns(Arrays.asList("word5"));
+			test2triggerMetadata.setAllowList(Arrays.asList("word4ru", "word5ru"));
+			synchronized (this.rules) {
+				this.rules.add(test1);
+				this.rules.add(test2);
+			}
+			this.save(path);
 		}
 	}
 
@@ -147,7 +172,45 @@ public class AutoModeration {
 			}
 		} else if (!file.getParentFile().exists()) {
 			throw new NoSuchFileException(file.toString());
+		} else if (this.manager.getConfig().dictionaryPath().equals("dictionary_ru.json")) {
+			synchronized (this.cleaner) {
+				this.cleaner.put('.', "");
+				this.cleaner.put(',', "");
+				this.cleaner.put('A', "А");
+				this.cleaner.put('C', "С");
+				this.cleaner.put('X', "Х");
+				this.cleaner.put('a', "а");
+				this.cleaner.put('c', "с");
+				this.cleaner.put('x', "х");
+			}
+			this.saveDictionary();
 		}
+	}
+
+	public void save() throws IOException {
+		this.save(this.getFilePath());
+	}
+
+	public void save(Path path) throws IOException {
+		GsonAutoMod automod = new GsonAutoMod();
+		synchronized (this.rules) {
+			for (BaseAutoModerationRule rule : this.rules) {
+				automod.add(GsonAutoModerationRule.fromAutoModerationRule(rule));
+			}
+		}
+		Files.write(path, new GsonBuilder().setPrettyPrinting().create().toJson(automod).getBytes(StandardCharsets.UTF_8));
+	}
+
+	public void saveDictionary() throws IOException {
+		this.saveDictionary(this.getDictionaryPath());
+	}
+
+	public void saveDictionary(Path path) throws IOException {
+		GsonDictionary dictionary = new GsonDictionary();
+		synchronized (this.cleaner) {
+			dictionary.putAll(this.cleaner);
+		}
+		Files.write(path, new Gson().toJson(dictionary).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public static class CheckResult {

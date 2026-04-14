@@ -179,6 +179,12 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 		}
 	}
 
+	public GsonAutoModerationRule toGson() {
+		GsonAutoModerationRule data = super.toGson();
+		data.trigger_metadata = new Gson().toJsonTree(this.triggerMetadata.toGson()).getAsJsonObject();
+		return data;
+	}
+
 	public static class TriggerMetadata {
 		private List<String> keywordFilter = Collections.emptyList();
 		private List<Pattern> regexPatterns = Collections.emptyList();
@@ -206,6 +212,14 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 
 		public void setAllowList(Collection<String> allowList) {
 			this.allowList = Collections.unmodifiableList(new ArrayList<>(allowList));
+		}
+
+		public GsonKeywordTriggerMetadata toGson() {
+			GsonKeywordTriggerMetadata data = new GsonKeywordTriggerMetadata();
+			data.keyword_filter = this.keywordFilter;
+			data.regex_patterns = this.regexPatterns.stream().map(Pattern::toString).collect(Collectors.toList());
+			data.allow_list = this.allowList;
+			return data;
 		}
 	}
 }

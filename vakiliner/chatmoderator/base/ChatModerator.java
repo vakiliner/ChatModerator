@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Date;
@@ -45,38 +46,34 @@ public abstract class ChatModerator {
 		}
 	}
 
-	protected void init(ILoader loader) {
-		loader.saveDefaultConfig();
-	}
-
-	protected void setup(ILoader loader) {
-		Config config = this.getConfig();
-		if (config.folderPath() == null) {
-			Path path = this.getDefaultFolderPath();
-			if (!path.toFile().exists()) try {
-				Files.createDirectories(path);
-			} catch (IOException err) {
-				throw new RuntimeException("Creating data folder", err);
-			}
-		} else if (!this.getFolderPath().toFile().exists()) {
-			throw new RuntimeException("Folder " + config.folderPath() + " not exists");
-		}
-		if (config.autoModerationRulesPath().equals("auto_moderation_rules.json")) {
-			if (!this.automod.getFilePath().toFile().exists()) {
-				loader.saveResource("auto_moderation_rules.json", false);
-			}
-		}
-		String dictionaryFile = config.dictionaryPath();
-		if (dictionaryFile != null && dictionaryFile.equals("dictionary_ru.json")) {
-			if (!this.automod.getDictionaryPath().toFile().exists()) {
-				loader.saveResource("dictionary_ru.json", false);
-			}
-		}
+	protected void setup() {
 		try {
+			this.createDefaultFolder();
+			this.mutes.setup(this.getMutesPath().toFile());
 			this.automod.reload();
 			this.automod.reloadDictionary();
 		} catch (IOException err) {
 			throw new RuntimeException(err);
+		}
+	}
+
+	private void createDefaultFolder() throws IOException {
+		String folderPath = this.getConfig().folderPath();
+		if (folderPath == null) {
+			Path path = this.getDefaultFolderPath();
+			if (!path.toFile().exists()) {
+				Files.createDirectories(path);
+			}
+		} else if (!this.getFolderPath().toFile().exists()) {
+			throw new NoSuchFileException(folderPath);
+		}
+	}
+
+	protected void stop() {
+		try {
+			this.mutes.stop();
+		} catch (IOException err) {
+			err.printStackTrace();
 		}
 	}
 

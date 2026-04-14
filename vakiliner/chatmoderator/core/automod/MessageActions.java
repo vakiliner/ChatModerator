@@ -43,4 +43,12 @@ public class MessageActions extends BaseActions {
 	public synchronized void muteReason(String muteReason) {
 		this.muteReason = muteReason;
 	}
+
+	public GsonAutoModerationRule.Actions toGson() {
+		GsonAutoModerationRule.Actions data = super.toGson();
+		data.block_action = this.blockAction;
+		data.mute_time = this.muteTime;
+		data.mute_reason = this.muteReason;
+		return data;
+	}
 }
