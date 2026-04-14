@@ -19,7 +19,7 @@ public abstract class BaseAutoModerationRule {
 		}
 		this.automod = automod;
 		this.name = Objects.requireNonNull(name);
-		this.actions = this.eventType.createActions(null);
+		this.actions = this.eventType.createActions();
 	}
 
 	public BaseAutoModerationRule(AutoModeration automod, GsonAutoModerationRule rule) {
