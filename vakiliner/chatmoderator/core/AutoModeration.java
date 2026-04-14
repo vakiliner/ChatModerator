@@ -104,18 +104,19 @@ public class AutoModeration {
 	}
 
 	public void reload() throws IOException {
-		this.reload(this.getFilePath());
+		Path path = this.getFilePath();
+		this.reload(path.toFile(), path, this.manager.getConfig().autoModerationRulesPath().equals("auto_moderation_rules.json"));
 	}
 
 	public void reload(File file) throws IOException {
-		this.reload(file, file.toPath());
+		this.reload(file, file.toPath(), false);
 	}
 
 	public void reload(Path path) throws IOException {
-		this.reload(path.toFile(), path);
+		this.reload(path.toFile(), path, false);
 	}
 
-	private void reload(File file, Path path) throws IOException {
+	private void reload(File file, Path path, boolean saveDefaultIfNotExists) throws IOException {
 		if (file.exists()) {
 			GsonAutoMod automod = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonAutoMod.class);
 			synchronized (this.rules) {
@@ -126,7 +127,7 @@ public class AutoModeration {
 			}
 		} else if (!file.getParentFile().exists()) {
 			throw new NoSuchFileException(file.toString());
-		} else if (this.manager.getConfig().autoModerationRulesPath().equals("auto_moderation_rules.json")) {
+		} else if (saveDefaultIfNotExists) {
 			KeywordAutoModerationRule test1 = new KeywordAutoModerationRule(this, "Test 1", EventType.MESSAGE);
 			MessageActions test1actions = (MessageActions) test1.getActions();
 			test1actions.blockAction("Тест");
@@ -143,6 +144,7 @@ public class AutoModeration {
 			test2triggerMetadata.setRegexPatterns(Arrays.asList("word5"));
 			test2triggerMetadata.setAllowList(Arrays.asList("word4ru", "word5ru"));
 			synchronized (this.rules) {
+				this.rules.clear();
 				this.rules.add(test1);
 				this.rules.add(test2);
 			}
@@ -151,18 +153,19 @@ public class AutoModeration {
 	}
 
 	public void reloadDictionary() throws IOException {
-		this.reloadDictionary(this.getDictionaryPath());
+		Path path = this.getDictionaryPath();
+		this.reloadDictionary(path.toFile(), path, this.manager.getConfig().dictionaryPath().equals("dictionary_ru.json"));
 	}
 
 	public void reloadDictionary(File file) throws IOException {
-		this.reloadDictionary(file, file.toPath());
+		this.reloadDictionary(file, file.toPath(), false);
 	}
 
 	public void reloadDictionary(Path path) throws IOException {
-		this.reloadDictionary(path.toFile(), path);
+		this.reloadDictionary(path.toFile(), path, false);
 	}
 
-	private void reloadDictionary(File file, Path path) throws IOException {
+	private void reloadDictionary(File file, Path path, boolean saveDefaultIfNotExists) throws IOException {
 		if (file == null) return;
 		if (file.exists()) {
 			GsonDictionary dictionary = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonDictionary.class);
@@ -172,8 +175,9 @@ public class AutoModeration {
 			}
 		} else if (!file.getParentFile().exists()) {
 			throw new NoSuchFileException(file.toString());
-		} else if (this.manager.getConfig().dictionaryPath().equals("dictionary_ru.json")) {
+		} else if (saveDefaultIfNotExists) {
 			synchronized (this.cleaner) {
+				this.cleaner.clear();
 				this.cleaner.put('.', "");
 				this.cleaner.put(',', "");
 				this.cleaner.put('A', "А");
@@ -183,12 +187,16 @@ public class AutoModeration {
 				this.cleaner.put('c', "с");
 				this.cleaner.put('x', "х");
 			}
-			this.saveDictionary();
+			this.saveDictionary(path);
 		}
 	}
 
 	public void save() throws IOException {
 		this.save(this.getFilePath());
+	}
+
+	public void save(File file) throws IOException {
+		this.save(file.toPath());
 	}
 
 	public void save(Path path) throws IOException {
@@ -203,6 +211,10 @@ public class AutoModeration {
 
 	public void saveDictionary() throws IOException {
 		this.saveDictionary(this.getDictionaryPath());
+	}
+
+	public void saveDictionary(File file) throws IOException {
+		this.saveDictionary(file.toPath());
 	}
 
 	public void saveDictionary(Path path) throws IOException {

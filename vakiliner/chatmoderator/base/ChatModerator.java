@@ -49,7 +49,7 @@ public abstract class ChatModerator {
 	protected void setup() {
 		try {
 			this.createDefaultFolder();
-			this.mutes.setup(this.getMutesPath().toFile());
+			this.mutes.setup();
 			this.automod.reload();
 			this.automod.reloadDictionary();
 		} catch (IOException err) {
