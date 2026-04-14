@@ -1,6 +1,5 @@
 package vakiliner.chatmoderator.fabric;
 
-import java.io.IOException;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStarting;
@@ -19,19 +18,11 @@ class FabricListener implements CommandRegistrationCallback, ServerStarting, Ser
 
 	public void onServerStarting(MinecraftServer server) {
 		this.manager.server = server;
-		try {
-			this.manager.mutes.setup(this.manager.getMutesPath().toFile());
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
+		this.manager.startServer();
 	}
 
 	public void onServerStopping(MinecraftServer server) {
-		try {
-			this.manager.mutes.stop();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
+		this.manager.stopServer();
 	}
 
 	public void onServerStopped(MinecraftServer server) {

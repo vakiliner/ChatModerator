@@ -1,6 +1,5 @@
 package vakiliner.chatmoderator.forge;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import com.mojang.brigadier.CommandDispatcher;
@@ -37,20 +36,12 @@ class ForgeListener {
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) {
 		this.manager.server = event.getServer();
-		try {
-			this.manager.mutes.setup(this.manager.getMutesPath().toFile());
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
+		this.manager.startServer();
 	}
 
 	@SubscribeEvent
 	public void onServerStopping(FMLServerStoppingEvent event) {
-		try {
-			this.manager.mutes.stop();
-		} catch (IOException err) {
-			throw new RuntimeException(err);
-		}
+		this.manager.stopServer();
 	}
 
 	@SubscribeEvent

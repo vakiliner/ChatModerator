@@ -1,18 +1,16 @@
 package vakiliner.chatmoderator.bukkit;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import vakiliner.chatmoderator.base.ILoader;
 import vakiliner.chatmoderator.bukkit.command.*;
 import vakiliner.chatmoderator.paper.PaperChatModerator;
 import vakiliner.chatmoderator.spigot.SpigotChatModerator;
 
-public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
+public class ChatModeratorPlugin extends JavaPlugin {
 	private static final BukkitChatModerator MANAGER;
 	private final BukkitListener listener = MANAGER.createListener();
 
@@ -32,13 +30,12 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 		MANAGER = manager;
 	}
 
+	public void onLoad() {
+		this.saveDefaultConfig();
+	}
+
 	public void onEnable() {
 		MANAGER.init(this);
-		try {
-			MANAGER.mutes.setup(MANAGER.getMutesPath().toFile());
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
 		Bukkit.getPluginManager().registerEvents(this.listener, this);
 		this.getCommand("mute").setExecutor(new MuteCommand(MANAGER));
 		this.getCommand("unmute").setExecutor(new UnmuteCommand(MANAGER));
@@ -47,11 +44,7 @@ public class ChatModeratorPlugin extends JavaPlugin implements ILoader {
 	}
 
 	public void onDisable() {
-		try {
-			MANAGER.mutes.stop();
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
+		MANAGER.stop(this);
 		this.getLogger().info("Plugin disabled");
 	}
 

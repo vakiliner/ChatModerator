@@ -61,4 +61,14 @@ public abstract class BaseAutoModerationRule {
 	}
 
 	public abstract MatchResult checkText(ChatPlayer player, String rawMessage);
+
+	public GsonAutoModerationRule toGson() {
+		GsonAutoModerationRule data = new GsonAutoModerationRule();
+		data.name = this.name;
+		data.event_type = this.eventType.asInt();
+		data.trigger_type = this.getTriggerType().asInt();
+		data.enabled = this.enabled;
+		data.actions = this.actions.toGson();
+		return data;
+	}
 }

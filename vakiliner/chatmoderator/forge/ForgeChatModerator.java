@@ -2,30 +2,33 @@ package vakiliner.chatmoderator.forge;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.forgespi.language.IModInfo;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.forge.ForgeChatCommandSender;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
+import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
@@ -34,19 +37,72 @@ import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.forge.event.AutoModerationTriggerEvent;
 
-@EventBusSubscriber(modid = ForgeChatModerator.ID, bus = EventBusSubscriber.Bus.MOD)
 public class ForgeChatModerator extends ChatModerator {
 	public static final Logger LOGGER = LogManager.getLogger(ID);
 	public static final ForgeParser PARSER = ChatComponentAPIForgeLoader.PARSER;
-	public final ConfigImpl config = ConfigImpl.config;
+	public final ConfigImpl config = new ConfigImpl();
+	private final ModContainer modContainer = ModLoadingContext.get().getActiveContainer();
 	protected MinecraftServer server;
 	private ChatModeratorModInitializer modInitializer;
 
 	void init(ChatModeratorModInitializer modInitializer) {
 		this.modInitializer = modInitializer;
-		super.init(this.modInitializer);
-		ModContainer modContainer = this.modInitializer.modContainer;
-		modContainer.addConfig(new ModConfig(ModConfig.Type.COMMON, ConfigImpl.configSpec, modContainer, "ChatModerator/config.toml"));
+		try {
+			this.reloadConfig();
+		} catch (IOException err) {
+			throw new RuntimeException(err);
+		}
+	}
+
+	void startServer() {
+		this.setup();
+	}
+
+	void stopServer() {
+		this.stop();
+	}
+
+	public void saveConfig() throws IOException {
+		Files.write(this.getConfigPath(), new Gson().toJson(this.config.config).getBytes(StandardCharsets.UTF_8));
+	}
+
+	public void reloadConfig() throws IOException {
+		Path path = this.getConfigPath();
+		if (path.toFile().exists()) {
+			final GsonConfig config;
+			try {
+				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
+			} catch (IOException err) {
+				throw err;
+			}
+			this.config.reload(config);
+			if (this.checkConfigUpdates()) {
+				this.saveConfig();
+			}
+		} else {
+			this.config.reload(new GsonConfig());
+			this.config.version(CONFIG_VERSION);
+			this.config.maxMessageLength(80);
+			this.config.maxMuteReasonLength(50);
+			this.config.autoModerationEnabled(true);
+			this.config.autoModerationUseThreadPool(false);
+			this.config.spectatorsChat(false);
+			this.config.dictionaryFile("dictionary_ru.json");
+			this.config.showFailMessage(true);
+			this.config.logBlockedMessages(false);
+			this.config.logBlockedCommands(false);
+			Map<String, String> messages = new HashMap<>();
+			messages.put("fail_send_message", "Ваше сообщение не было отправлено");
+			messages.put("fail_send_command", "Не удалось использовать команду");
+			messages.put("fail_reasons.muted", "Вы были ограничены");
+			messages.put("fail_reasons.muted_with_reason", "Вы были ограничены\nПричина: %s");
+			messages.put("fail_reasons.cannot_use_msg_command_in_spectator", "Наблюдатели не могут использовать команды отправки сообщений");
+			messages.put("fail_reasons.long_message", "Слишком длинное сообщение");
+			messages.put("fail_reasons.automod_blocked_without_custom_message", "Публикация невозможна, поскольку сообщение содержит материалы, заблокированные этим сервером. Владельцы сервера также могут просматривать содержимое сообщений.");
+			messages.put("fail_reasons.automod_blocked_with_custom_message", "Содержимое сообщения заблокировано сервером. Сообщение от модераторов: «%s»");
+			this.config.messages(messages);
+			this.saveConfig();
+		}
 	}
 
 	public ChatModeratorModInitializer getModInitializer() {
@@ -63,18 +119,6 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public Config getConfig() {
 		return this.config;
-	}
-
-	@SubscribeEvent
-	public void onModConfigLoading(ModConfig.Loading reloading) {
-		if (reloading.getConfig().getSpec() == ConfigImpl.configSpec) {
-			this.checkConfigUpdates();
-		}
-	}
-
-	@SubscribeEvent
-	public void onFMLCommonSetup(FMLCommonSetupEvent event) {
-		this.setup(this.modInitializer);
 	}
 
 	protected Path getFolderPath() {
@@ -98,14 +142,13 @@ public class ForgeChatModerator extends ChatModerator {
 	}
 
 	public String getName() {
-		IModInfo modInfo = this.modInitializer.modContainer.getModInfo();
+		IModInfo modInfo = this.modContainer.getModInfo();
 		String displayName = modInfo.getDisplayName();
 		return displayName != null ? displayName : modInfo.getModId();
 	}
 
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
-		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.forge.ForgeChatPlayer) player).getPlayer(), checkResult, actions);
-		return !MinecraftForge.EVENT_BUS.post(event);
+		return !MinecraftForge.EVENT_BUS.post(new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.forge.ForgeChatPlayer) player).getPlayer(), checkResult, actions));
 	}
 
 	@Deprecated
