@@ -159,7 +159,7 @@ public class AutoModeration {
 				this.cleaner.put('c', "с");
 				this.cleaner.put('x', "х");
 			}
-			this.save();
+			this.saveDictionary();
 		}
 	}
 
