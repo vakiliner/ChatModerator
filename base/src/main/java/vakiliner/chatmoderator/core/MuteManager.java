@@ -8,7 +8,10 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 import com.google.gson.Gson;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
@@ -21,6 +24,7 @@ public class MuteManager {
 	@SuppressWarnings("unused")
 	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
+	private final Map<String, Set<UUID>> byName = new HashMap<>();
 	private ThreadSaveConfig threadSaveConfig;
 	private File file;
 
@@ -32,6 +36,20 @@ public class MuteManager {
 		return this.map.get(uuid);
 	}
 
+	public MutedPlayer getByName(String name) {
+		Set<UUID> set = this.byName.get(name.toLowerCase());
+		UUID uuid;
+		if (set != null) try {
+			uuid = set.iterator().next();
+		} catch (NoSuchElementException err) {
+			uuid = null;
+		} else {
+			uuid = null;
+		}
+		return uuid != null ? this.get(uuid) : null;
+	}
+
+	@Deprecated
 	public MutedPlayer getMutedPlayer(String name) {
 		for (MutedPlayer mute : this.map.values()) {
 			if (mute.getName().equalsIgnoreCase(name)) return mute;
@@ -39,6 +57,7 @@ public class MuteManager {
 		return null;
 	}
 
+	@Deprecated
 	public MutedPlayer getMutedPlayerExact(String name) {
 		for (MutedPlayer mute : this.map.values()) {
 			if (mute.getName().equals(name)) return mute;
@@ -50,12 +69,40 @@ public class MuteManager {
 		return Collections.unmodifiableMap(this.map);
 	}
 
+	private synchronized boolean put(MutedPlayer mute) {
+		MutedPlayer put = this.map.putIfAbsent(mute.getUniqueId(), mute);
+		if (put == null) {
+			String key = mute.getName().toLowerCase();
+			Set<UUID> set = this.byName.get(key);
+			if (set == null) {
+				this.byName.put(key, set = new HashSet<>());
+			}
+			set.add(mute.getUniqueId());
+		}
+		return put == null;
+	}
+
+	private synchronized MutedPlayer remove(UUID uuid) {
+		MutedPlayer mute = this.map.remove(uuid);
+		if (mute != null) {
+			String key = mute.getName().toLowerCase();
+			Set<UUID> set = this.byName.get(key);
+			if (set != null) {
+				set.remove(mute.getUniqueId());
+				if (set.isEmpty()) {
+					this.byName.remove(key, mute);
+				}
+			}
+		};
+		return mute;
+	}
+
 	public boolean mute(ChatOfflinePlayer player, String moderator, ModeratorType moderatorType, Integer duration, String reason) {
 		Date now = new Date();
-		synchronized (this.map) {
+		synchronized (this) {
 			MutedPlayer mute = this.map.get(player.getUniqueId());
 			if (mute != null && !mute.isExpired(now)) return false;
-			this.map.put(player.getUniqueId(), new MutedPlayer(player, moderator, moderatorType, now, duration, reason));
+			if (!this.put(new MutedPlayer(player, moderator, moderatorType, now, duration, reason))) return false;
 		}
 		this.threadSaveConfig.save();
 		return true;
@@ -63,18 +110,12 @@ public class MuteManager {
 
 	@Deprecated
 	public boolean unmute(String name) {
-		MutedPlayer mute = this.getMutedPlayer(name);
-		if (mute != null) {
-			return this.unmute(mute.getUniqueId());
-		}
-		return false;
+		MutedPlayer mute = this.getByName(name);
+		return mute != null && this.unmute(mute.getUniqueId());
 	}
 
 	public boolean unmute(UUID uuid) {
-		MutedPlayer mute;
-		synchronized (this.map) {
-			mute = this.map.remove(uuid);
-		}
+		MutedPlayer mute = this.remove(uuid);
 		if (mute != null) this.threadSaveConfig.save();
 		return mute != null && !mute.isExpired();
 	}
@@ -103,10 +144,10 @@ public class MuteManager {
 	public void reload(File file) throws IOException {
 		if (file.exists()) {
 			GsonMutes mutes = new Gson().fromJson(new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8), GsonMutes.class);
-			synchronized (this.map) {
+			synchronized (this) {
 				this.map.clear();
 				for (GsonMutedPlayer mute : mutes) {
-					this.map.put(mute.uuid, mute.toMutedPlayer());
+					this.put(mute.toMutedPlayer());
 				}
 			}
 		}
@@ -118,7 +159,7 @@ public class MuteManager {
 
 	public void save(File file) throws IOException {
 		GsonMutes mutes = new GsonMutes();
-		synchronized (this.map) {
+		synchronized (this) {
 			for (MutedPlayer mute : this.map.values()) {
 				mutes.add(GsonMutedPlayer.fromMutedPlayer(mute));
 			}

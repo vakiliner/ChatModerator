@@ -23,7 +23,7 @@ public class UnmuteCommand implements TabExecutor {
 		if (args.length < 1) return false;
 		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
 		String targetName = args[0];
-		MutedPlayer mute = this.manager.mutes.getMutedPlayer(targetName);
+		MutedPlayer mute = this.manager.mutes.getByName(targetName);
 		if (mute != null && this.manager.mutes.unmute(mute.getUniqueId())) {
 			sender.sendMessage(new ChatTextComponent(mute.getName() + " теперь снова может общаться"));
 		} else {
