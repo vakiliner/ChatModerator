@@ -1,0 +1,22 @@
+plugins {
+	id 'java'
+}
+
+dependencies {
+	implementation project(':base')
+}
+
+processResources {
+	inputs.property 'version', project.version
+
+	filesMatching('plugin.yml') {
+		expand 'version': inputs.properties.version
+	}
+}
+
+jar {
+	exclude 'vakiliner/chatcomponentapi/spigot/**'
+	exclude 'vakiliner/chatcomponentapi/paper/**'
+	exclude 'vakiliner/chatmoderator/spigot/**'
+	exclude 'vakiliner/chatmoderator/paper/**'
+}

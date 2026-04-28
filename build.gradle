@@ -1,0 +1,81 @@
+plugins {
+	id 'java'
+}
+
+var base = project(':base')
+var craftbukkit = project(':craftbukkit')
+var spigot = project(':spigot')
+var paper = project(':paper')
+var fabric = project(':fabric')
+var forge = project(':forge')
+
+allprojects {
+	apply plugin: 'java'
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
+	dependencies {
+		compileOnly fileTree(include: ['*.jar'], dir: 'libs')
+	}
+}
+
+subprojects {
+	apply plugin: 'java'
+
+	it.base {
+		archivesName = "${project.archives_base_name}-${project.display_name}"
+	}
+
+	jar {
+		from '../LICENSE'
+	}
+}
+
+jar {
+	evaluationDependsOn(base.getName())
+	evaluationDependsOn(craftbukkit.getName())
+	evaluationDependsOn(spigot.getName())
+	evaluationDependsOn(paper.getName())
+	evaluationDependsOn(fabric.getName())
+	evaluationDependsOn(forge.getName())
+
+	var baseJar = base.tasks.getByName('jar')
+	var craftbukkitJar = craftbukkit.tasks.getByName('jar')
+	var spigotJar = spigot.tasks.getByName('jar')
+	var paperJar = paper.tasks.getByName('jar')
+	var fabricJar = fabric.tasks.getByName('jar')
+	var fabricRemapJar = fabric.tasks.getByName('remapJar')
+	var forgeJar = forge.tasks.getByName('jar')
+
+	from(zipTree(baseJar.archiveFile)) {
+		exclude 'LICENSE'
+	}
+	from(zipTree(craftbukkitJar.archiveFile)) {
+		exclude 'LICENSE'
+	}
+	from(zipTree(spigotJar.archiveFile)) {
+		exclude 'LICENSE'
+	}
+	from(zipTree(paperJar.archiveFile)) {
+		exclude 'LICENSE'
+	}
+	from(zipTree(fabricRemapJar.archiveFile)) {
+		exclude 'LICENSE'
+	}
+	from(zipTree(forgeJar.archiveFile)) {
+		exclude 'LICENSE'
+	}
+
+	manifest {
+		from baseJar.manifest
+		from craftbukkitJar.manifest
+		from spigotJar.manifest
+		from paperJar.manifest
+		from fabricJar.manifest
+		from forgeJar.manifest
+		attributes([
+			'Build-Timestamp': new Date()
+		])
+	}
+}

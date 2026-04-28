@@ -1,0 +1,32 @@
+plugins {
+	id 'fabric-loom' version "${loom_version}"
+}
+
+dependencies {
+	implementation project(':base')
+	minecraft group: 'com.mojang', name: 'minecraft', version: project.minecraft_version
+	mappings loom.officialMojangMappings()
+	modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: project.loader_version
+
+	modImplementation fabricApi.module('fabric-api-base', project.fabric_api)
+	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_api)
+	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_api)
+}
+
+loom {
+	mixin {
+		useLegacyMixinAp = false
+	}
+}
+
+processResources {
+	var replaceProperties = [
+		version: project.version,
+		license: project.license,
+	]
+	inputs.properties replaceProperties
+
+	filesMatching('fabric.mod.json') {
+		expand replaceProperties
+	}
+}
