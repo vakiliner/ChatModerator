@@ -2,21 +2,21 @@ package vakiliner.chatmoderator.fabric;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStarting;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStarted;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStopped;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStopping;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatmoderator.fabric.command.*;
 
-class FabricListener implements CommandRegistrationCallback, ServerStarting, ServerStopping, ServerStopped {
+class FabricListener implements CommandRegistrationCallback, ServerStarted, ServerStopping, ServerStopped {
 	private final FabricChatModerator manager;
 
 	protected FabricListener(FabricChatModerator manager) {
 		this.manager = manager;
 	}
 
-	public void onServerStarting(MinecraftServer server) {
+	public void onServerStarted(MinecraftServer server) {
 		this.manager.server = server;
 		this.manager.startServer();
 	}

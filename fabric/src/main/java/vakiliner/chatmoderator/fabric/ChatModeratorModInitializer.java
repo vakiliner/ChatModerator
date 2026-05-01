@@ -18,7 +18,7 @@ public class ChatModeratorModInitializer implements ModInitializer {
 	public void onInitialize() {
 		MANAGER.init(this);
 		CommandRegistrationCallback.EVENT.register(this.listener);
-		ServerLifecycleEvents.SERVER_STARTING.register(this.listener);
+		ServerLifecycleEvents.SERVER_STARTED.register(this.listener);
 		ServerLifecycleEvents.SERVER_STOPPING.register(this.listener);
 		ServerLifecycleEvents.SERVER_STOPPED.register(this.listener);
 		FabricChatModerator.LOGGER.info("Ready. Waiting for the server to start");
