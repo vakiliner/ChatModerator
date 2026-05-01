@@ -16,21 +16,12 @@ import com.google.gson.Gson;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.api.GsonMutedPlayer;
 import vakiliner.chatmoderator.api.GsonMutes;
-import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 
 public class MuteManager {
-	private final ChatModerator manager;
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
 	private ThreadSaveConfig threadSaveConfig;
-
-	public MuteManager(ChatModerator manager) {
-		this.manager = manager;
-	}
-
-	public Path getFilePath() {
-		return this.manager.getFolderPath().resolve(this.manager.getConfig().mutesPath());
-	}
+	public Path filepath;
 
 	public MutedPlayer get(UUID uuid) {
 		return this.map.get(uuid);
@@ -83,35 +74,48 @@ public class MuteManager {
 		return mute != null && !mute.isExpired();
 	}
 
-	public synchronized void setup() throws IOException {
+	public synchronized void setup(Path path) throws IOException {
 		if (this.threadSaveConfig != null) {
 			throw new IllegalStateException("Thread not stopped");
 		}
 		this.threadSaveConfig = new ThreadSaveConfig(this);
 		this.threadSaveConfig.start();
-		this.reload();
+		this.reload(this.filepath = path, true);
 	}
 
 	public synchronized void stop() throws IOException {
 		this.threadSaveConfig.interrupt();
 		this.threadSaveConfig = null;
 		this.save();
+		this.filepath = null;
 		this.map.clear();
 	}
 
 	public void reload() throws IOException {
-		this.reload(this.getFilePath());
+		this.reload(this.filepath, false);
 	}
 
 	public void reload(File file) throws IOException {
-		this.reload(file, file.toPath());
+		this.reload(file, false);
 	}
 
 	public void reload(Path path) throws IOException {
-		this.reload(path.toFile(), path);
+		this.reload(path, false);
 	}
 
-	private void reload(File file, Path path) throws IOException {
+	public void reload(boolean saveIfNotExists) throws IOException {
+		this.reload(this.filepath, saveIfNotExists);
+	}
+
+	public void reload(File file, boolean saveIfNotExists) throws IOException {
+		this.reload(file, file.toPath(), saveIfNotExists);
+	}
+
+	public void reload(Path path, boolean saveIfNotExists) throws IOException {
+		this.reload(path.toFile(), path, saveIfNotExists);
+	}
+
+	private void reload(File file, Path path, boolean saveIfNotExists) throws IOException {
 		if (file.exists()) {
 			GsonMutes mutes = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonMutes.class);
 			synchronized (this.map) {
@@ -122,11 +126,13 @@ public class MuteManager {
 			}
 		} else if (!file.getParentFile().exists()) {
 			throw new NoSuchFileException(file.toString());
+		} else if (saveIfNotExists) {
+			this.save(path);
 		}
 	}
 
 	public void save() throws IOException {
-		this.save(this.getFilePath());
+		this.save(this.filepath);
 	}
 
 	public void save(File file) throws IOException {

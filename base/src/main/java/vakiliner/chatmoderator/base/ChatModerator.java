@@ -36,8 +36,8 @@ public abstract class ChatModerator {
 	public static final int CONFIG_VERSION = Short.MIN_VALUE + 3;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
-	public final AutoModeration automod = new AutoModeration(this);
-	public final MuteManager mutes = new MuteManager(this);
+	public final AutoModeration automod = new AutoModeration();
+	public final MuteManager mutes = new MuteManager();
 
 	public ChatModerator() {
 		synchronized (ChatModerator.class) {
@@ -47,11 +47,15 @@ public abstract class ChatModerator {
 	}
 
 	protected void setup() {
+		Config config = this.getConfig();
+		Path folderPath = this.getFolderPath();
+		String autoModerationRulesPath = config.autoModerationRulesPath();
+		String dictionaryPath = config.dictionaryPath();
 		try {
 			this.createDefaultFolder();
-			this.mutes.setup();
-			this.automod.reload();
-			this.automod.reloadDictionary();
+			this.mutes.setup(folderPath.resolve(config.mutesPath()));
+			this.automod.setup(folderPath.resolve(autoModerationRulesPath), autoModerationRulesPath.equals("auto_moderation_rules.json"));
+			if (dictionaryPath != null) this.automod.setupDictionary(folderPath.resolve(dictionaryPath), dictionaryPath.equals("dictionary_ru.json"));
 		} catch (IOException err) {
 			throw new RuntimeException(err);
 		}
@@ -158,17 +162,17 @@ public abstract class ChatModerator {
 
 	@Deprecated
 	public Path getMutesPath() {
-		return this.mutes.getFilePath();
+		return this.mutes.filepath;
 	}
 
 	@Deprecated
 	public Path getAutoModerationRulesPath() {
-		return this.automod.getFilePath();
+		return this.automod.filepath;
 	}
 
 	@Deprecated
 	public Path getAutoModerationDictionaryPath() {
-		return this.automod.getDictionaryPath();
+		return this.automod.dictionaryPath;
 	}
 
 	public void broadcast(ChatComponent component) {

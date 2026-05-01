@@ -26,7 +26,6 @@ import com.google.gson.GsonBuilder;
 import vakiliner.chatmoderator.api.GsonAutoMod;
 import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 import vakiliner.chatmoderator.api.GsonDictionary;
-import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.automod.BaseAutoModerationRule;
 import vakiliner.chatmoderator.core.automod.EventType;
@@ -36,23 +35,11 @@ import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.core.automod.KeywordAutoModerationRule.TriggerMetadata;
 
 public class AutoModeration {
-	private final ChatModerator manager;
 	private final ExecutorService threadPool = Executors.newCachedThreadPool();
 	private final List<BaseAutoModerationRule> rules = new ArrayList<>();
 	public final Map<Character, String> cleaner = new HashMap<>();
-
-	public AutoModeration(ChatModerator manager) {
-		this.manager = manager;
-	}
-
-	public Path getFilePath() {
-		return this.manager.getFolderPath().resolve(this.manager.getConfig().autoModerationRulesPath());
-	}
-
-	public Path getDictionaryPath() {
-		String name = this.manager.getConfig().dictionaryPath();
-		return name != null ? this.manager.getFolderPath().resolve(name) : null;
-	}
+	public Path filepath;
+	public Path dictionaryPath;
 
 	public CheckResult checkMessage(ChatPlayer player, String message) {
 		try {
@@ -103,17 +90,36 @@ public class AutoModeration {
 		return checkResult;
 	}
 
+	public synchronized void setup(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(this.filepath = path);
+	}
+
+	public synchronized void setupDictionary(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		this.reloadDictionary(this.dictionaryPath = path);
+	}
+
 	public void reload() throws IOException {
-		Path path = this.getFilePath();
-		this.reload(path.toFile(), path, this.manager.getConfig().autoModerationRulesPath().equals("auto_moderation_rules.json"));
+		this.reload(false);
 	}
 
 	public void reload(File file) throws IOException {
-		this.reload(file, file.toPath(), false);
+		this.reload(file, false);
 	}
 
 	public void reload(Path path) throws IOException {
-		this.reload(path.toFile(), path, false);
+		this.reload(path, false);
+	}
+
+	public void reload(boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(this.filepath, saveDefaultIfNotExists);
+	}
+
+	public void reload(File file, boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(file, file.toPath(), saveDefaultIfNotExists);
+	}
+
+	public void reload(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(path.toFile(), path, saveDefaultIfNotExists);
 	}
 
 	private void reload(File file, Path path, boolean saveDefaultIfNotExists) throws IOException {
@@ -153,20 +159,32 @@ public class AutoModeration {
 	}
 
 	public void reloadDictionary() throws IOException {
-		Path path = this.getDictionaryPath();
-		this.reloadDictionary(path.toFile(), path, this.manager.getConfig().dictionaryPath().equals("dictionary_ru.json"));
+		this.reloadDictionary(false);
 	}
 
 	public void reloadDictionary(File file) throws IOException {
-		this.reloadDictionary(file, file.toPath(), false);
+		this.reloadDictionary(file, false);
 	}
 
 	public void reloadDictionary(Path path) throws IOException {
-		this.reloadDictionary(path.toFile(), path, false);
+		this.reloadDictionary(path, false);
+	}
+
+	public void reloadDictionary(boolean saveDefaultIfNotExists) throws IOException {
+		this.reloadDictionary(this.dictionaryPath, saveDefaultIfNotExists);
+	}
+
+	public void reloadDictionary(File file, boolean saveDefaultIfNotExists) throws IOException {
+		if (file == null) return;
+		this.reloadDictionary(file, file.toPath(), saveDefaultIfNotExists);
+	}
+
+	public void reloadDictionary(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		if (path == null) return;
+		this.reloadDictionary(path.toFile(), path, saveDefaultIfNotExists);
 	}
 
 	private void reloadDictionary(File file, Path path, boolean saveDefaultIfNotExists) throws IOException {
-		if (file == null) return;
 		if (file.exists()) {
 			GsonDictionary dictionary = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonDictionary.class);
 			synchronized (this.cleaner) {
@@ -192,7 +210,7 @@ public class AutoModeration {
 	}
 
 	public void save() throws IOException {
-		this.save(this.getFilePath());
+		this.save(this.filepath);
 	}
 
 	public void save(File file) throws IOException {
@@ -210,7 +228,7 @@ public class AutoModeration {
 	}
 
 	public void saveDictionary() throws IOException {
-		this.saveDictionary(this.getDictionaryPath());
+		this.saveDictionary(this.dictionaryPath);
 	}
 
 	public void saveDictionary(File file) throws IOException {
