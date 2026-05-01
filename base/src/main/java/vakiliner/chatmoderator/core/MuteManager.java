@@ -127,6 +127,9 @@ public class MuteManager {
 		} else if (!file.getParentFile().exists()) {
 			throw new NoSuchFileException(file.toString());
 		} else if (saveIfNotExists) {
+			synchronized (this.map) {
+				this.map.clear();
+			}
 			this.save(path);
 		}
 	}
