@@ -52,7 +52,7 @@ public abstract class ChatModerator {
 		String autoModerationRulesPath = config.autoModerationRulesPath();
 		String dictionaryPath = config.dictionaryPath();
 		try {
-			this.createDefaultFolder();
+			this.createDefaultFolder(folderPath);
 			this.mutes.setup(folderPath.resolve(config.mutesPath()));
 			this.automod.setup(folderPath.resolve(autoModerationRulesPath), autoModerationRulesPath.equals("auto_moderation_rules.json"));
 			if (dictionaryPath != null) this.automod.setupDictionary(folderPath.resolve(dictionaryPath), dictionaryPath.equals("dictionary_ru.json"));
@@ -61,15 +61,15 @@ public abstract class ChatModerator {
 		}
 	}
 
-	private void createDefaultFolder() throws IOException {
-		String folderPath = this.getConfig().folderPath();
-		if (folderPath == null) {
-			Path path = this.getDefaultFolderPath();
-			if (!path.toFile().exists()) {
-				Files.createDirectories(path);
+	private void createDefaultFolder(Path path) throws IOException {
+		Path defaultPath = this.getDefaultFolderPath();
+		String string = this.getConfig().folderPath();
+		if (string == null) {
+			if (!defaultPath.toFile().exists()) {
+				Files.createDirectories(defaultPath);
 			}
-		} else if (!this.getFolderPath().toFile().exists()) {
-			throw new NoSuchFileException(folderPath);
+		} else if (!path.toFile().exists()) {
+			throw new NoSuchFileException(string);
 		}
 	}
 
