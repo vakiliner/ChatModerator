@@ -59,10 +59,7 @@ public class MuteManager {
 	@Deprecated
 	public boolean unmute(String name) {
 		MutedPlayer mute = this.getMutedPlayer(name);
-		if (mute != null) {
-			return this.unmute(mute.getUniqueId());
-		}
-		return false;
+		return mute != null && this.unmute(mute.getUniqueId());
 	}
 
 	public boolean unmute(UUID uuid) {
