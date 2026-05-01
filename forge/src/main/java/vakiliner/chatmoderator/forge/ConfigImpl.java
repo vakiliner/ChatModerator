@@ -78,7 +78,7 @@ class ConfigImpl implements Config {
 	}
 
 	public String autoModerationRulesPath() {
-		return get(this.config.mutes_path, "auto_moderation_rules.json");
+		return get(this.config.auto_moderation_rules_path, "auto_moderation_rules.json");
 	}
 
 	public void autoModerationRulesPath(String path) {
