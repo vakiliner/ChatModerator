@@ -80,14 +80,18 @@ public class MuteManager {
 		}
 		this.threadSaveConfig = new ThreadSaveConfig(this);
 		this.threadSaveConfig.start();
-		this.reload(this.filepath = path, true);
+		this.reload(path, true);
+		this.filepath = path;
 	}
 
 	public synchronized void stop() throws IOException {
 		this.threadSaveConfig.interrupt();
 		this.threadSaveConfig = null;
-		this.save();
-		this.filepath = null;
+		Path filepath = this.filepath;
+		if (filepath != null) {
+			this.save(filepath);
+			this.filepath = null;
+		}
 		this.map.clear();
 	}
 
