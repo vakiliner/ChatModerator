@@ -91,11 +91,11 @@ public class AutoModeration {
 	}
 
 	public synchronized void setup(Path path, boolean saveDefaultIfNotExists) throws IOException {
-		this.reload(this.filepath = path);
+		this.reload(this.filepath = path, saveDefaultIfNotExists);
 	}
 
 	public synchronized void setupDictionary(Path path, boolean saveDefaultIfNotExists) throws IOException {
-		this.reloadDictionary(this.dictionaryPath = path);
+		this.reloadDictionary(this.dictionaryPath = path, saveDefaultIfNotExists);
 	}
 
 	public void reload() throws IOException {

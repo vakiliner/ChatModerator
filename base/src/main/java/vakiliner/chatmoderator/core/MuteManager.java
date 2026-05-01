@@ -92,7 +92,7 @@ public class MuteManager {
 	}
 
 	public void reload() throws IOException {
-		this.reload(this.filepath, false);
+		this.reload(false);
 	}
 
 	public void reload(File file) throws IOException {
