@@ -14,8 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -81,17 +83,20 @@ public class ForgeChatModerator extends ChatModerator {
 			}
 		}
 		if (configVersionType != null) {
+			final GsonConfig config;
+			Gson gson = new Gson();
 			if (configVersionType == ConfigVersionType.FIRST_FABRIC_FORGE) {
-				// Toml config reload
-			} else {
-				final GsonConfig config;
-				try {
-					config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-				} catch (IOException err) {
-					throw err;
-				}
-				this.config.reload(config);
+				CommentedFileConfig nightconfig = CommentedFileConfig.of(path);
+				nightconfig.load();
+				JsonObject object = (JsonObject) gson.toJsonTree(nightconfig.valueMap());
+				object.add("messages", gson.fromJson(object.getAsJsonPrimitive("messages").getAsString(), JsonObject.class));
+				config = gson.fromJson(object, GsonConfig.class);
+			} else try {
+				config = gson.fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
+			} catch (IOException err) {
+				throw err;
 			}
+			this.config.reload(config);
 			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
 			}
