@@ -18,6 +18,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -89,7 +90,10 @@ public class ForgeChatModerator extends ChatModerator {
 				CommentedFileConfig nightconfig = CommentedFileConfig.of(path);
 				nightconfig.load();
 				JsonObject object = (JsonObject) gson.toJsonTree(nightconfig.valueMap());
-				object.add("messages", gson.fromJson(object.getAsJsonPrimitive("messages").getAsString(), JsonObject.class));
+				JsonPrimitive messages = object.getAsJsonPrimitive("messages");
+				if (messages != null) {
+					object.add("messages", gson.fromJson(messages.getAsString(), JsonObject.class));
+				}
 				config = gson.fromJson(object, GsonConfig.class);
 			} else try {
 				config = gson.fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
