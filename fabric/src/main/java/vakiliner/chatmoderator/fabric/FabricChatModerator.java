@@ -65,7 +65,17 @@ public class FabricChatModerator extends ChatModerator {
 
 	public void reloadConfig() throws IOException {
 		Path path = this.getConfigPath();
+		ConfigVersionType configVersionType = null;
 		if (path.toFile().exists()) {
+			configVersionType = ConfigVersionType.LATEST_FABRIC_FORGE;
+		} else {
+			Path oldConfig = this.getDefaultFolderPath().resolve("config.json");
+			if (oldConfig.toFile().exists()) {
+				path = oldConfig;
+				configVersionType = ConfigVersionType.FIRST_FABRIC_FORGE;
+			}
+		}
+		if (configVersionType != null) {
 			final GsonConfig config;
 			try {
 				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
@@ -73,7 +83,7 @@ public class FabricChatModerator extends ChatModerator {
 				throw err;
 			}
 			this.config.reload(config);
-			if (this.checkConfigUpdates()) {
+			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
 			}
 		} else {

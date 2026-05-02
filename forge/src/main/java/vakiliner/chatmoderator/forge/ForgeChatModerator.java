@@ -66,15 +66,33 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public void reloadConfig() throws IOException {
 		Path path = this.getConfigPath();
+		ConfigVersionType configVersionType = null;
 		if (path.toFile().exists()) {
-			final GsonConfig config;
-			try {
-				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				throw err;
+			configVersionType = ConfigVersionType.LATEST_FABRIC_FORGE;
+		} else {
+			Path oldConfigJson = this.getDefaultFolderPath().resolve("config.json");
+			Path oldConfigToml = this.getDefaultFolderPath().resolve("config.toml");
+			if (oldConfigJson.toFile().exists()) {
+				path = oldConfigJson;
+				configVersionType = ConfigVersionType.FORGE_OLD_JSON_CONFIG_FOLDER;
+			} else if (oldConfigToml.toFile().exists()) {
+				path = oldConfigToml;
+				configVersionType = ConfigVersionType.FIRST_FABRIC_FORGE;
 			}
-			this.config.reload(config);
-			if (this.checkConfigUpdates()) {
+		}
+		if (configVersionType != null) {
+			if (configVersionType == ConfigVersionType.FIRST_FABRIC_FORGE) {
+				// Toml config reload
+			} else {
+				final GsonConfig config;
+				try {
+					config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
+				} catch (IOException err) {
+					throw err;
+				}
+				this.config.reload(config);
+			}
+			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
 			}
 		} else {

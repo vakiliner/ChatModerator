@@ -43,7 +43,7 @@ public class BukkitChatModerator extends ChatModerator {
 
 	void reloadConfig(FileConfiguration configuration) {
 		this.config.reload(configuration);
-		if (this.checkConfigUpdates()) {
+		if (this.checkConfigUpdates(ConfigVersionType.BUKKIT)) {
 			this.plugin.saveConfig();
 		}
 	}

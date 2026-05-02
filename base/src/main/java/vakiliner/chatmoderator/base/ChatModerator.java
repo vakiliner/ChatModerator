@@ -81,11 +81,11 @@ public abstract class ChatModerator {
 		}
 	}
 
-	protected boolean checkConfigUpdates() {
+	protected boolean checkConfigUpdates(ConfigVersionType configVersionType) {
 		Config config = this.getConfig();
 		int version = config.version();
 		if (version != CONFIG_VERSION) {
-			if (version < Short.MIN_VALUE || version > CONFIG_VERSION) throw new IllegalStateException("Unsupported config version " + version);
+			if (version < configVersionType.minVersion || version > configVersionType.maxVersion) throw new IllegalStateException("Unsupported config version " + version);
 			this.log("Updating config to a new version " + CONFIG_VERSION);
 			switch (version - Short.MIN_VALUE) {
 				case 0:
@@ -409,6 +409,25 @@ public abstract class ChatModerator {
 			default:
 				builder.append(some);
 				return;
+		}
+	}
+
+	protected enum ConfigVersionType {
+		BUKKIT(Short.MIN_VALUE, CONFIG_VERSION),
+		FIRST_FABRIC_FORGE(Short.MIN_VALUE, Short.MIN_VALUE + 2),
+		FORGE_OLD_JSON_CONFIG_FOLDER(Short.MIN_VALUE + 2),
+		LATEST_FABRIC_FORGE(Short.MIN_VALUE + 3, CONFIG_VERSION);
+
+		public final int maxVersion;
+		public final int minVersion;
+
+		private ConfigVersionType(int minVersion, int maxVersion) {
+			this.minVersion = minVersion;
+			this.maxVersion = maxVersion;
+		}
+
+		private ConfigVersionType(int version) {
+			this(version, version);
 		}
 	}
 }
