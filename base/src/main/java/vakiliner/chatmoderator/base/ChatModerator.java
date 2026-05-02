@@ -100,7 +100,7 @@ public abstract class ChatModerator {
 					messages.put("fail_reasons.automod_blocked_without_custom_message", "Публикация невозможна, поскольку сообщение содержит материалы, заблокированные этим сервером. Владельцы сервера также могут просматривать содержимое сообщений.");
 					messages.put("fail_reasons.automod_blocked_with_custom_message", "Содержимое сообщения заблокировано сервером. Сообщение от модераторов: «%s»");
 					config.messages(messages);
-					Path autoModerationRulesPath = this.getAutoModerationRulesPath();
+					Path autoModerationRulesPath = this.getDefaultFolderPath().resolve("auto_moderation_rules.json");
 					if (autoModerationRulesPath.toFile().exists()) {
 						final JsonArray rules;
 						try {
