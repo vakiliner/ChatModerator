@@ -1,10 +1,10 @@
 package vakiliner.chatmoderator.base;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Date;
@@ -33,11 +33,11 @@ import vakiliner.chatmoderator.core.automod.EventType;
 import vakiliner.chatmoderator.core.automod.MessageActions;
 
 public abstract class ChatModerator {
-	public static final int CONFIG_VERSION = Short.MIN_VALUE + 2;
+	public static final int CONFIG_VERSION = Short.MIN_VALUE + 3;
 	public static final String ID = "chatmoderator";
 	public static ChatModerator MANAGER;
-	public final AutoModeration automod = new AutoModeration(this);
-	public final MuteManager mutes = new MuteManager(this);
+	public final AutoModeration automod = new AutoModeration();
+	public final MuteManager mutes = new MuteManager();
 
 	public ChatModerator() {
 		synchronized (ChatModerator.class) {
@@ -47,12 +47,29 @@ public abstract class ChatModerator {
 	}
 
 	protected void setup() {
+		Config config = this.getConfig();
+		Path folderPath = this.getFolderPath();
+		String autoModerationRulesPath = config.autoModerationRulesPath();
+		String dictionaryPath = config.dictionaryPath();
 		try {
-			this.mutes.setup(this.getMutesPath().toFile());
-			this.automod.reload();
-			this.automod.reloadDictionary();
+			this.createDefaultFolder(folderPath);
+			this.mutes.setup(folderPath.resolve(config.mutesPath()));
+			this.automod.setup(folderPath.resolve(autoModerationRulesPath), autoModerationRulesPath.equals("auto_moderation_rules.json"));
+			if (dictionaryPath != null) this.automod.setupDictionary(folderPath.resolve(dictionaryPath), dictionaryPath.equals("dictionary_ru.json"));
 		} catch (IOException err) {
 			throw new RuntimeException(err);
+		}
+	}
+
+	private void createDefaultFolder(Path path) throws IOException {
+		Path defaultPath = this.getDefaultFolderPath();
+		String string = this.getConfig().folderPath();
+		if (string == null) {
+			if (!defaultPath.toFile().exists()) {
+				Files.createDirectories(defaultPath);
+			}
+		} else if (!path.toFile().exists()) {
+			throw new NoSuchFileException(string);
 		}
 	}
 
@@ -64,11 +81,11 @@ public abstract class ChatModerator {
 		}
 	}
 
-	protected boolean checkConfigUpdates() {
+	protected boolean checkConfigUpdates(ConfigVersionType configVersionType) {
 		Config config = this.getConfig();
 		int version = config.version();
 		if (version != CONFIG_VERSION) {
-			if (version < Short.MIN_VALUE || version > CONFIG_VERSION) throw new IllegalStateException("Unsupported config version " + version);
+			if (version < configVersionType.minVersion || version > configVersionType.maxVersion) throw new IllegalStateException("Unsupported config version " + version);
 			this.log("Updating config to a new version " + CONFIG_VERSION);
 			switch (version - Short.MIN_VALUE) {
 				case 0:
@@ -83,7 +100,7 @@ public abstract class ChatModerator {
 					messages.put("fail_reasons.automod_blocked_without_custom_message", "Публикация невозможна, поскольку сообщение содержит материалы, заблокированные этим сервером. Владельцы сервера также могут просматривать содержимое сообщений.");
 					messages.put("fail_reasons.automod_blocked_with_custom_message", "Содержимое сообщения заблокировано сервером. Сообщение от модераторов: «%s»");
 					config.messages(messages);
-					Path autoModerationRulesPath = this.getAutoModerationRulesPath();
+					Path autoModerationRulesPath = this.getDefaultFolderPath().resolve("auto_moderation_rules.json");
 					if (autoModerationRulesPath.toFile().exists()) {
 						final JsonArray rules;
 						try {
@@ -113,6 +130,10 @@ public abstract class ChatModerator {
 				case 1:
 					config.logBlockedMessages(false);
 					config.logBlockedCommands(false);
+				case 2:
+					config.folderPath(null);
+					config.autoModerationRulesPath("auto_moderation_rules.json");
+					config.mutesPath("mutes.json");
 			}
 			config.version(CONFIG_VERSION);
 			return true;
@@ -124,25 +145,34 @@ public abstract class ChatModerator {
 
 	public abstract Config getConfig();
 
-	protected abstract File getDataFolder();
+	protected abstract Path getDefaultFolderPath();
 
-	protected abstract Path getFolderPath();
+	public Path getFolderPath() {
+		Path path = this.getDefaultFolderPath();
+		String folderPath = this.getConfig().folderPath();
+		if (folderPath != null) {
+			return path.resolve(folderPath);
+		}
+		return path;
+	}
 
 	public abstract Path getConfigPath();
 
 	public abstract String getName();
 
+	@Deprecated
 	public Path getMutesPath() {
-		return this.getFolderPath().resolve("mutes.json");
+		return this.mutes.filepath;
 	}
 
+	@Deprecated
 	public Path getAutoModerationRulesPath() {
-		return this.getFolderPath().resolve("auto_moderation_rules.json");
+		return this.automod.filepath;
 	}
 
+	@Deprecated
 	public Path getAutoModerationDictionaryPath() {
-		String name = this.getConfig().dictionaryFile();
-		return name != null ? this.getFolderPath().resolve(name) : null;
+		return this.automod.dictionaryPath;
 	}
 
 	public void broadcast(ChatComponent component) {
@@ -379,6 +409,25 @@ public abstract class ChatModerator {
 			default:
 				builder.append(some);
 				return;
+		}
+	}
+
+	protected enum ConfigVersionType {
+		BUKKIT(Short.MIN_VALUE, CONFIG_VERSION),
+		FIRST_FABRIC_FORGE(Short.MIN_VALUE, Short.MIN_VALUE + 2),
+		FORGE_OLD_JSON_CONFIG_FOLDER(Short.MIN_VALUE + 2),
+		LATEST_FABRIC_FORGE(Short.MIN_VALUE + 3, CONFIG_VERSION);
+
+		public final int maxVersion;
+		public final int minVersion;
+
+		private ConfigVersionType(int minVersion, int maxVersion) {
+			this.minVersion = minVersion;
+			this.maxVersion = maxVersion;
+		}
+
+		private ConfigVersionType(int version) {
+			this(version, version);
 		}
 	}
 }

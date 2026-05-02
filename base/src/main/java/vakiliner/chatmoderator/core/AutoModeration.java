@@ -1,9 +1,11 @@
 package vakiliner.chatmoderator.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +26,6 @@ import com.google.gson.GsonBuilder;
 import vakiliner.chatmoderator.api.GsonAutoMod;
 import vakiliner.chatmoderator.api.GsonAutoModerationRule;
 import vakiliner.chatmoderator.api.GsonDictionary;
-import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.automod.BaseAutoModerationRule;
 import vakiliner.chatmoderator.core.automod.EventType;
@@ -34,14 +35,11 @@ import vakiliner.chatmoderator.core.automod.MessageActions;
 import vakiliner.chatmoderator.core.automod.KeywordAutoModerationRule.TriggerMetadata;
 
 public class AutoModeration {
-	private final ChatModerator manager;
 	private final ExecutorService threadPool = Executors.newCachedThreadPool();
 	private final List<BaseAutoModerationRule> rules = new ArrayList<>();
 	public final Map<Character, String> cleaner = new HashMap<>();
-
-	public AutoModeration(ChatModerator manager) {
-		this.manager = manager;
-	}
+	public Path filepath;
+	public Path dictionaryPath;
 
 	public CheckResult checkMessage(ChatPlayer player, String message) {
 		try {
@@ -92,9 +90,40 @@ public class AutoModeration {
 		return checkResult;
 	}
 
+	public synchronized void setup(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(this.filepath = path, saveDefaultIfNotExists);
+	}
+
+	public synchronized void setupDictionary(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		this.reloadDictionary(this.dictionaryPath = path, saveDefaultIfNotExists);
+	}
+
 	public void reload() throws IOException {
-		Path path = this.manager.getAutoModerationRulesPath();
-		if (path.toFile().exists()) {
+		this.reload(false);
+	}
+
+	public void reload(File file) throws IOException {
+		this.reload(file, false);
+	}
+
+	public void reload(Path path) throws IOException {
+		this.reload(path, false);
+	}
+
+	public void reload(boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(this.filepath, saveDefaultIfNotExists);
+	}
+
+	public void reload(File file, boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(file, file.toPath(), saveDefaultIfNotExists);
+	}
+
+	public void reload(Path path, boolean saveDefaultIfNotExists) throws IOException {
+		this.reload(path.toFile(), path, saveDefaultIfNotExists);
+	}
+
+	private void reload(File file, Path path, boolean saveDefaultIfNotExists) throws IOException {
+		if (file.exists()) {
 			GsonAutoMod automod = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonAutoMod.class);
 			synchronized (this.rules) {
 				this.rules.clear();
@@ -102,7 +131,9 @@ public class AutoModeration {
 					this.rules.add(rule.toAutoModerationRule());
 				}
 			}
-		} else {
+		} else if (!file.getParentFile().exists()) {
+			throw new NoSuchFileException(file.toString());
+		} else if (saveDefaultIfNotExists) {
 			KeywordAutoModerationRule test1 = new KeywordAutoModerationRule(this, "Test 1", EventType.MESSAGE);
 			MessageActions test1actions = (MessageActions) test1.getActions();
 			test1actions.blockAction("Тест");
@@ -119,24 +150,52 @@ public class AutoModeration {
 			test2triggerMetadata.setRegexPatterns(Arrays.asList("word5"));
 			test2triggerMetadata.setAllowList(Arrays.asList("word4ru", "word5ru"));
 			synchronized (this.rules) {
+				this.rules.clear();
 				this.rules.add(test1);
 				this.rules.add(test2);
 			}
-			this.save();
+			this.save(path);
 		}
 	}
 
 	public void reloadDictionary() throws IOException {
-		Path path = this.manager.getAutoModerationDictionaryPath();
+		this.reloadDictionary(false);
+	}
+
+	public void reloadDictionary(File file) throws IOException {
+		this.reloadDictionary(file, false);
+	}
+
+	public void reloadDictionary(Path path) throws IOException {
+		this.reloadDictionary(path, false);
+	}
+
+	public void reloadDictionary(boolean saveDefaultIfNotExists) throws IOException {
+		this.reloadDictionary(this.dictionaryPath, saveDefaultIfNotExists);
+	}
+
+	public void reloadDictionary(File file, boolean saveDefaultIfNotExists) throws IOException {
+		if (file == null) return;
+		this.reloadDictionary(file, file.toPath(), saveDefaultIfNotExists);
+	}
+
+	public void reloadDictionary(Path path, boolean saveDefaultIfNotExists) throws IOException {
 		if (path == null) return;
-		if (path.toFile().exists()) {
+		this.reloadDictionary(path.toFile(), path, saveDefaultIfNotExists);
+	}
+
+	private void reloadDictionary(File file, Path path, boolean saveDefaultIfNotExists) throws IOException {
+		if (file.exists()) {
 			GsonDictionary dictionary = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonDictionary.class);
 			synchronized (this.cleaner) {
 				this.cleaner.clear();
 				this.cleaner.putAll(dictionary);
 			}
-		} else if (this.manager.getConfig().dictionaryFile().equals("dictionary_ru.json")) {
+		} else if (!file.getParentFile().exists()) {
+			throw new NoSuchFileException(file.toString());
+		} else if (saveDefaultIfNotExists) {
 			synchronized (this.cleaner) {
+				this.cleaner.clear();
 				this.cleaner.put('.', "");
 				this.cleaner.put(',', "");
 				this.cleaner.put('A', "А");
@@ -146,12 +205,16 @@ public class AutoModeration {
 				this.cleaner.put('c', "с");
 				this.cleaner.put('x', "х");
 			}
-			this.saveDictionary();
+			this.saveDictionary(path);
 		}
 	}
 
 	public void save() throws IOException {
-		this.save(this.manager.getAutoModerationRulesPath());
+		this.save(this.filepath);
+	}
+
+	public void save(File file) throws IOException {
+		this.save(file.toPath());
 	}
 
 	public void save(Path path) throws IOException {
@@ -165,7 +228,11 @@ public class AutoModeration {
 	}
 
 	public void saveDictionary() throws IOException {
-		this.saveDictionary(this.manager.getAutoModerationDictionaryPath());
+		this.saveDictionary(this.dictionaryPath);
+	}
+
+	public void saveDictionary(File file) throws IOException {
+		this.saveDictionary(file.toPath());
 	}
 
 	public void saveDictionary(Path path) throws IOException {

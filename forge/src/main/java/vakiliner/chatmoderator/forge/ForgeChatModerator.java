@@ -66,15 +66,33 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public void reloadConfig() throws IOException {
 		Path path = this.getConfigPath();
+		ConfigVersionType configVersionType = null;
 		if (path.toFile().exists()) {
-			final GsonConfig config;
-			try {
-				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				throw err;
+			configVersionType = ConfigVersionType.LATEST_FABRIC_FORGE;
+		} else {
+			Path oldConfigJson = this.getDefaultFolderPath().resolve("config.json");
+			Path oldConfigToml = this.getDefaultFolderPath().resolve("config.toml");
+			if (oldConfigJson.toFile().exists()) {
+				path = oldConfigJson;
+				configVersionType = ConfigVersionType.FORGE_OLD_JSON_CONFIG_FOLDER;
+			} else if (oldConfigToml.toFile().exists()) {
+				path = oldConfigToml;
+				configVersionType = ConfigVersionType.FIRST_FABRIC_FORGE;
 			}
-			this.config.reload(config);
-			if (this.checkConfigUpdates()) {
+		}
+		if (configVersionType != null) {
+			if (configVersionType == ConfigVersionType.FIRST_FABRIC_FORGE) {
+				// Toml config reload
+			} else {
+				final GsonConfig config;
+				try {
+					config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
+				} catch (IOException err) {
+					throw err;
+				}
+				this.config.reload(config);
+			}
+			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
 			}
 		} else {
@@ -85,7 +103,10 @@ public class ForgeChatModerator extends ChatModerator {
 			this.config.autoModerationEnabled(true);
 			this.config.autoModerationUseThreadPool(false);
 			this.config.spectatorsChat(false);
-			this.config.dictionaryFile("dictionary_ru.json");
+			this.config.folderPath(null);
+			this.config.mutesPath("mutes.json");
+			this.config.autoModerationRulesPath("auto_moderation_rules.json");
+			this.config.dictionaryPath("dictionary_ru.json");
 			this.config.showFailMessage(true);
 			this.config.logBlockedMessages(false);
 			this.config.logBlockedCommands(false);
@@ -119,24 +140,12 @@ public class ForgeChatModerator extends ChatModerator {
 		return this.config;
 	}
 
-	protected Path getFolderPath() {
-		Path path = new File(".").toPath().resolve("config").resolve("ChatModerator");
-		if (!path.toFile().exists()) {
-			try {
-				Files.createDirectories(path);
-			} catch (IOException err) {
-				throw new RuntimeException("Creating data folder", err);
-			}
-		}
-		return path;
-	}
-
-	protected File getDataFolder() {
-		return this.getFolderPath().toFile();
+	protected Path getDefaultFolderPath() {
+		return new File("config").toPath().resolve("ChatModerator");
 	}
 
 	public Path getConfigPath() {
-		return this.getFolderPath().resolve("config.json");
+		return new File("config").toPath().resolve(this.modInitializer.modContainer.getModId() + ".json");
 	}
 
 	public String getName() {
