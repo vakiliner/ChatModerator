@@ -19,7 +19,7 @@ public class PaperChatTeam extends BukkitChatTeam {
 		try {
 			return PaperParser.paper((NamedTextColor) this.team.color());
 		} catch (IllegalStateException err) {
-			return ChatNamedColor.RESET;
+			return null;
 		}
 	}
 

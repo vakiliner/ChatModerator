@@ -39,4 +39,15 @@ public class BukkitChatTeam implements ChatTeam {
 	public ChatComponent getSuffix() {
 		return new ChatTextComponent(this.team.getSuffix());
 	}
+
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj != null && this.getClass() == obj.getClass()) {
+			BukkitChatTeam other = (BukkitChatTeam) obj;
+			return this.parser.equals(other.parser) && this.team.equals(other.team);
+		} else {
+			return false;
+		}
+	}
 }

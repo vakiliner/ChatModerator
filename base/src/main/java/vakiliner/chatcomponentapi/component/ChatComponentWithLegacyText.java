@@ -9,16 +9,17 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 	private final Supplier<ChatComponent> getLegacyComponent;
 	private ChatComponent legacyComponent;
 
+	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, Supplier<ChatComponent> getLegacyComponent) {
 		super(component);
 		this.getLegacyComponent = Objects.requireNonNull(getLegacyComponent);
 	}
 
+	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, ChatComponent legacyComponent) {
 		super(component);
 		this.getLegacyComponent = () -> this.legacyComponent;
 		this.legacyComponent = Objects.requireNonNull(legacyComponent);
-		this.legacyComponent.setParent(this);
 	}
 
 	@Deprecated
@@ -26,15 +27,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		this(component, new ChatTextComponent(legacyText));
 	}
 
-	public ChatComponentWithLegacyText(ChatComponentWithLegacyText component) {
+	protected ChatComponentWithLegacyText(ChatComponentWithLegacyText component) {
 		super(component);
 		this.getLegacyComponent = component.getLegacyComponent;
-		ChatComponent legacyComponent = component.legacyComponent;
-		if (legacyComponent != null) {
-			legacyComponent = legacyComponent.clone();
-			legacyComponent.setParent(this);
-		}
-		this.legacyComponent = legacyComponent;
+		this.legacyComponent = component.legacyComponent;
 	}
 
 	public ChatComponent getLegacyComponent() {
@@ -45,13 +41,11 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 			if (this.legacyComponent != null) {
 				return this.legacyComponent;
 			}
-			this.legacyComponent = this.getLegacyComponent.get().clone();
-			this.legacyComponent.setParent(this);
-			return this.legacyComponent;
+			return this.legacyComponent = this.getLegacyComponent.get();
 		}
 	}
 
-	public ChatComponent clone() {
+	public ChatComponent clone(boolean cloneExtra) {
 		return new ChatComponentWithLegacyText(this);
 	}
 

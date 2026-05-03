@@ -31,7 +31,6 @@ public enum ChatTextFormat {
 	private static final Map<Character, ChatTextFormat> BY_CHAR = Maps.newHashMap();
 	private static final Map<String, ChatTextFormat> BY_NAME = Maps.newHashMap();
 	private final char code;
-	private final String name;
 	private final boolean isFormat;
 	private final String string;
 
@@ -41,7 +40,6 @@ public enum ChatTextFormat {
 
 	private ChatTextFormat(char code, boolean isFormat) {
 		this.code = code;
-		this.name = this.name().toLowerCase();
 		this.isFormat = isFormat;
 		this.string = new String(new char[] { COLOR_CHAR, code });
 	}
@@ -51,7 +49,7 @@ public enum ChatTextFormat {
 	}
 
 	public String getName() {
-		return this.name;
+		return this.name().toLowerCase();
 	}
 
 	public String toString() {
@@ -77,7 +75,7 @@ public enum ChatTextFormat {
 	static {
 		for (ChatTextFormat color : values()) {
 			BY_CHAR.put(color.code, color);
-			BY_NAME.put(color.name, color);
+			BY_NAME.put(color.getName(), color);
 		}
 	}
 }

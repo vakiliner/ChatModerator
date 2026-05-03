@@ -2,13 +2,14 @@ package vakiliner.chatcomponentapi.fabric;
 
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatStyle;
 
 interface IStyleParser {
-	Style injectStyle(ChatComponent component);
+	ChatTextColor injectColor(Style style);
 
-	void copyColor(ChatComponent to, Style from);
+	Style fabric(ChatStyle chatStyle);
 
 	HoverEvent fabric(ChatHoverEvent<?> event);
 

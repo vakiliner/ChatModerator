@@ -14,52 +14,54 @@ import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 class HoverEventParser {
 	public HoverEvent spigot(ChatHoverEvent<?> event) {
-		return event != null ? new HoverEvent(HoverEvent.Action.valueOf(event.getAction().getName().toUpperCase()), spigotContent(event.getContents())) : null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <V> ChatHoverEvent<?> spigot(HoverEvent event) {
-		return event != null ? new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(event.getAction().name().toLowerCase()), (V) spigotContent2(event.getContents().get(0))) : null;
-	}
-
-	public Content spigotContent(Object raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof ChatComponent) {
-			ChatComponent content = (ChatComponent) raw;
-			return new Text(new BaseComponent[] { SpigotParser.spigot(content) });
-		} else if (raw instanceof ChatHoverEvent.ShowEntity) {
-			ChatHoverEvent.ShowEntity content = (ChatHoverEvent.ShowEntity) raw;
-			return new Entity(content.getType().toString(), content.getUniqueId().toString(), SpigotParser.spigot(content.getName()));
-		} else if (raw instanceof ChatHoverEvent.ShowItem) {
-			ChatHoverEvent.ShowItem content = (ChatHoverEvent.ShowItem) raw;
-			return new Item(content.getItem().toString(), content.getCount(), null);
+		ChatHoverEvent.Action<?> action = event.getAction();
+		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
+			return new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new BaseComponent[] { SpigotParser.spigot(event.getValue(ChatHoverEvent.Action.SHOW_TEXT)) }));
+		} else if (action == ChatHoverEvent.Action.SHOW_ENTITY) {
+			return new HoverEvent(HoverEvent.Action.SHOW_ENTITY, spigot(event.getValue(ChatHoverEvent.Action.SHOW_ENTITY)));
+		} else if (action == ChatHoverEvent.Action.SHOW_ITEM) {
+			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, spigot(event.getValue(ChatHoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+			throw new IllegalArgumentException("Unknown action");
 		}
 	}
 
-	public Object spigotContent2(Content raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof Text) {
-			Text content = (Text) raw;
-			Object value = content.getValue();
+	public ChatHoverEvent<?> spigot(HoverEvent event) {
+		HoverEvent.Action action = event.getAction();
+		Content content = event.getContents().get(0);
+		if (action == HoverEvent.Action.SHOW_TEXT) {
+			Object value = ((Text) content).getValue();
+			final ChatComponent chatComponent;
 			if (value instanceof String) {
-				return new ChatTextComponent((String) value);
+				chatComponent = new ChatTextComponent((String) value);
 			} else if (value instanceof BaseComponent[]) {
-				return SpigotParser.spigot(((BaseComponent[]) value)[0]);
+				chatComponent = SpigotParser.spigot(((BaseComponent[]) value)[0]);
 			} else {
-				throw new IllegalArgumentException("Could not parse ChatTextContent from " + value.getClass());
+				throw new IllegalArgumentException("Could not parse ChatComponent from " + value.getClass());
 			}
-		} else if (raw instanceof Entity) {
-			Entity content = (Entity) raw;
-			return new ChatHoverEvent.ShowEntity(ChatId.parse(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName()));
-		} else if (raw instanceof Item) {
-			Item content = (Item) raw;
-			return new ChatHoverEvent.ShowItem(ChatId.parse(content.getId()), content.getCount());
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, chatComponent);
+		} else if (action == HoverEvent.Action.SHOW_ENTITY) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ENTITY, spigot((Entity) content));
+		} else if (action == HoverEvent.Action.SHOW_ITEM) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, spigot((Item) content));
 		} else {
-			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
+			throw new IllegalArgumentException("Unknown action");
 		}
+	}
+
+	public static Entity spigot(ChatHoverEvent.ShowEntity content) {
+		return content != null ? new Entity(content.getType().toString(), content.getUniqueId().toString(), SpigotParser.spigot(content.getName())) : null;
+	}
+
+	public static ChatHoverEvent.ShowEntity spigot(Entity content) {
+		return content != null ? new ChatHoverEvent.ShowEntity(ChatId.parse(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName())) : null;
+	}
+
+	public static Item spigot(ChatHoverEvent.ShowItem content) {
+		return content != null ? new Item(content.getItem().toString(), content.getCount(), null) : null;
+	}
+
+	public static ChatHoverEvent.ShowItem spigot(Item content) {
+		return content != null ? new ChatHoverEvent.ShowItem(ChatId.parse(content.getId()), content.getCount()) : null;
 	}
 }

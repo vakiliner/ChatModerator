@@ -28,4 +28,15 @@ public class BukkitChatCommandSender implements ChatCommandSender {
 	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.sendMessage(this.sender, component, type, uuid);
 	}
+
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj != null && this.getClass() == obj.getClass()) {
+			BukkitChatCommandSender other = (BukkitChatCommandSender) obj;
+			return this.parser.equals(other.parser) && this.sender.equals(other.sender);
+		} else {
+			return false;
+		}
+	}
 }

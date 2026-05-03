@@ -20,6 +20,7 @@ import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatStyle;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.util.Utils;
@@ -222,13 +223,13 @@ public abstract class ChatModerator {
 				this.log((isCommand ? "Command issue" : "Message") + " blocked " + player.getName() + ": " + fullMessage);
 			}
 			if (this.getConfig().showFailMessage()) {
+				ChatStyle style = ChatStyle.EMPTY.withColor(ChatNamedColor.RED);
 				final ChatComponent messageComponent;
 				if (!isCommand) {
-					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(fullMessage));
+					messageComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", style, player.getDisplayName(), new ChatTextComponent(fullMessage));
 				} else {
-					messageComponent = new ChatTextComponent(fullMessage);
+					messageComponent = new ChatTextComponent(fullMessage, style);
 				}
-				messageComponent.setColor(ChatNamedColor.RED);
 				player.sendMessage(messageComponent, ChatMessageType.CHAT, player.getUniqueId());
 			}
 			ChatTextComponent error = new ChatTextComponent(ChatNamedColor.RED);
@@ -334,10 +335,7 @@ public abstract class ChatModerator {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
 						log.append(player.getDisplayName());
 						ChatTextComponent getMessage = new ChatTextComponent(", ");
-						ChatTextComponent showMessage = new ChatTextComponent("показать сообщение");
-						showMessage.setUnderlined(true);
-						showMessage.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(checkResult.getMessage())));
-						getMessage.append(showMessage);
+						getMessage.append(new ChatTextComponent("показать сообщение", ChatStyle.EMPTY.withUnderlined(true).withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(checkResult.getMessage())))));
 						log.append(getMessage.withLegacyText(": " + message));
 						ChatTranslateComponent component = new ChatTranslateComponent("[%s: %s]", "chat.type.admin", ChatNamedColor.GRAY, new ChatTextComponent("AutoMod"), log);
 						this.broadcast(component, true);

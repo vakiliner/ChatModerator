@@ -39,4 +39,15 @@ public class FabricChatTeam implements ChatTeam {
 	public ChatComponent getSuffix() {
 		return FabricParser.fabric(this.team.getPlayerSuffix());
 	}
+
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj != null && this.getClass() == obj.getClass()) {
+			FabricChatTeam other = (FabricChatTeam) obj;
+			return this.parser.equals(other.parser) && this.team.equals(other.team);
+		} else {
+			return false;
+		}
+	}
 }

@@ -1,99 +1,101 @@
 package vakiliner.chatcomponentapi.fabric;
 
-import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
-import vakiliner.chatcomponentapi.component.ChatClickEvent;
-import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatComponentFormat;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatStyle;
 
 class HoverEventContents implements IStyleParser {
+	private static final Constructor<Style> STYLE_CONSTRUCTOR;
+	private static final Field ITEM_FIELD;
+	private static final Field COUND_FIELD;
+
 	static {
-		TextColor.class.getName();
+		try {
+			STYLE_CONSTRUCTOR = Style.class.getConstructor(TextColor.class, Boolean.class, Boolean.class, Boolean.class, Boolean.class, Boolean.class, ClickEvent.class, HoverEvent.class, String.class, ResourceLocation.class);
+		} catch (NoSuchMethodException err) {
+			throw new IllegalStateException(err);
+		}
+		try {
+			ITEM_FIELD = HoverEvent.ItemStackInfo.class.getField("item");
+			COUND_FIELD = HoverEvent.ItemStackInfo.class.getField("count");
+		} catch (NoSuchFieldException err) {
+			throw new IllegalStateException(err);
+		}
 	}
 
-	public Style injectStyle(ChatComponent component) {
-		Style style = Style.EMPTY;
-		TextColor color = fabric(component.getColorRaw());
-		if (color != null) {
-			style = style.withColor(color);
-		}
-		for (Map.Entry<ChatComponentFormat, Boolean> entry : component.getFormatsRaw().entrySet()) {
-			Boolean isSetted = entry.getValue();
-			if (isSetted != null && isSetted) {
-				style = style.applyFormat(FabricParser.fabric(entry.getKey().asTextFormat()));
-			}
-		}
-		ChatClickEvent clickEvent = component.getClickEvent();
-		if (clickEvent != null) style = style.withClickEvent(FabricParser.fabric(clickEvent));
-		ChatHoverEvent<?> hoverEvent = component.getHoverEvent();
-		if (hoverEvent != null) style = style.withHoverEvent(FabricParser.fabric(hoverEvent));
-		return style;
+	public ChatTextColor injectColor(Style style) {
+		return fabric(style.getColor());
 	}
 
-	public void copyColor(ChatComponent component, Style style) {
-		component.setColor(fabric(style.getColor()));
+	public Style fabric(ChatStyle chatStyle) {
+		if (chatStyle.isEmpty()) return Style.EMPTY;
+		try {
+			return STYLE_CONSTRUCTOR.newInstance(fabric(chatStyle.getColor()), chatStyle.getBold(), chatStyle.getItalic(), chatStyle.getUnderlined(), chatStyle.getStrikethrough(), chatStyle.getObfuscated(), FabricParser.fabric(chatStyle.getClickEvent()), fabric(chatStyle.getHoverEvent()), chatStyle.getInsertion(), FabricParser.fabric(chatStyle.getFont()));
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException err) {
+			throw new IllegalStateException(err);
+		}
 	}
 
 	public HoverEvent fabric(ChatHoverEvent<?> event) {
-		return hoverEvent(event);
+		ChatHoverEvent.Action<?> action = event.getAction();
+		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
+			return new HoverEvent(HoverEvent.Action.SHOW_TEXT, FabricParser.fabric(event.getValue(ChatHoverEvent.Action.SHOW_TEXT)));
+		} else if (action == ChatHoverEvent.Action.SHOW_ENTITY) {
+			return new HoverEvent(HoverEvent.Action.SHOW_ENTITY, fabric(event.getValue(ChatHoverEvent.Action.SHOW_ENTITY)));
+		} else if (action == ChatHoverEvent.Action.SHOW_ITEM) {
+			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, fabric(event.getValue(ChatHoverEvent.Action.SHOW_ITEM)));
+		} else {
+			throw new IllegalArgumentException("Unknown action");
+		}
 	}
 
 	public ChatHoverEvent<?> fabric(HoverEvent event) {
-		return hoverEvent(event);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static HoverEvent hoverEvent(ChatHoverEvent<?> event) {
-		return event != null ? new HoverEvent(HoverEvent.Action.getByName(event.getAction().getName()), fabricContent(event.getContents())) : null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <V> ChatHoverEvent<V> hoverEvent(HoverEvent event) {
-		if (event == null) return null;
 		HoverEvent.Action<?> action = event.getAction();
-		return new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(action.getName()), (V) fabricContent2(event.getValue(action)));
-	}
-
-	public static Object fabricContent(Object raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof ChatComponent) {
-			ChatComponent content = (ChatComponent) raw;
-			return FabricParser.fabric(content);
-		} else if (raw instanceof ChatHoverEvent.ShowEntity) {
-			ChatHoverEvent.ShowEntity content = (ChatHoverEvent.ShowEntity) raw;
-			return new HoverEvent.EntityTooltipInfo(Registry.ENTITY_TYPE.get(FabricParser.fabric(content.getType())), content.getUniqueId(), FabricParser.fabric(content.getName()));
-		} else if (raw instanceof ChatHoverEvent.ShowItem) {
-			ChatHoverEvent.ShowItem content = (ChatHoverEvent.ShowItem) raw;
-			return new HoverEvent.ItemStackInfo(new ItemStack(Registry.ITEM.get(FabricParser.fabric(content.getItem())), content.getCount()));
+		if (action == HoverEvent.Action.SHOW_TEXT) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, FabricParser.fabric(event.getValue(HoverEvent.Action.SHOW_TEXT)));
+		} else if (action == HoverEvent.Action.SHOW_ENTITY) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ENTITY, fabric(event.getValue(HoverEvent.Action.SHOW_ENTITY)));
+		} else if (action == HoverEvent.Action.SHOW_ITEM) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, fabric(event.getValue(HoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+			throw new IllegalArgumentException("Unknown action");
 		}
 	}
 
-	public static Object fabricContent2(Object raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof Component) {
-			Component content = (Component) raw;
-			return FabricParser.fabric(content);
-		} else if (raw instanceof HoverEvent.EntityTooltipInfo) {
-			HoverEvent.EntityTooltipInfo content = (HoverEvent.EntityTooltipInfo) raw;
-			return new ChatHoverEvent.ShowEntity(FabricParser.fabric(Registry.ENTITY_TYPE.getKey(content.type)), content.id, FabricParser.fabric(content.name));
-		} else if (raw instanceof HoverEvent.ItemStackInfo) {
-			HoverEvent.ItemStackInfo content = (HoverEvent.ItemStackInfo) raw;
-			ItemStack itemStack = content.getItemStack();
-			return new ChatHoverEvent.ShowItem(FabricParser.fabric(Registry.ITEM.getKey(itemStack.getItem())), itemStack.getCount());
-		} else {
-			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
+	public static HoverEvent.EntityTooltipInfo fabric(ChatHoverEvent.ShowEntity content) {
+		return content != null ? new HoverEvent.EntityTooltipInfo(Registry.ENTITY_TYPE.get(FabricParser.fabric(content.getType())), content.getUniqueId(), FabricParser.fabric(content.getName())) : null;
+	}
+
+	public static ChatHoverEvent.ShowEntity fabric(HoverEvent.EntityTooltipInfo content) {
+		return content != null ? new ChatHoverEvent.ShowEntity(FabricParser.fabric(Registry.ENTITY_TYPE.getKey(content.type)), content.id, FabricParser.fabric(content.name)) : null;
+	}
+
+	public static HoverEvent.ItemStackInfo fabric(ChatHoverEvent.ShowItem content) {
+		return content != null ? new HoverEvent.ItemStackInfo(new ItemStack(Registry.ITEM.get(FabricParser.fabric(content.getItem())), content.getCount())) : null;
+	}
+
+	public static ChatHoverEvent.ShowItem fabric(HoverEvent.ItemStackInfo content) {
+		if (content == null) return null;
+		final Item item;
+		final int count;
+		try {
+			item = (Item) ITEM_FIELD.get(content);
+			count = (Integer) COUND_FIELD.get(content);
+		} catch (IllegalAccessException err) {
+			throw new IllegalArgumentException(err);
 		}
+		return new ChatHoverEvent.ShowItem(FabricParser.fabric(Registry.ITEM.getKey(item)), count);
 	}
 
 	public static TextColor fabric(ChatTextColor color) {

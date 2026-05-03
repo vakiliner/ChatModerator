@@ -2,6 +2,8 @@ package vakiliner.chatcomponentapi.component;
 
 import java.util.Objects;
 import java.util.Set;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
@@ -14,12 +16,24 @@ public class ChatTextComponent extends ChatComponent {
 		this("");
 	}
 
-	@Deprecated
+	public ChatTextComponent(ChatStyle style) {
+		this("", style);
+	}
+
 	public ChatTextComponent(ChatTextColor color) {
 		this("", color);
 	}
 
+	public ChatTextComponent(ChatComponentFormat format) {
+		this("", format);
+	}
+
 	public ChatTextComponent(String text) {
+		this.text = Objects.requireNonNull(text);
+	}
+
+	public ChatTextComponent(String text, ChatStyle style) {
+		super(style);
 		this.text = Objects.requireNonNull(text);
 	}
 
@@ -28,13 +42,18 @@ public class ChatTextComponent extends ChatComponent {
 		this.text = Objects.requireNonNull(text);
 	}
 
-	public ChatTextComponent(ChatTextComponent component) {
-		super(component);
+	public ChatTextComponent(String text, ChatComponentFormat format) {
+		super(format);
+		this.text = Objects.requireNonNull(text);
+	}
+
+	public ChatTextComponent(ChatTextComponent component, boolean cloneExtra) {
+		super(component, cloneExtra);
 		this.text = component.text;
 	}
 
-	public ChatTextComponent clone() {
-		return new ChatTextComponent(this);
+	public ChatTextComponent clone(boolean cloneExtra) {
+		return new ChatTextComponent(this, cloneExtra);
 	}
 
 	public String getText() {
@@ -69,8 +88,8 @@ public class ChatTextComponent extends ChatComponent {
 			ChatNamedColor color = team.getColor();
 			ChatComponent prefix = team.getPrefix();
 			ChatComponent suffix = team.getSuffix();
-			if (color != ChatNamedColor.RESET) {
-				component.color = team.getColor();
+			if (color != null) {
+				component.setColor(team.getColor());
 			}
 			if (prefix != null) {
 				component.append(prefix);
@@ -87,6 +106,10 @@ public class ChatTextComponent extends ChatComponent {
 		return component;
 	}
 
+	protected void serialize(JsonObject object) {
+		object.addProperty("text", this.text);
+	}
+
 	@Deprecated
 	public static ChatTextComponent team(ChatTeam team) {
 		ChatTextComponent component = new ChatTextComponent();
@@ -99,5 +122,14 @@ public class ChatTextComponent extends ChatComponent {
 		component.append(teamName);
 		component.append(new ChatTextComponent("]"));
 		return component;
+	}
+
+	public static ChatTextComponent deserialize(JsonElement element) {
+		if (element.isJsonPrimitive()) {
+			return new ChatTextComponent(element.getAsString());
+		}
+		JsonObject object = element.getAsJsonObject();
+		String text = object.get("text").getAsString();
+		return ChatComponent.deserialize((style) -> new ChatTextComponent(text, style), object);
 	}
 }

@@ -1,19 +1,12 @@
 package vakiliner.chatcomponentapi.common;
 
-import java.util.Objects;
-
 public class ChatTextColor {
 	protected final int value;
 	protected final ChatTextFormat asFormat;
 
-	private ChatTextColor(int value, ChatTextFormat asFormat) {
+	protected ChatTextColor(int value, ChatTextFormat asFormat) {
 		this.value = value & 0xFFFFFF;
 		this.asFormat = asFormat;
-	}
-
-	protected ChatTextColor(ChatTextFormat format, int value) {
-		this.asFormat = Objects.requireNonNull(format);
-		this.value = Objects.requireNonNull(value);
 	}
 
 	public static ChatTextColor color(int color, ChatTextFormat asFormat) {
