@@ -11,6 +11,7 @@ import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
+import vakiliner.chatcomponentapi.component.ChatStyle;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
@@ -119,10 +120,10 @@ public class MuteListCommand implements TabExecutor {
 				for (int i = (page - 1) * 10; a > i && size > i; i++) {
 					MutedPlayer mute = mutes.get(i);
 					ChatTextComponent component = new ChatTextComponent();
-					ChatTextComponent unmute = new ChatTextComponent("[❌]");
-					unmute.setClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/unmute " + mute.getName()));
-					unmute.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent("Unmute player")));
-					component.append(unmute);
+					ChatStyle.Builder unmute = ChatStyle.newBuilder();
+					unmute.withClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/unmute " + mute.getName()));
+					unmute.withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent("Unmute player")));
+					component.append(new ChatTextComponent("[❌]", unmute.build()));
 					component.append(new ChatTextComponent(" " + mute.getName()));
 					ModeratorType moderatorType = mute.getModeratorType();
 					switch (moderatorType) {
@@ -166,9 +167,9 @@ public class MuteListCommand implements TabExecutor {
 	}
 
 	private static ChatTextComponent button(String button, int page, String text) {
-		ChatTextComponent component = new ChatTextComponent(button);
-		component.setClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/mutes " + page));
-		component.setHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(text)));
-		return component;
+		ChatStyle.Builder style = ChatStyle.newBuilder();
+		style.withClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/mutes " + page));
+		style.withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(text)));
+		return new ChatTextComponent(button, style.build());
 	}
 }
