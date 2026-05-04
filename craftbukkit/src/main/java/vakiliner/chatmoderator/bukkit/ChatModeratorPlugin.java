@@ -5,12 +5,14 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import vakiliner.chatcomponentapi.craftbukkit.IBukkitChatPlugin;
 import vakiliner.chatmoderator.bukkit.command.*;
 import vakiliner.chatmoderator.paper.PaperChatModerator;
 import vakiliner.chatmoderator.spigot.SpigotChatModerator;
 
-public class ChatModeratorPlugin extends JavaPlugin {
+public class ChatModeratorPlugin extends JavaPlugin implements IBukkitChatPlugin {
 	private static final BukkitChatModerator MANAGER;
 	private final BukkitListener listener = MANAGER.createListener();
 
@@ -28,6 +30,10 @@ public class ChatModeratorPlugin extends JavaPlugin {
 			}
 		}
 		MANAGER = manager;
+	}
+
+	public Plugin asPlugin() {
+		return this;
 	}
 
 	public void onLoad() {

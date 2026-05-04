@@ -198,7 +198,11 @@ public class ForgeParser extends BaseParser {
 		}
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
-			component.append(forge(chatComponent, isConsole));
+			try {
+				APPEND.invoke(component, forge(chatComponent, isConsole));
+			} catch (IllegalAccessException | InvocationTargetException err) {
+				throw new RuntimeException(err);
+			}
 		}
 		return component;
 	}

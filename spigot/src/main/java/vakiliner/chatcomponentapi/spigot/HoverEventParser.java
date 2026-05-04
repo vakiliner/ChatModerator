@@ -54,7 +54,7 @@ class HoverEventParser {
 	}
 
 	public static ChatHoverEvent.ShowEntity spigot(Entity content) {
-		return content != null ? new ChatHoverEvent.ShowEntity(ChatId.parse(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName())) : null;
+		return content != null ? new ChatHoverEvent.ShowEntity(ChatId.of(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName())) : null;
 	}
 
 	public static Item spigot(ChatHoverEvent.ShowItem content) {
@@ -62,6 +62,6 @@ class HoverEventParser {
 	}
 
 	public static ChatHoverEvent.ShowItem spigot(Item content) {
-		return content != null ? new ChatHoverEvent.ShowItem(ChatId.parse(content.getId()), content.getCount()) : null;
+		return content != null ? new ChatHoverEvent.ShowItem(ChatId.of(content.getId()), content.getCount()) : null;
 	}
 }
