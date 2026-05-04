@@ -11,16 +11,16 @@ public class PaperChatTeam extends BukkitChatTeam {
 		super(parser, team);
 	}
 
-	public ChatComponent getDisplayName() {
-		return PaperParser.paper(this.team.displayName());
-	}
-
 	public ChatNamedColor getColor() {
 		try {
 			return PaperParser.paper((NamedTextColor) this.team.color());
 		} catch (IllegalStateException err) {
 			return null;
 		}
+	}
+
+	public ChatComponent getDisplayName() {
+		return PaperParser.paper(this.team.displayName());
 	}
 
 	public ChatComponent getPrefix() {

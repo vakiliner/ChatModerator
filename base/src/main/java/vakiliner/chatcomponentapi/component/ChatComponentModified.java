@@ -2,6 +2,7 @@ package vakiliner.chatcomponentapi.component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -26,12 +27,20 @@ public abstract class ChatComponentModified extends ChatComponent {
 		return this.component;
 	}
 
+	public ChatComponent getComponent(boolean isConsole) {
+		return this.getComponent();
+	}
+
 	public String toLegacyText() {
 		return this.component.toLegacyText();
 	}
 
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.component.getLegacyText(parentColor, parentFormats);
+	}
+
+	public ChatStyle getStyle() {
+		return this.component.getStyle();
 	}
 
 	@Deprecated
@@ -84,6 +93,20 @@ public abstract class ChatComponentModified extends ChatComponent {
 	}
 
 	@Deprecated
+	public Boolean getFormatRaw(ChatComponentFormat format) {
+		return this.component.getFormatRaw(format);
+	}
+
+	@Deprecated
+	public Map<ChatComponentFormat, Boolean> getFormatsRaw() {
+		return this.component.getFormatsRaw();
+	}
+
+	public void setStyle(ChatStyle style) {
+		this.component.setStyle(style);
+	}
+
+	@Deprecated
 	public void setColor(ChatTextColor color) {
 		this.component.setColor(color);
 	}
@@ -128,6 +151,7 @@ public abstract class ChatComponentModified extends ChatComponent {
 		this.component.setHoverEvent(hoverEvent);
 	}
 
+	@Deprecated
 	public void setExtra(Collection<ChatComponent> children) {
 		this.component.setExtra(children);
 	}
@@ -137,12 +161,17 @@ public abstract class ChatComponentModified extends ChatComponent {
 		this.component.setFormat(format, isSet);
 	}
 
-	protected void unsafeAppend(ChatComponent component) {
-		this.component.unsafeAppend(component);
+	@Deprecated
+	public void setFormats(Map<ChatComponentFormat, Boolean> map) {
+		this.component.setFormats(map);
 	}
 
 	public void append(ChatComponent component) {
 		this.component.append(component);
+	}
+
+	protected void unsafeAppend(ChatComponent component) {
+		this.component.unsafeAppend(component);
 	}
 
 	public ChatComponentWithLegacyText withLegacyComponent(Supplier<ChatComponent> getLegacyComponent) {

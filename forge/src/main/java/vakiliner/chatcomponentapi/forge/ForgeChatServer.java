@@ -1,7 +1,6 @@
 package vakiliner.chatcomponentapi.forge;
 
 import java.util.Objects;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;

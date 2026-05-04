@@ -9,7 +9,7 @@ import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 import vakiliner.chatcomponentapi.gson.IGsonSerializer;
 
-public class ChatStyle implements IGsonSerializer {
+public final class ChatStyle implements IGsonSerializer {
 	public static final ChatStyle EMPTY = new ChatStyle(null, null, null, null, null, null, null, null, null, null);
 	private final ChatTextColor color;
 	private final Boolean bold;
@@ -160,11 +160,11 @@ public class ChatStyle implements IGsonSerializer {
 
 	public Boolean getFormat(ChatComponentFormat format) {
 		switch (format) {
-			case BOLD: return this.getBold();
-			case ITALIC: return this.getItalic();
-			case UNDERLINED: return this.getUnderlined();
-			case STRIKETHROUGH: return this.getStrikethrough();
-			case OBFUSCATED: return this.getObfuscated();
+			case BOLD: return this.bold;
+			case ITALIC: return this.italic;
+			case UNDERLINED: return this.underlined;
+			case STRIKETHROUGH: return this.strikethrough;
+			case OBFUSCATED: return this.obfuscated;
 			default: throw new IllegalArgumentException("Invalid ChatComponentFormat");
 		}
 	}
@@ -202,16 +202,16 @@ public class ChatStyle implements IGsonSerializer {
 		} else if (style == EMPTY) {
 			return this;
 		} else return new ChatStyle(
-			this.color != null ? this.color : style.color,
-			this.bold != null ? this.bold : style.bold,
-			this.italic != null ? this.italic : style.italic,
-			this.underlined != null ? this.underlined : style.underlined,
-			this.strikethrough != null ? this.strikethrough : style.strikethrough,
-			this.obfuscated != null ? this.obfuscated : style.obfuscated,
-			this.clickEvent != null ? this.clickEvent : style.clickEvent,
-			this.hoverEvent != null ? this.hoverEvent : style.hoverEvent,
-			this.insertion != null ? this.insertion : style.insertion,
-			this.font != null ? this.font : style.font
+			this.color			!= null ? this.color			: style.color,
+			this.bold			!= null ? this.bold				: style.bold,
+			this.italic			!= null ? this.italic			: style.italic,
+			this.underlined		!= null ? this.underlined		: style.underlined,
+			this.strikethrough	!= null ? this.strikethrough	: style.strikethrough,
+			this.obfuscated		!= null ? this.obfuscated		: style.obfuscated,
+			this.clickEvent		!= null ? this.clickEvent		: style.clickEvent,
+			this.hoverEvent		!= null ? this.hoverEvent		: style.hoverEvent,
+			this.insertion		!= null ? this.insertion		: style.insertion,
+			this.font			!= null ? this.font				: style.font
 		);
 	}
 
@@ -226,9 +226,9 @@ public class ChatStyle implements IGsonSerializer {
 				 && Objects.equals(this.underlined,		other.underlined)
 				 && Objects.equals(this.strikethrough,	other.strikethrough)
 				 && Objects.equals(this.obfuscated,		other.obfuscated)
-				 && Objects.equals(this.insertion,		other.insertion)
 				 && Objects.equals(this.clickEvent,		other.clickEvent)
 				 && Objects.equals(this.hoverEvent,		other.hoverEvent)
+				 && Objects.equals(this.insertion,		other.insertion)
 				 && Objects.equals(this.font,			other.font)
 			);
 		} else {
@@ -291,7 +291,7 @@ public class ChatStyle implements IGsonSerializer {
 		if (clickEvent != null) builder.withClickEvent(ChatClickEvent.deserialize(clickEvent));
 		if (hoverEvent != null) builder.withHoverEvent(ChatHoverEvent.deserialize(hoverEvent));
 		if (insertion != null) builder.withInsertion(insertion.getAsString());
-		if (font != null) builder.withFont(ChatId.parse(font.getAsString()));
+		if (font != null) builder.withFont(ChatId.of(font.getAsString()));
 		return builder.build();
 	}
 
@@ -302,25 +302,25 @@ public class ChatStyle implements IGsonSerializer {
 		private Boolean underlined;
 		private Boolean strikethrough;
 		private Boolean obfuscated;
-		private String insertion;
 		private ChatClickEvent clickEvent;
 		private ChatHoverEvent<?> hoverEvent;
+		private String insertion;
 		private ChatId font;
 
 		private Builder() {
 		}
 
 		private Builder(ChatStyle style) {
-			this.color = style.color;
-			this.bold = style.bold;
-			this.italic = style.italic;
-			this.underlined = style.underlined;
-			this.strikethrough = style.strikethrough;
-			this.obfuscated = style.obfuscated;
-			this.insertion = style.insertion;
-			this.clickEvent = style.clickEvent;
-			this.hoverEvent = style.hoverEvent;
-			this.font = style.font;
+			this.color			= style.color;
+			this.bold			= style.bold;
+			this.italic			= style.italic;
+			this.underlined		= style.underlined;
+			this.strikethrough	= style.strikethrough;
+			this.obfuscated		= style.obfuscated;
+			this.clickEvent		= style.clickEvent;
+			this.hoverEvent		= style.hoverEvent;
+			this.insertion		= style.insertion;
+			this.font			= style.font;
 		}
 
 		public Builder withColor(ChatTextColor color) {

@@ -6,9 +6,9 @@ import vakiliner.chatcomponentapi.component.ChatComponent;
 public interface ChatTeam {
 	String getName();
 
-	ChatComponent getDisplayName();
-
 	ChatNamedColor getColor();
+
+	ChatComponent getDisplayName();
 
 	ChatComponent getPrefix();
 

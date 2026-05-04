@@ -29,10 +29,9 @@ public class BukkitParser extends BaseParser {
 	protected static final boolean sendMessageWithUUID;
 
 	static {
-		Class<CommandSender> clazz = CommandSender.class;
 		Method method;
 		try {
-			method = clazz.getMethod("sendMessage", UUID.class, String.class);
+			method = CommandSender.class.getMethod("sendMessage", UUID.class, String.class);
 		} catch (NoSuchMethodException err) {
 			method = null;
 		}

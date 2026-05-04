@@ -64,10 +64,11 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 	protected String toLegacyText(final ChatTextColor parentColor, final Set<ChatComponentFormat> parentFormats) {
 		StringBuilder text = new StringBuilder();
 		Set<ChatComponentFormat> formats = new HashSet<>(parentFormats);
-		ChatTextColor color = this.getColorRaw();
+		ChatStyle style = this.style;
+		ChatTextColor color = style.getColor();
 		if (color == null) color = parentColor;
 		boolean reset = !Objects.equals(color, parentColor);
-		for (Map.Entry<ChatComponentFormat, Boolean> entry : this.getFormatsRaw().entrySet()) {
+		for (Map.Entry<ChatComponentFormat, Boolean> entry : style.getFormats().entrySet()) {
 			Boolean isSet = entry.getValue();
 			if (isSet != null) {
 				if (isSet) {
@@ -79,9 +80,8 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		}
 		formats = Collections.unmodifiableSet(formats);
 		if (reset) {
-			ChatTextFormat textFormat = color != null ? color.asFormat() : ChatTextFormat.RESET;
-			if (textFormat == null) textFormat = ChatTextFormat.RESET;
-			text.append(textFormat);
+			ChatTextFormat textColor = color != null ? color.asFormat() : ChatTextFormat.RESET;
+			text.append(textColor != null ? textColor : ChatTextFormat.RESET);
 			for (ChatComponentFormat format : formats) {
 				text.append(format.asTextFormat());
 			}
@@ -175,6 +175,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		return this.style.getFormat(format);
 	}
 
+	@Deprecated
 	public Map<ChatComponentFormat, Boolean> getFormatsRaw() {
 		return this.style.getFormats();
 	}
@@ -228,6 +229,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		this.setStyle(this.style.withHoverEvent(hoverEvent));
 	}
 
+	@Deprecated
 	public void setExtra(Collection<ChatComponent> children) {
 		if (children == null) {
 			this.extra = null;
@@ -246,32 +248,30 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		this.setStyle(this.style.withFormats(map));
 	}
 
-	protected void unsafeAppend(ChatComponent component) {
-		List<ChatComponent> extra = this.extra;
-		if (extra == null) synchronized (this) {
-			if ((extra = this.extra) == null) {
-				extra = this.extra = new ArrayList<>();
-			}
-		}
-		extra.add(component);
-	}
-
 	public void append(ChatComponent component) {
 		if (component == this) throw new IllegalArgumentException("This component cannot be added");
 		List<ChatComponent> extra = component.extra;
 		if (extra != null) {
-			Set<ChatComponent> set = new HashSet<>();
+			Set<ChatComponent> checked = new HashSet<>();
 			Queue<ChatComponent> queue = new LinkedList<>(extra);
-			ChatComponent check = null;
-			while ((check = queue.poll()) != null) {
-				if (set.contains(check)) continue;
-				if (check == this) throw new IllegalArgumentException("Components are looping, try cloning the component before appending");
-				List<ChatComponent> e = check.extra;
+			ChatComponent current = null;
+			while ((current = queue.poll()) != null) {
+				if (checked.contains(current)) continue;
+				if (current == this) throw new IllegalArgumentException("Components are looping, try cloning the component before appending");
+				List<ChatComponent> e = current.extra;
 				if (e != null) queue.addAll(e);
-				set.add(check);
+				checked.add(current);
 			}
 		}
 		this.unsafeAppend(component);
+	}
+
+	protected void unsafeAppend(ChatComponent component) {
+		List<ChatComponent> extra = this.extra;
+		if (extra == null)  {
+			extra = this.extra = new ArrayList<>();
+		}
+		extra.add(component);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -311,8 +311,8 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 	protected abstract void serialize(JsonObject object);
 
 	public static JsonElement serialize(ChatComponent component) {
-		JsonObject object = ChatStyle.serialize(component.style, new JsonObject());
-		List<ChatComponent> extra = component.extra;
+		JsonObject object = ChatStyle.serialize(component.getStyle(), new JsonObject());
+		List<ChatComponent> extra = component.getExtra();
 		if (extra != null && !extra.isEmpty()) {
 			JsonArray array = new JsonArray();
 			extra.forEach((c) -> array.add(ChatComponent.serialize(c)));

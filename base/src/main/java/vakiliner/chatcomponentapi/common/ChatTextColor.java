@@ -7,12 +7,17 @@ public class ChatTextColor {
 	protected ChatTextColor(int value, ChatTextFormat asFormat) {
 		this.value = value & 0xFFFFFF;
 		this.asFormat = asFormat;
+		if (this.asFormat != null && this.asFormat.isFormat()) {
+			throw new IllegalArgumentException("Invalid ChatTextFormat");
+		}
 	}
 
 	public static ChatTextColor color(int color, ChatTextFormat asFormat) {
 		int truncatedValue = color & 0xFFFFFF;
 		ChatNamedColor named = ChatNamedColor.getByValue(truncatedValue);
-		return named != null ? named : new ChatTextColor(color, asFormat);
+		if (named != null && (asFormat == null || asFormat == named.asFormat)) {
+			return named;
+		} else return new ChatTextColor(color, asFormat);
 	}
 
 	public static ChatTextColor color(int red, int green, int blue, ChatTextFormat asFormat) {

@@ -1,6 +1,5 @@
 package vakiliner.chatcomponentapi.paper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +32,6 @@ import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
-import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatStyle;
@@ -63,18 +61,9 @@ public class PaperParser extends SpigotParser {
 	public static Component paper(ChatComponent raw, boolean isConsole) {
 		if (raw == null) return null;
 		if (raw instanceof ChatComponentModified) {
-			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
-				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
-			} else {
-				raw = ((ChatComponentModified) raw).getComponent();
-			}
+			raw = ((ChatComponentModified) raw).getComponent(isConsole);
 		}
 		final ComponentBuilder<?, ?> builder;
-		List<Component> children = new ArrayList<>();
-		List<ChatComponent> extra = raw.getExtra();
-		if (extra != null) for (ChatComponent chatComponent : extra) {
-			children.add(paper(chatComponent, isConsole));
-		}
 		if (raw instanceof ChatTextComponent) {
 			ChatTextComponent chatComponent = (ChatTextComponent) raw;
 			builder = Component.text().content(chatComponent.getText());
@@ -87,7 +76,12 @@ public class PaperParser extends SpigotParser {
 		} else {
 			throw new IllegalArgumentException("Could not parse Component from " + raw.getClass());
 		}
-		return builder.style(paper(raw.getStyle())).append(children).build();
+		builder.style(paper(raw.getStyle()));
+		List<ChatComponent> extra = raw.getExtra();
+		if (extra != null) for (ChatComponent chatComponent : extra) {
+			builder.append(paper(chatComponent, isConsole));
+		}
+		return builder.build();
 	}
 
 	public static ChatComponent paper(Component raw) {
@@ -107,9 +101,8 @@ public class PaperParser extends SpigotParser {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}
 		chatComponent.setStyle(paper(raw.style()));
-		List<Component> children = raw.children();
-		if (children != null) {
-			chatComponent.setExtra(children.stream().map(PaperParser::paper).collect(Collectors.toList()));
+		for (Component component : raw.children()) {
+			chatComponent.append(paper(component));
 		}
 		return chatComponent;
 	}

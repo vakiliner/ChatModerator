@@ -20,7 +20,7 @@ public class FabricChatPlayerList implements ChatPlayerList {
 		this.playerList = Objects.requireNonNull(playerList);
 	}
 
-	public PlayerList getPlayerList() {
+	public PlayerList getImpl() {
 		return this.playerList;
 	}
 
