@@ -14,8 +14,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -66,15 +69,39 @@ public class ForgeChatModerator extends ChatModerator {
 
 	public void reloadConfig() throws IOException {
 		Path path = this.getConfigPath();
+		ConfigVersionType configVersionType = null;
 		if (path.toFile().exists()) {
+			configVersionType = ConfigVersionType.LATEST_FABRIC_FORGE;
+		} else {
+			Path oldConfigJson = this.getDefaultFolderPath().resolve("config.json");
+			Path oldConfigToml = this.getDefaultFolderPath().resolve("config.toml");
+			if (oldConfigJson.toFile().exists()) {
+				path = oldConfigJson;
+				configVersionType = ConfigVersionType.FORGE_OLD_JSON_CONFIG_FOLDER;
+			} else if (oldConfigToml.toFile().exists()) {
+				path = oldConfigToml;
+				configVersionType = ConfigVersionType.FIRST_FABRIC_FORGE;
+			}
+		}
+		if (configVersionType != null) {
 			final GsonConfig config;
-			try {
-				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
+			Gson gson = new Gson();
+			if (configVersionType == ConfigVersionType.FIRST_FABRIC_FORGE) {
+				CommentedFileConfig nightconfig = CommentedFileConfig.of(path);
+				nightconfig.load();
+				JsonObject object = (JsonObject) gson.toJsonTree(nightconfig.valueMap());
+				JsonPrimitive messages = object.getAsJsonPrimitive("messages");
+				if (messages != null) {
+					object.add("messages", gson.fromJson(messages.getAsString(), JsonObject.class));
+				}
+				config = gson.fromJson(object, GsonConfig.class);
+			} else try {
+				config = gson.fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
 			} catch (IOException err) {
 				throw err;
 			}
 			this.config.reload(config);
-			if (this.checkConfigUpdates()) {
+			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
 			}
 		} else {
@@ -85,7 +112,10 @@ public class ForgeChatModerator extends ChatModerator {
 			this.config.autoModerationEnabled(true);
 			this.config.autoModerationUseThreadPool(false);
 			this.config.spectatorsChat(false);
-			this.config.dictionaryFile("dictionary_ru.json");
+			this.config.folderPath(null);
+			this.config.mutesPath("mutes.json");
+			this.config.autoModerationRulesPath("auto_moderation_rules.json");
+			this.config.dictionaryPath("dictionary_ru.json");
 			this.config.showFailMessage(true);
 			this.config.logBlockedMessages(false);
 			this.config.logBlockedCommands(false);
@@ -119,24 +149,12 @@ public class ForgeChatModerator extends ChatModerator {
 		return this.config;
 	}
 
-	protected Path getFolderPath() {
-		Path path = new File(".").toPath().resolve("config").resolve("ChatModerator");
-		if (!path.toFile().exists()) {
-			try {
-				Files.createDirectories(path);
-			} catch (IOException err) {
-				throw new RuntimeException("Creating data folder", err);
-			}
-		}
-		return path;
-	}
-
-	protected File getDataFolder() {
-		return this.getFolderPath().toFile();
+	protected Path getDefaultFolderPath() {
+		return new File("config").toPath().resolve("ChatModerator");
 	}
 
 	public Path getConfigPath() {
-		return this.getFolderPath().resolve("config.json");
+		return new File("config").toPath().resolve(this.modInitializer.modContainer.getModId() + ".json");
 	}
 
 	public String getName() {

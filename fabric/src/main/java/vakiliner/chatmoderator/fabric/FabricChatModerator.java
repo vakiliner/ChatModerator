@@ -1,6 +1,5 @@
 package vakiliner.chatmoderator.fabric;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -66,7 +65,17 @@ public class FabricChatModerator extends ChatModerator {
 
 	public void reloadConfig() throws IOException {
 		Path path = this.getConfigPath();
+		ConfigVersionType configVersionType = null;
 		if (path.toFile().exists()) {
+			configVersionType = ConfigVersionType.LATEST_FABRIC_FORGE;
+		} else {
+			Path oldConfig = this.getDefaultFolderPath().resolve("config.json");
+			if (oldConfig.toFile().exists()) {
+				path = oldConfig;
+				configVersionType = ConfigVersionType.FIRST_FABRIC_FORGE;
+			}
+		}
+		if (configVersionType != null) {
 			final GsonConfig config;
 			try {
 				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
@@ -74,7 +83,7 @@ public class FabricChatModerator extends ChatModerator {
 				throw err;
 			}
 			this.config.reload(config);
-			if (this.checkConfigUpdates()) {
+			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
 			}
 		} else {
@@ -85,7 +94,10 @@ public class FabricChatModerator extends ChatModerator {
 			this.config.autoModerationEnabled(true);
 			this.config.autoModerationUseThreadPool(false);
 			this.config.spectatorsChat(false);
-			this.config.dictionaryFile("dictionary_ru.json");
+			this.config.folderPath(null);
+			this.config.mutesPath("mutes.json");
+			this.config.autoModerationRulesPath("auto_moderation_rules.json");
+			this.config.dictionaryPath("dictionary_ru.json");
 			this.config.showFailMessage(true);
 			this.config.logBlockedMessages(false);
 			this.config.logBlockedCommands(false);
@@ -119,24 +131,12 @@ public class FabricChatModerator extends ChatModerator {
 		return this.config;
 	}
 
-	protected Path getFolderPath() {
-		Path path = FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
-		if (!path.toFile().exists()) {
-			try {
-				Files.createDirectories(path);
-			} catch (IOException err) {
-				throw new RuntimeException("Creating data folder", err);
-			}
-		}
-		return path;
-	}
-
-	protected File getDataFolder() {
-		return this.getFolderPath().toFile();
+	protected Path getDefaultFolderPath() {
+		return FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
 	}
 
 	public Path getConfigPath() {
-		return this.getFolderPath().resolve("config.json");
+		return FabricLoader.getInstance().getConfigDir().resolve(this.modInitializer.modContainer.getMetadata().getId() + ".json");
 	}
 
 	public String getName() {
