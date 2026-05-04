@@ -319,6 +319,9 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 			object.add("extra", array);
 		}
 		component.serialize(object);
+		if (object.has("text") && object.size() == 1) {
+			return object.getAsJsonPrimitive("text");
+		}
 		return object;
 	}
 

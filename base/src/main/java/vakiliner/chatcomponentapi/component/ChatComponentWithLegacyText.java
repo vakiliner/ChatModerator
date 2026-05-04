@@ -33,6 +33,10 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		this.legacyComponent = component.legacyComponent;
 	}
 
+	public ChatComponent clone(boolean cloneExtra) {
+		return new ChatComponentWithLegacyText(this);
+	}
+
 	public ChatComponent getLegacyComponent() {
 		if (this.legacyComponent != null) {
 			return this.legacyComponent;
@@ -47,10 +51,6 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 
 	public ChatComponent getComponent(boolean isConsole) {
 		return isConsole ? this.getLegacyComponent() : super.getComponent();
-	}
-
-	public ChatComponent clone(boolean cloneExtra) {
-		return new ChatComponentWithLegacyText(this);
 	}
 
 	public String toLegacyText() {

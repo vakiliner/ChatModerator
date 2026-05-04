@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -21,6 +22,7 @@ import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.base.IChatPlugin;
+import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -95,6 +97,14 @@ public class BukkitParser extends BaseParser {
 
 	public static ChatTextFormat bukkit(ChatColor color) {
 		return color != null ? ChatTextFormat.getByChar(color.getChar()) : null;
+	}
+
+	public static NamespacedKey bukkit(ChatId chatId) {
+		return chatId != null ? NamespacedKey.fromString(chatId.toString()) : null;
+	}
+
+	public static ChatId bukkit(NamespacedKey namespacedKey) {
+		return namespacedKey != null ? new ChatId(namespacedKey.getNamespace(), namespacedKey.getKey()) : null;
 	}
 
 	public ChatPlayer toChatPlayer(Player player) {
