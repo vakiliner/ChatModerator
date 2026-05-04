@@ -61,11 +61,35 @@ class ConfigImpl implements Config {
 		this.configuration.set("spectators_chat", enabled);
 	}
 
-	public String dictionaryFile() {
+	public String folderPath() {
+		return this.configuration.getString("folder_path", null);
+	}
+
+	public void folderPath(String name) {
+		this.configuration.set("folder_path", name);
+	}
+
+	public String mutesPath() {
+		return this.configuration.getString("mutes_path", "mutes.json");
+	}
+
+	public void mutesPath(String path) {
+		this.configuration.set("mutes_path", path);
+	}
+
+	public String autoModerationRulesPath() {
+		return this.configuration.getString("auto_moderation_rules_path", "auto_moderation_rules.json");
+	}
+
+	public void autoModerationRulesPath(String path) {
+		this.configuration.set("auto_moderation_rules_path", path);
+	}
+
+	public String dictionaryPath() {
 		return this.configuration.getString("dictionary_file", null);
 	}
 
-	public void dictionaryFile(String name) {
+	public void dictionaryPath(String name) {
 		this.configuration.set("dictionary_file", name);
 	}
 
