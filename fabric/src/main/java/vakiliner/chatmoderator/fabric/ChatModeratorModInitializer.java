@@ -20,7 +20,7 @@ public class ChatModeratorModInitializer implements ModInitializer {
 		try {
 			CommandRegistrationCallback.EVENT.register(this.listener::register);
 		} catch (NoClassDefFoundError err) {
-			FabricChatModerator.LOGGER.info("Mod fabric-command-api-v1 not found, commands not registered");
+			FabricChatModerator.LOGGER.warn("Mod fabric-command-api-v1 not found, commands not registered");
 		}
 		ServerLifecycleEvents.SERVER_STARTED.register(this.listener);
 		ServerLifecycleEvents.SERVER_STOPPING.register(this.listener);
