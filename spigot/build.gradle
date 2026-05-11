@@ -2,23 +2,7 @@ plugins {
 	id 'java'
 }
 
-repositories {
-	maven {
-		url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
-
-		content {
-			includeGroup 'org.bukkit'
-			includeGroup 'org.spigotmc'
-		}
-	}
-
-	mavenCentral()
-}
-
 dependencies {
 	implementation project(':base')
 	implementation project(':craftbukkit')
-	compileOnly group: 'com.google.code.gson', name: 'gson', version: project(':base').gson_version
-	compileOnly group: 'org.spigotmc', name: 'spigot-api', version: "${minecraft_version}-${project.spigot_version}"
-	compileOnly group: 'net.md-5', name: 'bungeecord-chat', version: project.bungeecord_version
 }
