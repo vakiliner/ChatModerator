@@ -59,7 +59,7 @@ public class ForgeParser extends BaseParser {
 	static {
 		UUID nilUUID;
 		try {
-			nilUUID = (UUID) net.minecraft.util.Util.class.getField("NIL_UUID").get(null);
+			nilUUID = (UUID) net.minecraft.util.Util.class.getField("field_240973_b_").get(null);
 		} catch (NoSuchFieldException err) {
 			nilUUID = null;
 		} catch (IllegalAccessException err) {
@@ -69,7 +69,7 @@ public class ForgeParser extends BaseParser {
 		IStyleParser parser;
 		try {
 			parser = new HoverEventContents();
-		} catch (NoClassDefFoundError err) {
+		} catch (Throwable err) {
 			parser = new OldStyle();
 		}
 		STYLE_PARSER = parser;
@@ -88,7 +88,7 @@ public class ForgeParser extends BaseParser {
 			SET_STYLE = TextComponent.class.getMethod("method_10862", Style.class);
 			APPEND = TextComponent.class.getMethod("method_10852", TextComponent.class);
 		} catch (NoSuchMethodException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		Method sendMessageWithType;
 		try {
@@ -97,7 +97,7 @@ public class ForgeParser extends BaseParser {
 			try {
 				sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", TextComponent.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
@@ -108,7 +108,7 @@ public class ForgeParser extends BaseParser {
 			try {
 				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", TextComponent.class);
 			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
@@ -155,7 +155,7 @@ public class ForgeParser extends BaseParser {
 				packet = S_CHAT_PACKET_CONSTRUCTOR.newInstance(forge(component), forge(type));
 			}
 		} catch (IllegalAccessException | InvocationTargetException | InstantiationException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		playerList.broadcastAll(packet);
 	}
@@ -194,14 +194,14 @@ public class ForgeParser extends BaseParser {
 		try {
 			SET_STYLE.invoke(component, forge(raw.getStyle()));
 		} catch (IllegalAccessException | InvocationTargetException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
 			try {
 				APPEND.invoke(component, forge(chatComponent, isConsole));
 			} catch (IllegalAccessException | InvocationTargetException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		return component;

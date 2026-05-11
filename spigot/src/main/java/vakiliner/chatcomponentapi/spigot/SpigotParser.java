@@ -36,7 +36,7 @@ public class SpigotParser extends BukkitParser {
 		HoverEventParser hoverEventParser;
 		try {
 			hoverEventParser = new HoverEventParser();
-		} catch (NoClassDefFoundError err) {
+		} catch (Throwable err) {
 			hoverEventParser = null;
 		}
 		HOVER_EVENT_PARSER = hoverEventParser;
@@ -164,7 +164,7 @@ public class SpigotParser extends BukkitParser {
 		switch (action) {
 			case SHOW_ENTITY: return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ENTITY, ChatHoverEvent.ShowEntity.deserialize(value, true));
 			case SHOW_ITEM: return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, ChatHoverEvent.ShowItem.deserialize(value));
-			default: throw new RuntimeException("Unknown action");
+			default: throw new IllegalArgumentException("Unknown action");
 		}
 	}
 

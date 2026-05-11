@@ -27,8 +27,10 @@ class HoverEventContents implements IStyleParser {
 			throw new IllegalStateException(err);
 		}
 		try {
-			ITEM_FIELD = HoverEvent.ItemHover.class.getField("item");
-			COUND_FIELD = HoverEvent.ItemHover.class.getField("count");
+			ITEM_FIELD = HoverEvent.ItemHover.class.getDeclaredField("field_240685_a_");
+			ITEM_FIELD.setAccessible(true);
+			COUND_FIELD = HoverEvent.ItemHover.class.getDeclaredField("field_240686_b_");
+			COUND_FIELD.setAccessible(true);
 		} catch (NoSuchFieldException err) {
 			throw new IllegalStateException(err);
 		}

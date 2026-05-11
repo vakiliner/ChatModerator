@@ -47,13 +47,13 @@ class OldStyle implements IStyleParser {
 			HOVER_EVENT_GET_ACTION = HoverEvent.class.getMethod("method_10892", Object.class);
 			HOVER_EVENT_GET_VALUE = HoverEvent.class.getMethod("method_10891", Component.class);
 		} catch (NoSuchMethodException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		try {
-			COLOR_FIELD = Style.class.getDeclaredField("color");
+			COLOR_FIELD = Style.class.getDeclaredField("field_11855");
 			COLOR_FIELD.setAccessible(true);
 		} catch (NoSuchFieldException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 	}
 

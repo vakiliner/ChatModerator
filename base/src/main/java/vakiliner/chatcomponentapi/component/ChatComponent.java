@@ -80,8 +80,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		}
 		formats = Collections.unmodifiableSet(formats);
 		if (reset) {
-			ChatTextFormat textColor = color != null ? color.asFormat() : ChatTextFormat.RESET;
-			text.append(textColor != null ? textColor : ChatTextFormat.RESET);
+			text.append(ChatTextFormat.getFromColor(color));
 			for (ChatComponentFormat format : formats) {
 				text.append(format.asTextFormat());
 			}
@@ -102,7 +101,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 			}
 		}
 		if (reset) {
-			text.append(parentColor != null ? parentColor.asFormat() : ChatTextFormat.RESET);
+			text.append(ChatTextFormat.getFromColor(color));
 			for (ChatComponentFormat format : parentFormats) {
 				text.append(format);
 			}

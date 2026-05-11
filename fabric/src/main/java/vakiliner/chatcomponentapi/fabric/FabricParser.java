@@ -58,7 +58,7 @@ public class FabricParser extends BaseParser {
 	static {
 		UUID nilUUID;
 		try {
-			nilUUID = (UUID) net.minecraft.Util.class.getField("NIL_UUID").get(null);
+			nilUUID = (UUID) net.minecraft.Util.class.getField("field_25140").get(null);
 		} catch (NoSuchFieldException err) {
 			nilUUID = null;
 		} catch (IllegalAccessException err) {
@@ -68,7 +68,7 @@ public class FabricParser extends BaseParser {
 		IStyleParser parser;
 		try {
 			parser = new HoverEventContents();
-		} catch (NoClassDefFoundError err) {
+		} catch (Throwable err) {
 			parser = new OldStyle();
 		}
 		STYLE_PARSER = parser;
@@ -87,7 +87,7 @@ public class FabricParser extends BaseParser {
 			SET_STYLE = BaseComponent.class.getMethod("method_10862", Style.class);
 			APPEND = BaseComponent.class.getMethod("method_10852", Component.class);
 		} catch (NoSuchMethodException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		Method sendMessageWithType;
 		try {
@@ -96,7 +96,7 @@ public class FabricParser extends BaseParser {
 			try {
 				sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
@@ -107,7 +107,7 @@ public class FabricParser extends BaseParser {
 			try {
 				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class);
 			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
@@ -154,7 +154,7 @@ public class FabricParser extends BaseParser {
 				packet = CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type));
 			}
 		} catch (IllegalAccessException | InvocationTargetException | InstantiationException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		playerList.broadcastAll(packet);
 	}
@@ -193,14 +193,14 @@ public class FabricParser extends BaseParser {
 		try {
 			SET_STYLE.invoke(component, fabric(raw.getStyle()));
 		} catch (IllegalAccessException | InvocationTargetException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
 			try {
 				APPEND.invoke(component, fabric(chatComponent, isConsole));
 			} catch (IllegalAccessException | InvocationTargetException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		return component;

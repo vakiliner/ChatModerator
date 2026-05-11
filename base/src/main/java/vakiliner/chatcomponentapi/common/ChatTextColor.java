@@ -48,6 +48,15 @@ public class ChatTextColor {
 		return this.value & 0xFF;
 	}
 
+	public ChatTextFormat asFormat() {
+		return this.asFormat;
+	}
+
+	public ChatTextFormat asFormat(ChatTextFormat orElse) {
+		ChatTextFormat format = this.asFormat();
+		return format != null ? format : orElse;
+	}
+
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -55,12 +64,8 @@ public class ChatTextColor {
 			return false;
 		} else {
 			ChatTextColor other = (ChatTextColor) obj;
-			return this.value == other.value;
+			return this.value == other.value && this.asFormat == other.asFormat;
 		}
-	}
-
-	public ChatTextFormat asFormat() {
-		return this.asFormat;
 	}
 
 	public String toString() {

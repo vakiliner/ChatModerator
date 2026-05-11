@@ -72,6 +72,14 @@ public enum ChatTextFormat {
 		return BY_NAME.get(name);
 	}
 
+	public static ChatTextFormat getFromColor(ChatTextColor color) {
+		return getFromColor(color, RESET);
+	}
+
+	public static ChatTextFormat getFromColor(ChatTextColor color, ChatTextFormat def) {
+		return color != null ? color.asFormat(def) : def;
+	}
+
 	static {
 		for (ChatTextFormat color : values()) {
 			BY_CHAR.put(color.code, color);
