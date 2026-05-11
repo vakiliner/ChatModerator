@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.spigot;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
 
 public class SpigotParser extends BukkitParser {
 	private static final HoverEventParser HOVER_EVENT_PARSER;
+	private static final boolean supportsFontInStyle;
 
 	static {
 		HoverEventParser hoverEventParser;
@@ -40,6 +42,17 @@ public class SpigotParser extends BukkitParser {
 			hoverEventParser = null;
 		}
 		HOVER_EVENT_PARSER = hoverEventParser;
+		Method method;
+		try {
+			method = BaseComponent.class.getMethod("setFont");
+		} catch (NoSuchMethodException err) {
+			method = null;
+		}
+		supportsFontInStyle = method != null;
+	}
+
+	public boolean supportsFontInStyle() {
+		return supportsFontInStyle;
 	}
 
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
@@ -105,7 +118,7 @@ public class SpigotParser extends BukkitParser {
 		component.setClickEvent(spigot(chatStyle.getClickEvent()));
 		component.setHoverEvent(spigot(chatStyle.getHoverEvent()));
 		component.setInsertion(chatStyle.getInsertion());
-		component.setFont(chatStyle.getFont().toString());
+		if (supportsFontInStyle) component.setFont(chatStyle.getFont().toString());
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
 			component.addExtra(spigot(chatComponent, isConsole));
@@ -188,7 +201,7 @@ public class SpigotParser extends BukkitParser {
 		builder.withClickEvent(spigot(component.getClickEvent()));
 		builder.withHoverEvent(spigot(component.getHoverEvent()));
 		builder.withInsertion(component.getInsertion());
-		builder.withFont(ChatId.of(component.getFont()));
+		if (supportsFontInStyle) builder.withFont(ChatId.of(component.getFont()));
 		return builder.build();
 	}
 

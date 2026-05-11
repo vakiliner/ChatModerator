@@ -45,7 +45,7 @@ public class BukkitParser extends BaseParser {
 	}
 
 	public boolean supportsFontInStyle() {
-		return true;
+		return false;
 	}
 
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
