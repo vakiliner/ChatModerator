@@ -219,12 +219,12 @@ public class SpigotParser extends BukkitParser {
 	}
 
 	public static ChatColor spigot(ChatTextColor color) {
-		return color != null ? ChatColor.of(color.toString()) : null;
+		return color != null ? ChatColor.class.isEnum() ? spigot(color.asFormat()) : ChatColor.of(color.toString()) : null;
 	}
 
 	public static ChatTextColor spigotColor(ChatColor color) {
 		if (color == null) return null;
-		if (color.getClass().isEnum() || color.getColor() == null) throw new IllegalArgumentException("ChatColor has no color");
+		if (ChatColor.class.isEnum() || color.getColor() == null) throw new IllegalArgumentException("ChatColor has no color");
 		return ChatTextColor.of(color.getName());
 	}
 }
