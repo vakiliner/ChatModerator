@@ -22,7 +22,8 @@ class HoverEventContents implements IStyleParser {
 
 	static {
 		try {
-			STYLE_CONSTRUCTOR = Style.class.getConstructor(TextColor.class, Boolean.class, Boolean.class, Boolean.class, Boolean.class, Boolean.class, ClickEvent.class, HoverEvent.class, String.class, ResourceLocation.class);
+			STYLE_CONSTRUCTOR = Style.class.getDeclaredConstructor(TextColor.class, Boolean.class, Boolean.class, Boolean.class, Boolean.class, Boolean.class, ClickEvent.class, HoverEvent.class, String.class, ResourceLocation.class);
+			STYLE_CONSTRUCTOR.setAccessible(true);
 		} catch (NoSuchMethodException err) {
 			throw new IllegalStateException(err);
 		}
