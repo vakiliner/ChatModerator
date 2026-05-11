@@ -1,6 +1,7 @@
 package vakiliner.chatcomponentapi.forge;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -55,8 +56,15 @@ public class ForgeParser extends BaseParser {
 	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
 	private static final Method SET_STYLE;
 	private static final Method APPEND;
+	private static final Field FONT;
 
 	static {
+		try {
+			SET_STYLE = TextComponent.class.getMethod("func_230530_a_", Style.class);
+			APPEND = TextComponent.class.getMethod("func_230529_a_", ITextComponent.class);
+		} catch (NoSuchMethodException err) {
+			throw new IllegalStateException(err);
+		}
 		UUID nilUUID;
 		try {
 			nilUUID = (UUID) net.minecraft.util.Util.class.getField("field_240973_b_").get(null);
@@ -66,6 +74,14 @@ public class ForgeParser extends BaseParser {
 			throw new IllegalStateException(err);
 		}
 		NIL_UUID = nilUUID;
+		Field font;
+		try {
+			font = Style.class.getField("field_240710_l_");
+			font.setAccessible(true);
+		} catch (NoSuchFieldException err) {
+			font = null;
+		}
+		FONT = font;
 		IStyleParser parser;
 		try {
 			parser = new HoverEventContents();
@@ -84,12 +100,6 @@ public class ForgeParser extends BaseParser {
 			}
 		}
 		S_CHAT_PACKET_CONSTRUCTOR = SChatPacketConstructor;
-		try {
-			SET_STYLE = TextComponent.class.getMethod("method_10862", Style.class);
-			APPEND = TextComponent.class.getMethod("method_10852", TextComponent.class);
-		} catch (NoSuchMethodException err) {
-			throw new IllegalStateException(err);
-		}
 		Method sendMessageWithType;
 		try {
 			sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", TextComponent.class, ChatType.class, UUID.class);
@@ -119,7 +129,7 @@ public class ForgeParser extends BaseParser {
 	}
 
 	public boolean supportsFontInStyle() {
-		return true;
+		return FONT != null;
 	}
 
 	public void sendMessage(ICommandSource commandSource, ChatComponent chatComponent, ChatMessageType type, UUID uuid) {
@@ -248,7 +258,13 @@ public class ForgeParser extends BaseParser {
 		builder.withClickEvent(forge(accessor.getClickEvent()));
 		builder.withHoverEvent(forge(accessor.getHoverEvent()));
 		builder.withInsertion(accessor.getInsertion());
-		builder.withFont(forge(accessor.getFont()));
+		if (FONT != null) {
+			try {
+				builder.withFont(forge((ResourceLocation) FONT.get(style)));
+			} catch (IllegalAccessException err) {
+				throw new IllegalStateException(err);
+			}
+		}
 		return builder.build();
 	}
 

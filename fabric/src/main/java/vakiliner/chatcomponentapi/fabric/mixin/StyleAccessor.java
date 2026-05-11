@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 
 @Mixin(Style.class)
 public interface StyleAccessor {
@@ -32,7 +31,4 @@ public interface StyleAccessor {
 
 	@Accessor("insertion")
 	String getInsertion();
-
-	@Accessor("font")
-	ResourceLocation getFont();
 }

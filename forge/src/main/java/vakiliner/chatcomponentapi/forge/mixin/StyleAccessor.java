@@ -2,7 +2,6 @@ package vakiliner.chatcomponentapi.forge.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
@@ -32,7 +31,4 @@ public interface StyleAccessor {
 
 	@Accessor("insertion")
 	String getInsertion();
-
-	@Accessor("font")
-	ResourceLocation getFont();
 }

@@ -31,21 +31,23 @@ class OldStyle implements IStyleParser {
 	private static final Method SET_OBFUSCATED;
 	private static final Method SET_CLICK_EVENT;
 	private static final Method SET_HOVER_EVENT;
+	private static final Method SET_INSERTION;
 
 	static {
 		try {
 			STYLE_CONSTRUCTOR = Style.class.getConstructor();
 			HOVER_EVENT_CONSTRUCTOR = HoverEvent.class.getConstructor(HoverEvent.Action.class, TextComponent.class);
-			SET_COLOR = Style.class.getMethod("method_10977", TextFormatting.class);
-			SET_BOLD = Style.class.getMethod("method_10982", Boolean.class);
-			SET_ITALIC = Style.class.getMethod("method_10978", Boolean.class);
-			SET_UNDERLINED = Style.class.getMethod("method_10968", Boolean.class);
-			SET_STRIKETHROUGH = Style.class.getMethod("method_10959", Boolean.class);
-			SET_OBFUSCATED = Style.class.getMethod("method_10948", Boolean.class);
-			SET_CLICK_EVENT = Style.class.getMethod("method_10958", ClickEvent.class);
-			SET_HOVER_EVENT = Style.class.getMethod("method_10949", HoverEvent.class);
-			HOVER_EVENT_GET_ACTION = HoverEvent.class.getMethod("method_10892", Object.class);
-			HOVER_EVENT_GET_VALUE = HoverEvent.class.getMethod("method_10891", TextComponent.class);
+			SET_COLOR = Style.class.getMethod("func_150238_a", TextFormatting.class);
+			SET_BOLD = Style.class.getMethod("func_150227_a", Boolean.class);
+			SET_ITALIC = Style.class.getMethod("func_150217_b", Boolean.class);
+			SET_UNDERLINED = Style.class.getMethod("func_150228_d", Boolean.class);
+			SET_STRIKETHROUGH = Style.class.getMethod("func_150225_c", Boolean.class);
+			SET_OBFUSCATED = Style.class.getMethod("func_150237_e", Boolean.class);
+			SET_CLICK_EVENT = Style.class.getMethod("func_150241_a", ClickEvent.class);
+			SET_HOVER_EVENT = Style.class.getMethod("func_150209_a", HoverEvent.class);
+			SET_INSERTION = Style.class.getMethod("func_179989_a", HoverEvent.class);
+			HOVER_EVENT_GET_ACTION = HoverEvent.class.getMethod("func_150701_a");
+			HOVER_EVENT_GET_VALUE = HoverEvent.class.getMethod("func_150702_b");
 		} catch (NoSuchMethodException err) {
 			throw new IllegalStateException(err);
 		}
@@ -83,6 +85,7 @@ class OldStyle implements IStyleParser {
 			SET_OBFUSCATED.invoke(style, chatStyle.getObfuscated());
 			SET_CLICK_EVENT.invoke(style, ForgeParser.forge(chatStyle.getClickEvent()));
 			SET_HOVER_EVENT.invoke(style, ForgeParser.forge(chatStyle.getHoverEvent()));
+			SET_INSERTION.invoke(style, chatStyle.getInsertion());
 		} catch (IllegalAccessException | InvocationTargetException err) {
 			throw new IllegalStateException(err);
 		}
@@ -98,11 +101,12 @@ class OldStyle implements IStyleParser {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ChatHoverEvent<?> forge(HoverEvent event) {
-		final Object action;
+		final HoverEvent.Action action;
 		final TextComponent contents;
 		try {
-			action = HOVER_EVENT_GET_ACTION.invoke(event);
+			action = (HoverEvent.Action) HOVER_EVENT_GET_ACTION.invoke(event);
 			contents = (TextComponent) HOVER_EVENT_GET_VALUE.invoke(event);
 		} catch (IllegalAccessException | InvocationTargetException err) {
 			throw new IllegalStateException(err);

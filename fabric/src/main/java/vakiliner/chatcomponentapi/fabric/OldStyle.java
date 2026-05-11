@@ -31,6 +31,7 @@ class OldStyle implements IStyleParser {
 	private static final Method SET_OBFUSCATED;
 	private static final Method SET_CLICK_EVENT;
 	private static final Method SET_HOVER_EVENT;
+	private static final Method SET_INSERTION;
 
 	static {
 		try {
@@ -44,8 +45,9 @@ class OldStyle implements IStyleParser {
 			SET_OBFUSCATED = Style.class.getMethod("method_10948", Boolean.class);
 			SET_CLICK_EVENT = Style.class.getMethod("method_10958", ClickEvent.class);
 			SET_HOVER_EVENT = Style.class.getMethod("method_10949", HoverEvent.class);
-			HOVER_EVENT_GET_ACTION = HoverEvent.class.getMethod("method_10892", Object.class);
-			HOVER_EVENT_GET_VALUE = HoverEvent.class.getMethod("method_10891", Component.class);
+			SET_INSERTION = Style.class.getMethod("method_10975", HoverEvent.class);
+			HOVER_EVENT_GET_ACTION = HoverEvent.class.getMethod("method_10892");
+			HOVER_EVENT_GET_VALUE = HoverEvent.class.getMethod("method_10891");
 		} catch (NoSuchMethodException err) {
 			throw new IllegalStateException(err);
 		}
@@ -83,6 +85,7 @@ class OldStyle implements IStyleParser {
 			SET_OBFUSCATED.invoke(style, chatStyle.getObfuscated());
 			SET_CLICK_EVENT.invoke(style, FabricParser.fabric(chatStyle.getClickEvent()));
 			SET_HOVER_EVENT.invoke(style, FabricParser.fabric(chatStyle.getHoverEvent()));
+			SET_INSERTION.invoke(style, chatStyle.getInsertion());
 		} catch (IllegalAccessException | InvocationTargetException err) {
 			throw new IllegalStateException(err);
 		}
@@ -98,11 +101,12 @@ class OldStyle implements IStyleParser {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ChatHoverEvent<?> fabric(HoverEvent event) {
-		final Object action;
+		final HoverEvent.Action action;
 		final Component contents;
 		try {
-			action = HOVER_EVENT_GET_ACTION.invoke(event);
+			action = (HoverEvent.Action) HOVER_EVENT_GET_ACTION.invoke(event);
 			contents = (Component) HOVER_EVENT_GET_VALUE.invoke(event);
 		} catch (IllegalAccessException | InvocationTargetException err) {
 			throw new IllegalStateException(err);

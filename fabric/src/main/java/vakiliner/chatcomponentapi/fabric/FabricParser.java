@@ -1,6 +1,7 @@
 package vakiliner.chatcomponentapi.fabric;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -54,8 +55,15 @@ public class FabricParser extends BaseParser {
 	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
 	private static final Method SET_STYLE;
 	private static final Method APPEND;
+	private static final Field FONT;
 
 	static {
+		try {
+			SET_STYLE = BaseComponent.class.getMethod("method_10862", Style.class);
+			APPEND = BaseComponent.class.getMethod("method_10852", Component.class);
+		} catch (NoSuchMethodException err) {
+			throw new IllegalStateException(err);
+		}
 		UUID nilUUID;
 		try {
 			nilUUID = (UUID) net.minecraft.Util.class.getField("field_25140").get(null);
@@ -65,6 +73,14 @@ public class FabricParser extends BaseParser {
 			throw new IllegalStateException(err);
 		}
 		NIL_UUID = nilUUID;
+		Field font;
+		try {
+			font = Style.class.getDeclaredField("font");
+			font.setAccessible(true);
+		} catch (NoSuchFieldException err) {
+			font = null;
+		}
+		FONT = font;
 		IStyleParser parser;
 		try {
 			parser = new HoverEventContents();
@@ -83,12 +99,6 @@ public class FabricParser extends BaseParser {
 			}
 		}
 		CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR = clientboundChatPacketConstructor;
-		try {
-			SET_STYLE = BaseComponent.class.getMethod("method_10862", Style.class);
-			APPEND = BaseComponent.class.getMethod("method_10852", Component.class);
-		} catch (NoSuchMethodException err) {
-			throw new IllegalStateException(err);
-		}
 		Method sendMessageWithType;
 		try {
 			sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class, UUID.class);
@@ -118,7 +128,7 @@ public class FabricParser extends BaseParser {
 	}
 
 	public boolean supportsFontInStyle() {
-		return true;
+		return FONT != null;
 	}
 
 	public void sendMessage(CommandSource commandSource, ChatComponent chatComponent, ChatMessageType type, UUID uuid) {
@@ -247,7 +257,11 @@ public class FabricParser extends BaseParser {
 		builder.withClickEvent(fabric(accessor.getClickEvent()));
 		builder.withHoverEvent(fabric(accessor.getHoverEvent()));
 		builder.withInsertion(accessor.getInsertion());
-		builder.withFont(fabric(accessor.getFont()));
+		if (FONT != null) try {
+			builder.withFont(fabric((ResourceLocation) FONT.get(style)));
+		} catch (IllegalAccessException err) {
+			throw new IllegalStateException(err);
+		}
 		return builder.build();
 	}
 
