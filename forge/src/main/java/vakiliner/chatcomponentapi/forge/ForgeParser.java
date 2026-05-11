@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.command.CommandSource;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.play.server.SChatPacket;
@@ -113,10 +112,10 @@ public class ForgeParser extends BaseParser {
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
 		Method sendMessageWithoutType;
 		try {
-			sendMessageWithoutType = CommandSource.class.getMethod("func_145747_a", ITextComponent.class, UUID.class);
+			sendMessageWithoutType = ICommandSource.class.getMethod("func_145747_a", ITextComponent.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithoutType = CommandSource.class.getMethod("func_145747_a", ITextComponent.class);
+				sendMessageWithoutType = ICommandSource.class.getMethod("func_145747_a", ITextComponent.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
