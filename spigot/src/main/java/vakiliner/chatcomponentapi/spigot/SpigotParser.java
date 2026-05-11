@@ -44,7 +44,7 @@ public class SpigotParser extends BukkitParser {
 		HOVER_EVENT_PARSER = hoverEventParser;
 		Method method;
 		try {
-			method = BaseComponent.class.getMethod("setFont");
+			method = BaseComponent.class.getMethod("setFont", String.class);
 		} catch (NoSuchMethodException err) {
 			method = null;
 		}
