@@ -1,7 +1,6 @@
 {
 	"mappings": {
 		"vakiliner/chatcomponentapi/forge/mixin/StyleAccessor": {
-			"color": "field_150247_b:Lnet/minecraft/util/text/Color;",
 			"bold": "field_150248_c:Ljava/lang/Boolean;",
 			"italic": "field_150245_d:Ljava/lang/Boolean;",
 			"underlined": "field_150246_e:Ljava/lang/Boolean;",
@@ -15,7 +14,6 @@
 	"data": {
 		"named:intermediary": {
 			"vakiliner/chatcomponentapi/forge/mixin/StyleAccessor": {
-				"color": "field_150247_b:Lnet/minecraft/util/text/Color;",
 				"bold": "field_150248_c:Ljava/lang/Boolean;",
 				"italic": "field_150245_d:Ljava/lang/Boolean;",
 				"underlined": "field_150246_e:Ljava/lang/Boolean;",
