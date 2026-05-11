@@ -1,21 +1,29 @@
 {
 	"mappings": {
-		"vakiliner/chatcomponentapi/forge/mixin/StyleMixin": {
+		"vakiliner/chatcomponentapi/forge/mixin/StyleAccessor": {
+			"color": "field_150247_b:Lnet/minecraft/util/text/Color;",
 			"bold": "field_150248_c:Ljava/lang/Boolean;",
 			"italic": "field_150245_d:Ljava/lang/Boolean;",
-			"obfuscated": "field_150244_g:Ljava/lang/Boolean;",
+			"underlined": "field_150246_e:Ljava/lang/Boolean;",
 			"strikethrough": "field_150243_f:Ljava/lang/Boolean;",
-			"underlined": "field_150246_e:Ljava/lang/Boolean;"
+			"obfuscated": "field_150244_g:Ljava/lang/Boolean;",
+			"clickEvent": "field_150251_h:Lnet/minecraft/util/text/event/ClickEvent;",
+			"hoverEvent": "field_150252_i:Lnet/minecraft/util/text/event/HoverEvent;",
+			"insertion": "field_179990_j:Ljava/lang/String;"
 		}
 	},
 	"data": {
 		"named:intermediary": {
-			"vakiliner/chatcomponentapi/forge/mixin/StyleMixin": {
+			"vakiliner/chatcomponentapi/forge/mixin/StyleAccessor": {
+				"color": "field_150247_b:Lnet/minecraft/util/text/Color;",
 				"bold": "field_150248_c:Ljava/lang/Boolean;",
 				"italic": "field_150245_d:Ljava/lang/Boolean;",
-				"obfuscated": "field_150244_g:Ljava/lang/Boolean;",
+				"underlined": "field_150246_e:Ljava/lang/Boolean;",
 				"strikethrough": "field_150243_f:Ljava/lang/Boolean;",
-				"underlined": "field_150246_e:Ljava/lang/Boolean;"
+				"obfuscated": "field_150244_g:Ljava/lang/Boolean;",
+				"clickEvent": "field_150251_h:Lnet/minecraft/util/text/event/ClickEvent;",
+				"hoverEvent": "field_150252_i:Lnet/minecraft/util/text/event/HoverEvent;",
+				"insertion": "field_179990_j:Ljava/lang/String;"
 			}
 		}
 	}
