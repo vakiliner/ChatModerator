@@ -91,10 +91,10 @@ public class ForgeParser extends BaseParser {
 		STYLE_PARSER = parser;
 		Constructor<SChatPacket> SChatPacketConstructor;
 		try {
-			SChatPacketConstructor = SChatPacket.class.getConstructor(TextComponent.class, ChatType.class, UUID.class);
+			SChatPacketConstructor = SChatPacket.class.getConstructor(ITextComponent.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException a) {
 			try {
-				SChatPacketConstructor = SChatPacket.class.getConstructor(TextComponent.class, ChatType.class);
+				SChatPacketConstructor = SChatPacket.class.getConstructor(ITextComponent.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
@@ -102,10 +102,10 @@ public class ForgeParser extends BaseParser {
 		S_CHAT_PACKET_CONSTRUCTOR = SChatPacketConstructor;
 		Method sendMessageWithType;
 		try {
-			sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", TextComponent.class, ChatType.class, UUID.class);
+			sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", ITextComponent.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", TextComponent.class, ChatType.class);
+				sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", ITextComponent.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
@@ -113,10 +113,10 @@ public class ForgeParser extends BaseParser {
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
 		Method sendMessageWithoutType;
 		try {
-			sendMessageWithoutType = CommandSource.class.getMethod("method_9203", TextComponent.class, UUID.class);
+			sendMessageWithoutType = CommandSource.class.getMethod("method_9203", ITextComponent.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", TextComponent.class);
+				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", ITextComponent.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}

@@ -6,9 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
@@ -36,7 +36,7 @@ class OldStyle implements IStyleParser {
 	static {
 		try {
 			STYLE_CONSTRUCTOR = Style.class.getConstructor();
-			HOVER_EVENT_CONSTRUCTOR = HoverEvent.class.getConstructor(HoverEvent.Action.class, TextComponent.class);
+			HOVER_EVENT_CONSTRUCTOR = HoverEvent.class.getConstructor(HoverEvent.Action.class, ITextComponent.class);
 			SET_COLOR = Style.class.getMethod("func_150238_a", TextFormatting.class);
 			SET_BOLD = Style.class.getMethod("func_150227_a", Boolean.class);
 			SET_ITALIC = Style.class.getMethod("func_150217_b", Boolean.class);
@@ -104,10 +104,10 @@ class OldStyle implements IStyleParser {
 	@SuppressWarnings("rawtypes")
 	public ChatHoverEvent<?> forge(HoverEvent event) {
 		final HoverEvent.Action action;
-		final TextComponent contents;
+		final ITextComponent contents;
 		try {
 			action = (HoverEvent.Action) HOVER_EVENT_GET_ACTION.invoke(event);
-			contents = (TextComponent) HOVER_EVENT_GET_VALUE.invoke(event);
+			contents = (ITextComponent) HOVER_EVENT_GET_VALUE.invoke(event);
 		} catch (IllegalAccessException | InvocationTargetException err) {
 			throw new IllegalStateException(err);
 		}
