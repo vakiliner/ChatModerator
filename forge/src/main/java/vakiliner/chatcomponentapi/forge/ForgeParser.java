@@ -102,10 +102,10 @@ public class ForgeParser extends BaseParser {
 		S_CHAT_PACKET_CONSTRUCTOR = SChatPacketConstructor;
 		Method sendMessageWithType;
 		try {
-			sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", ITextComponent.class, ChatType.class, UUID.class);
+			sendMessageWithType = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithType = ServerPlayerEntity.class.getMethod("method_14254", ITextComponent.class, ChatType.class);
+				sendMessageWithType = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
@@ -113,10 +113,10 @@ public class ForgeParser extends BaseParser {
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
 		Method sendMessageWithoutType;
 		try {
-			sendMessageWithoutType = CommandSource.class.getMethod("method_9203", ITextComponent.class, UUID.class);
+			sendMessageWithoutType = CommandSource.class.getMethod("func_145747_a", ITextComponent.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", ITextComponent.class);
+				sendMessageWithoutType = CommandSource.class.getMethod("func_145747_a", ITextComponent.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
