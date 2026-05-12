@@ -40,7 +40,10 @@ public class UnmuteCommand {
 		int i = 0;
 		for (GameProfile profile : collection) {
 			if (manager.mutes.unmute(profile.getId())) {
-				stack.sendSuccess(ForgeParser.forge(new ChatTextComponent(profile.getName() + " теперь снова может общаться")), true);
+				ChatTextComponent component = new ChatTextComponent();
+				component.append(ForgeChatModerator.playerName(profile));
+				component.append(new ChatTextComponent(" теперь снова может общаться"));
+				stack.sendSuccess(ForgeParser.forge(component), true);
 				i++;
 			}
 		}

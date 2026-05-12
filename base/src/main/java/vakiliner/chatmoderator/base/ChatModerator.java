@@ -10,12 +10,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.authlib.GameProfile;
+import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatcomponentapi.common.ChatGameMode;
+import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -183,6 +187,24 @@ public abstract class ChatModerator {
 	public abstract void broadcast(ChatComponent component, boolean admins);
 
 	public abstract Collection<ChatPlayer> getOnlinePlayers();
+
+	public static ChatComponent playerName(ChatOfflinePlayer player) {
+		return playerName(player.getGameProfile());
+	}
+
+	public static ChatComponent playerName(MutedPlayer player) {
+		return playerName(player.getName(), player.getUniqueId());
+	}
+
+	public static ChatComponent playerName(GameProfile profile) {
+		return playerName(profile.getName(), profile.getId());
+	}
+
+	public static ChatComponent playerName(String name, UUID uuid) {
+		ChatStyle.Builder style = ChatStyle.newBuilder();
+		style.withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ENTITY, new ChatHoverEvent.ShowEntity(new ChatId("minecraft", "player"), uuid, new ChatTextComponent(name))));
+		return new ChatTextComponent(name, style.build());
+	}
 
 	public void onChat(ChatPlayer player, final String fullMessage, Runnable cancel, Runnable spectatorsChatRunnable) {
 		boolean isCommand = fullMessage.startsWith("/");
