@@ -41,14 +41,24 @@ public class ChatId {
 		return this.namespace + ':' + this.value;
 	}
 
-	public static ChatId parse(String string) {
-		return parse(string, "minecraft");
+	public static ChatId of(String string) {
+		return of(string, "minecraft");
 	}
 
-	public static ChatId parse(String string, String defaultNamespace) {
+	public static ChatId of(String string, String defaultNamespace) {
 		int index = string.indexOf(':');
 		String namespace = index > 0 ? string.substring(0, index) : defaultNamespace;
 		String value = index >= 0 ? string.substring(index + 1) : string;
 		return new ChatId(namespace, value);
+	}
+
+	@Deprecated
+	public static ChatId parse(String string) {
+		return of(string);
+	}
+
+	@Deprecated
+	public static ChatId parse(String string, String defaultNamespace) {
+		return of(string, defaultNamespace);
 	}
 }

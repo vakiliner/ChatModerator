@@ -1,9 +1,7 @@
 package vakiliner.chatcomponentapi.paper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
@@ -34,20 +32,29 @@ import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentFormat;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
-import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
+import vakiliner.chatcomponentapi.component.ChatStyle;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 import vakiliner.chatcomponentapi.spigot.SpigotParser;
 
 public class PaperParser extends SpigotParser {
+	public boolean supportsFontInStyle() {
+		return true;
+	}
+
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
-		boolean isConsole = sender instanceof ConsoleCommandSender;
-		if (uuid != null && sendMessageWithUUID) {
-			sender.sendMessage(Identity.identity(uuid), paper(component, isConsole), paper(type));
-		} else {
-			sender.sendMessage(paper(component, isConsole), paper(type));
+		sender.sendMessage(uuid != null ? Identity.identity(uuid) : Identity.nil(), paper(component, sender instanceof ConsoleCommandSender), paper(type));
+	}
+
+	public void broadcast(Iterable<CommandSender> recipients, ChatComponent chatComponent, ChatMessageType chatMessageType, UUID uuid) {
+		Component component = paper(chatComponent, false);
+		Component consoleComponent = paper(chatComponent, true);
+		MessageType type = paper(chatMessageType);
+		Identity identity = uuid != null ? Identity.identity(uuid) : Identity.nil();
+		for (CommandSender recipient : recipients) {
+			recipient.sendMessage(identity, recipient instanceof ConsoleCommandSender ? consoleComponent : component, type);
 		}
 	}
 
@@ -58,19 +65,9 @@ public class PaperParser extends SpigotParser {
 	public static Component paper(ChatComponent raw, boolean isConsole) {
 		if (raw == null) return null;
 		if (raw instanceof ChatComponentModified) {
-			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
-				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
-			} else {
-				raw = ((ChatComponentModified) raw).getComponent();
-			}
+			raw = ((ChatComponentModified) raw).getComponent(isConsole);
 		}
 		final ComponentBuilder<?, ?> builder;
-		Style style = paperStyle(raw);
-		List<Component> children = new ArrayList<>();
-		List<ChatComponent> extra = raw.getExtra();
-		if (extra != null) for (ChatComponent chatComponent : extra) {
-			children.add(paper(chatComponent, isConsole));
-		}
 		if (raw instanceof ChatTextComponent) {
 			ChatTextComponent chatComponent = (ChatTextComponent) raw;
 			builder = Component.text().content(chatComponent.getText());
@@ -83,7 +80,12 @@ public class PaperParser extends SpigotParser {
 		} else {
 			throw new IllegalArgumentException("Could not parse Component from " + raw.getClass());
 		}
-		return builder.style(style).append(children).build();
+		builder.style(paper(raw.getStyle()));
+		List<ChatComponent> extra = raw.getExtra();
+		if (extra != null) for (ChatComponent chatComponent : extra) {
+			builder.append(paper(chatComponent, isConsole));
+		}
+		return builder.build();
 	}
 
 	public static ChatComponent paper(Component raw) {
@@ -102,21 +104,47 @@ public class PaperParser extends SpigotParser {
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}
-		Style style = raw.style();
-		chatComponent.setColor(paper(style.color()));
-		for (Map.Entry<TextDecoration, TextDecoration.State> entry : raw.decorations().entrySet()) {
-			TextDecoration.State isSetted = entry.getValue();
-			if (isSetted != TextDecoration.State.NOT_SET) {
-				chatComponent.setFormat(paper(entry.getKey()), isSetted == TextDecoration.State.TRUE);
-			}
-		}
-		chatComponent.setClickEvent(paper(raw.clickEvent()));
-		chatComponent.setHoverEvent(paper(raw.hoverEvent()));
-		List<Component> children = raw.children();
-		if (children != null) {
-			chatComponent.setExtra(children.stream().map(PaperParser::paper).collect(Collectors.toList()));
+		chatComponent.setStyle(paper(raw.style()));
+		for (Component component : raw.children()) {
+			chatComponent.append(paper(component));
 		}
 		return chatComponent;
+	}
+
+	public static Style paper(ChatStyle chatStyle) {
+		if (chatStyle == null) return null;
+		if (chatStyle.isEmpty()) return Style.empty();
+		Style.Builder builder = Style.style();
+		builder.color(paper(chatStyle.getColor()));
+		for (Map.Entry<ChatComponentFormat, Boolean> entry : chatStyle.getFormats().entrySet()) {
+			Boolean isSetted = entry.getValue();
+			if (isSetted != null) {
+				builder.decoration(paper(entry.getKey()), isSetted);
+			}
+		}
+		builder.clickEvent(paper(chatStyle.getClickEvent()));
+		builder.hoverEvent(paper(chatStyle.getHoverEvent()));
+		builder.insertion(chatStyle.getInsertion());
+		builder.font(paper(chatStyle.getFont()));
+		return builder.build();
+	}
+
+	public static ChatStyle paper(Style style) {
+		if (style == null) return null;
+		if (style.isEmpty()) return ChatStyle.EMPTY;
+		ChatStyle.Builder builder = ChatStyle.newBuilder();
+		builder.withColor(paper(style.color()));
+		for (Map.Entry<TextDecoration, TextDecoration.State> entry : style.decorations().entrySet()) {
+			TextDecoration.State isSetted = entry.getValue();
+			if (isSetted != TextDecoration.State.NOT_SET) {
+				builder.withFormat(paper(entry.getKey()), isSetted == TextDecoration.State.TRUE);
+			}
+		}
+		builder.withClickEvent(paper(style.clickEvent()));
+		builder.withHoverEvent(paper(style.hoverEvent()));
+		builder.withInsertion(style.insertion());
+		builder.withFont(paper(style.font()));
+		return builder.build();
 	}
 
 	public static ClickEvent paper(ChatClickEvent event) {
@@ -127,48 +155,49 @@ public class PaperParser extends SpigotParser {
 		return event != null ? new ChatClickEvent(ChatClickEvent.Action.getByName(event.action().toString()), event.value()) : null;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <V> HoverEvent<V> paper(ChatHoverEvent<?> event) {
-		return event != null ? HoverEvent.hoverEvent((HoverEvent.Action<V>) HoverEvent.Action.NAMES.value(event.getAction().getName()), (V) paperContent(event.getContents())) : null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <V> ChatHoverEvent<V> paper(HoverEvent<?> event) {
-		return event != null ? new ChatHoverEvent<>((ChatHoverEvent.Action<V>) ChatHoverEvent.Action.getByName(event.action().toString()), (V) paperContent2(event.value())) : null;
-	}
-
-	public static Object paperContent(Object raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof ChatComponent) {
-			ChatComponent content = (ChatComponent) raw;
-			return paper(content);
-		} else if (raw instanceof ChatHoverEvent.ShowEntity) {
-			ChatHoverEvent.ShowEntity content = (ChatHoverEvent.ShowEntity) raw;
-			return HoverEvent.ShowEntity.of(paper(content.getType()), content.getUniqueId(), paper(content.getName()));
-		} else if (raw instanceof ChatHoverEvent.ShowItem) {
-			ChatHoverEvent.ShowItem content = (ChatHoverEvent.ShowItem) raw;
-			return HoverEvent.ShowItem.of(paper(content.getItem()), content.getCount());
+	public static HoverEvent<?> paper(ChatHoverEvent<?> event) {
+		if (event == null) return null;
+		ChatHoverEvent.Action<?> action = event.getAction();
+		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
+			return HoverEvent.showText(paper(event.getValue(ChatHoverEvent.Action.SHOW_TEXT)));
+		} else if (action == ChatHoverEvent.Action.SHOW_ENTITY) {
+			return HoverEvent.showEntity(paper(event.getValue(ChatHoverEvent.Action.SHOW_ENTITY)));
+		} else if (action == ChatHoverEvent.Action.SHOW_ITEM) {
+			return HoverEvent.showItem(paper(event.getValue(ChatHoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Could not parse Content from " + raw.getClass());
+			throw new IllegalArgumentException("Unknown action");
 		}
 	}
 
-	public static Object paperContent2(Object raw) {
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof Component) {
-			Component content = (Component) raw;
-			return paper(content);
-		} else if (raw instanceof HoverEvent.ShowEntity) {
-			HoverEvent.ShowEntity content = (HoverEvent.ShowEntity) raw;
-			return new ChatHoverEvent.ShowEntity(paper(content.type()), content.id(), paper(content.name()));
-		} else if (raw instanceof HoverEvent.ShowItem) {
-			HoverEvent.ShowItem content = (HoverEvent.ShowItem) raw;
-			return new ChatHoverEvent.ShowItem(paper(content.item()), content.count());
+	public static ChatHoverEvent<?> paper(HoverEvent<?> event) {
+		if (event == null) return null;
+		HoverEvent.Action<?> action = event.action();
+		Object value = event.value();
+		if (action == HoverEvent.Action.SHOW_TEXT) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, paper((Component) value));
+		} else if (action == HoverEvent.Action.SHOW_ENTITY) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ENTITY, paper((HoverEvent.ShowEntity) value));
+		} else if (action == HoverEvent.Action.SHOW_ITEM) {
+			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, paper((HoverEvent.ShowItem) value));
 		} else {
-			throw new IllegalArgumentException("Could not parse ChatContent from " + raw.getClass());
+			throw new IllegalArgumentException("Unknown action");
 		}
+	}
+
+	public static HoverEvent.ShowEntity paper(ChatHoverEvent.ShowEntity content) {
+		return content != null ? HoverEvent.ShowEntity.of(paper(content.getType()), content.getUniqueId(), paper(content.getName())) : null;
+	}
+
+	public static ChatHoverEvent.ShowEntity paper(HoverEvent.ShowEntity content) {
+		return content != null ? new ChatHoverEvent.ShowEntity(paper(content.type()), content.id(), paper(content.name())) : null;
+	}
+
+	public static HoverEvent.ShowItem paper(ChatHoverEvent.ShowItem content) {
+		return content != null ? HoverEvent.ShowItem.of(paper(content.getItem()), content.getCount()) : null;
+	}
+
+	public static ChatHoverEvent.ShowItem paper(HoverEvent.ShowItem content) {
+		return content != null ? new ChatHoverEvent.ShowItem(paper(content.item()), content.count()) : null;
 	}
 
 	public static Key paper(ChatId id) {
@@ -185,24 +214,6 @@ public class PaperParser extends SpigotParser {
 
 	public static ChatMessageType paper(MessageType type) {
 		return type != null ? ChatMessageType.valueOf(type.name()) : null;
-	}
-
-	public static Style paperStyle(ChatComponent component) {
-		Objects.requireNonNull(component);
-		Style.Builder builder = Style.style();
-		ChatTextColor color = component.getColor();
-		if (color != null) {
-			builder.color(paper(color));
-		}
-		for (Map.Entry<ChatComponentFormat, Boolean> entry : component.getFormatsRaw().entrySet()) {
-			Boolean isSetted = entry.getValue();
-			if (isSetted != null) {
-				builder.decoration(paper(entry.getKey()), isSetted);
-			}
-		}
-		builder.clickEvent(paper(component.getClickEvent()));
-		builder.hoverEvent(paper(component.getHoverEvent()));
-		return builder.build();
 	}
 
 	public static NamedTextColor paper(ChatNamedColor color) {

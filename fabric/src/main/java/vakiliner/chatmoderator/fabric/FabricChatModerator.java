@@ -21,6 +21,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import vakiliner.chatcomponentapi.ChatComponentAPIFabricLoader;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.component.ChatComponent;
@@ -30,6 +31,8 @@ import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatPlayerList;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
@@ -186,5 +189,13 @@ public class FabricChatModerator extends ChatModerator {
 			return this.toChatPlayer((ServerPlayer) sender);
 		}
 		return sender != null ? new FabricChatCommandSender(PARSER, sender) : null;
+	}
+
+	public ChatServer toChatServer(MinecraftServer server) {
+		return server != null ? new FabricChatServer(this, server) : null;
+	}
+
+	public ChatPlayerList toChatPlayerList(PlayerList playerList) {
+		return playerList != null ? new FabricChatPlayerList(this, playerList) : null;
 	}
 }

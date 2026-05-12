@@ -38,4 +38,15 @@ public class ForgeChatTeam implements ChatTeam {
 	public ChatComponent getSuffix() {
 		return ForgeParser.forge(this.team.getPlayerSuffix());
 	}
+
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj != null && this.getClass() == obj.getClass()) {
+			ForgeChatTeam other = (ForgeChatTeam) obj;
+			return this.parser.equals(other.parser) && this.team.equals(other.team);
+		} else {
+			return false;
+		}
+	}
 }

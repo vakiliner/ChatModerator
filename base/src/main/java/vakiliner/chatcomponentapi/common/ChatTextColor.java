@@ -1,25 +1,23 @@
 package vakiliner.chatcomponentapi.common;
 
-import java.util.Objects;
-
 public class ChatTextColor {
 	protected final int value;
 	protected final ChatTextFormat asFormat;
 
-	private ChatTextColor(int value, ChatTextFormat asFormat) {
+	protected ChatTextColor(int value, ChatTextFormat asFormat) {
 		this.value = value & 0xFFFFFF;
 		this.asFormat = asFormat;
-	}
-
-	protected ChatTextColor(ChatTextFormat format, int value) {
-		this.asFormat = Objects.requireNonNull(format);
-		this.value = Objects.requireNonNull(value);
+		if (this.asFormat != null && this.asFormat.isFormat()) {
+			throw new IllegalArgumentException("Invalid ChatTextFormat");
+		}
 	}
 
 	public static ChatTextColor color(int color, ChatTextFormat asFormat) {
 		int truncatedValue = color & 0xFFFFFF;
 		ChatNamedColor named = ChatNamedColor.getByValue(truncatedValue);
-		return named != null ? named : new ChatTextColor(color, asFormat);
+		if (named != null && (asFormat == null || asFormat == named.asFormat)) {
+			return named;
+		} else return new ChatTextColor(color, asFormat);
 	}
 
 	public static ChatTextColor color(int red, int green, int blue, ChatTextFormat asFormat) {
@@ -50,6 +48,15 @@ public class ChatTextColor {
 		return this.value & 0xFF;
 	}
 
+	public ChatTextFormat asFormat() {
+		return this.asFormat;
+	}
+
+	public ChatTextFormat asFormat(ChatTextFormat orElse) {
+		ChatTextFormat format = this.asFormat();
+		return format != null ? format : orElse;
+	}
+
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -57,12 +64,8 @@ public class ChatTextColor {
 			return false;
 		} else {
 			ChatTextColor other = (ChatTextColor) obj;
-			return this.value == other.value;
+			return this.value == other.value && this.asFormat == other.asFormat;
 		}
-	}
-
-	public ChatTextFormat asFormat() {
-		return this.asFormat;
 	}
 
 	public String toString() {

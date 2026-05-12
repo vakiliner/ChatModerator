@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.bukkit;
 
 import org.bukkit.entity.Player;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.core.MutedPlayer;
 
 public class BukkitChatPlayer extends vakiliner.chatcomponentapi.craftbukkit.BukkitChatPlayer implements ChatPlayer {
@@ -10,6 +11,10 @@ public class BukkitChatPlayer extends vakiliner.chatcomponentapi.craftbukkit.Buk
 	public BukkitChatPlayer(BukkitChatModerator manager, Player player) {
 		super(BukkitChatModerator.PARSER, player);
 		this.manager = manager;
+	}
+
+	public ChatServer getServer() {
+		return this.manager.toChatServer(this.getPlayer().getServer());
 	}
 
 	public MutedPlayer getMute(boolean ignoreExpired) {

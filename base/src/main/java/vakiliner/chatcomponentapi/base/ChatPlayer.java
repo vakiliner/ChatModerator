@@ -4,6 +4,12 @@ import vakiliner.chatcomponentapi.common.ChatGameMode;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 
 public interface ChatPlayer extends ChatOfflinePlayer, ChatCommandSender {
+	ChatServer getServer();
+
+	default String getName() {
+		return ChatOfflinePlayer.super.getName();
+	}
+
 	ChatComponent getDisplayName();
 
 	ChatGameMode getGameMode();

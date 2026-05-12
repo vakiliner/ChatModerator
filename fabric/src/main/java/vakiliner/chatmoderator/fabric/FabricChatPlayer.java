@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.fabric;
 
 import net.minecraft.server.level.ServerPlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.core.MutedPlayer;
 
 public class FabricChatPlayer extends vakiliner.chatcomponentapi.fabric.FabricChatPlayer implements ChatPlayer {
@@ -10,6 +11,10 @@ public class FabricChatPlayer extends vakiliner.chatcomponentapi.fabric.FabricCh
 	public FabricChatPlayer(FabricChatModerator manager, ServerPlayer player) {
 		super(FabricChatModerator.PARSER, player);
 		this.manager = manager;
+	}
+
+	public ChatServer getServer() {
+		return this.manager.toChatServer(this.player.server);
 	}
 
 	public MutedPlayer getMute(boolean ignoreExpired) {

@@ -2,9 +2,11 @@ package vakiliner.chatcomponentapi.component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import com.google.gson.JsonObject;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
 
 public abstract class ChatComponentModified extends ChatComponent {
@@ -15,16 +17,18 @@ public abstract class ChatComponentModified extends ChatComponent {
 			throw new IllegalArgumentException(component.getClass().getSimpleName() + " cannot be used as a component");
 		}
 		this.component = Objects.requireNonNull(component);
-		this.component.setParent(this);
 	}
 
 	protected ChatComponentModified(ChatComponentModified component) {
-		this.component = component.component.clone();
-		this.component.setParent(this);
+		this.component = component.component;
 	}
 
 	public final ChatComponent getComponent() {
 		return this.component;
+	}
+
+	public ChatComponent getComponent(boolean isConsole) {
+		return this.getComponent();
 	}
 
 	public String toLegacyText() {
@@ -35,38 +39,51 @@ public abstract class ChatComponentModified extends ChatComponent {
 		return this.component.getLegacyText(parentColor, parentFormats);
 	}
 
+	public ChatStyle getStyle() {
+		return this.component.getStyle();
+	}
+
+	@Deprecated
 	public ChatTextColor getColorRaw() {
 		return this.component.getColorRaw();
 	}
 
+	@Deprecated
 	public Boolean isBoldRaw() {
 		return this.component.isBoldRaw();
 	}
 
+	@Deprecated
 	public Boolean isItalicRaw() {
 		return this.component.isItalicRaw();
 	}
 
+	@Deprecated
 	public Boolean isUnderlinedRaw() {
 		return this.component.isUnderlinedRaw();
 	}
 
+	@Deprecated
 	public Boolean isStrikethroughRaw() {
 		return this.component.isStrikethroughRaw();
 	}
 
+	@Deprecated
 	public Boolean isObfuscatedRaw() {
 		return this.component.isObfuscatedRaw();
 	}
 
+	@Deprecated
 	public String getInsertion() {
 		return this.component.getInsertion();
 	}
 
+	@Deprecated
 	public ChatClickEvent getClickEvent() {
 		return this.component.getClickEvent();
 	}
 
+	@Deprecated
 	public ChatHoverEvent<?> getHoverEvent() {
 		return this.component.getHoverEvent();
 	}
@@ -75,52 +92,86 @@ public abstract class ChatComponentModified extends ChatComponent {
 		return this.component.getExtra();
 	}
 
+	@Deprecated
+	public Boolean getFormatRaw(ChatComponentFormat format) {
+		return this.component.getFormatRaw(format);
+	}
+
+	@Deprecated
+	public Map<ChatComponentFormat, Boolean> getFormatsRaw() {
+		return this.component.getFormatsRaw();
+	}
+
+	public void setStyle(ChatStyle style) {
+		this.component.setStyle(style);
+	}
+
+	@Deprecated
 	public void setColor(ChatTextColor color) {
 		this.component.setColor(color);
 	}
 
+	@Deprecated
 	public void setBold(Boolean bold) {
 		this.component.setBold(bold);
 	}
 
+	@Deprecated
 	public void setItalic(Boolean italic) {
 		this.component.setItalic(italic);
 	}
 
+	@Deprecated
 	public void setUnderlined(Boolean underlined) {
 		this.component.setUnderlined(underlined);
 	}
 
+	@Deprecated
 	public void setStrikethrough(Boolean strikethrough) {
 		this.component.setStrikethrough(strikethrough);
 	}
 
+	@Deprecated
 	public void setObfuscated(Boolean obfuscated) {
 		this.component.setObfuscated(obfuscated);
 	}
 
+	@Deprecated
 	public void setInsertion(String insertion) {
 		this.component.setInsertion(insertion);
 	}
 
+	@Deprecated
 	public void setClickEvent(ChatClickEvent clickEvent) {
 		this.component.setClickEvent(clickEvent);
 	}
 
+	@Deprecated
 	public void setHoverEvent(ChatHoverEvent<?> hoverEvent) {
 		this.component.setHoverEvent(hoverEvent);
 	}
 
+	@Deprecated
 	public void setExtra(Collection<ChatComponent> children) {
 		this.component.setExtra(children);
 	}
 
+	@Deprecated
 	public void setFormat(ChatComponentFormat format, Boolean isSet) {
 		this.component.setFormat(format, isSet);
 	}
 
+	@Deprecated
+	public void setFormats(Map<ChatComponentFormat, Boolean> map) {
+		this.component.setFormats(map);
+	}
+
 	public void append(ChatComponent component) {
 		this.component.append(component);
+	}
+
+	protected void unsafeAppend(ChatComponent component) {
+		this.component.unsafeAppend(component);
 	}
 
 	public ChatComponentWithLegacyText withLegacyComponent(Supplier<ChatComponent> getLegacyComponent) {
@@ -148,5 +199,9 @@ public abstract class ChatComponentModified extends ChatComponent {
 			ChatComponentModified other = (ChatComponentModified) obj;
 			return this.component.equals(other.component);
 		}
+	}
+
+	protected void serialize(JsonObject object) {
+		this.component.serialize(object);
 	}
 }

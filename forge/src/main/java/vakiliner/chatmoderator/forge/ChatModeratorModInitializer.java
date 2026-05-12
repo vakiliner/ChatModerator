@@ -5,9 +5,10 @@ import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import vakiliner.chatcomponentapi.forge.IForgeChatPlugin;
 
 @Mod(ForgeChatModerator.ID)
-public class ChatModeratorModInitializer {
+public class ChatModeratorModInitializer implements IForgeChatPlugin {
 	public static final ForgeChatModerator MANAGER;
 	private final ForgeListener listener = MANAGER.createListener();
 	protected final ModContainer modContainer;

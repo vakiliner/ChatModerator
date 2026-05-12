@@ -3,8 +3,11 @@ package vakiliner.chatcomponentapi.component;
 import java.util.Map;
 import java.util.Objects;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import vakiliner.chatcomponentapi.gson.IGsonSerializer;
 
-public class ChatClickEvent {
+public class ChatClickEvent implements IGsonSerializer {
 	private final Action action;
 	private final String value;
 
@@ -39,6 +42,24 @@ public class ChatClickEvent {
 			ChatClickEvent other = (ChatClickEvent) obj;
 			return this.action == other.action && this.value.equals(other.value);
 		}
+	}
+
+	public JsonElement serialize() {
+		return serialize(this);
+	}
+
+	public static JsonElement serialize(ChatClickEvent event) {
+		JsonObject object = new JsonObject();
+		object.addProperty("action", event.action.getName());
+		object.addProperty("value", event.value);
+		return object;
+	}
+
+	public static ChatClickEvent deserialize(JsonElement element) {
+		JsonObject object = element.getAsJsonObject();
+		Action action = Action.getByName(object.get("action").getAsString());
+		String value = object.get("value").getAsString();
+		return new ChatClickEvent(action, value);
 	}
 
 	public static enum Action {

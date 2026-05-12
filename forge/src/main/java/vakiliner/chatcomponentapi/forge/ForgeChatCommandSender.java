@@ -28,4 +28,15 @@ public class ForgeChatCommandSender implements ChatCommandSender {
 	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.sendMessage(this.commandSource, component, type, uuid);
 	}
+
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		} else if (obj != null && this.getClass() == obj.getClass()) {
+			ForgeChatCommandSender other = (ForgeChatCommandSender) obj;
+			return this.parser.equals(other.parser) && this.commandSource.equals(other.commandSource);
+		} else {
+			return false;
+		}
+	}
 }

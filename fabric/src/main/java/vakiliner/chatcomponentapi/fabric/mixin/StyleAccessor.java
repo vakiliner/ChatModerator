@@ -2,10 +2,12 @@ package vakiliner.chatcomponentapi.fabric.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 
 @Mixin(Style.class)
-public interface StyleMixin {
+public interface StyleAccessor {
 	@Accessor("bold")
 	Boolean getBold();
 
@@ -20,4 +22,13 @@ public interface StyleMixin {
 
 	@Accessor("obfuscated")
 	Boolean getObfuscated();
+
+	@Accessor("clickEvent")
+	ClickEvent getClickEvent();
+
+	@Accessor("hoverEvent")
+	HoverEvent getHoverEvent();
+
+	@Accessor("insertion")
+	String getInsertion();
 }

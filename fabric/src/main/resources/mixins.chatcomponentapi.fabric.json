@@ -4,7 +4,7 @@
 	"package": "vakiliner.chatcomponentapi.fabric.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [
-		"StyleMixin"
+		"StyleAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -23,6 +23,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.forgespi.language.IModInfo;
 import vakiliner.chatcomponentapi.ChatComponentAPIForgeLoader;
@@ -34,6 +35,8 @@ import vakiliner.chatmoderator.api.GsonConfig;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatPlayerList;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
 import vakiliner.chatmoderator.core.automod.MessageActions;
@@ -204,5 +207,13 @@ public class ForgeChatModerator extends ChatModerator {
 			return this.toChatPlayer((ServerPlayerEntity) sender);
 		}
 		return sender != null ? new ForgeChatCommandSender(PARSER, sender) : null;
+	}
+
+	public ChatServer toChatServer(MinecraftServer server) {
+		return server != null ? new ForgeChatServer(this, server) : null;
+	}
+
+	public ChatPlayerList toChatPlayerList(PlayerList playerList) {
+		return playerList != null ? new ForgeChatPlayerList(this, playerList) : null;
 	}
 }

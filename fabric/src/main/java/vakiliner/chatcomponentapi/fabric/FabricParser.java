@@ -1,15 +1,15 @@
 package vakiliner.chatcomponentapi.fabric;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.ChatType;
@@ -20,6 +20,7 @@ import net.minecraft.network.chat.SelectorComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,42 +30,75 @@ import vakiliner.chatcomponentapi.base.BaseParser;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatcomponentapi.base.ChatPlayer;
+import vakiliner.chatcomponentapi.base.ChatPlayerList;
+import vakiliner.chatcomponentapi.base.ChatServer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
+import vakiliner.chatcomponentapi.base.IChatPlugin;
 import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatClickEvent;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 import vakiliner.chatcomponentapi.component.ChatComponentModified;
-import vakiliner.chatcomponentapi.component.ChatComponentWithLegacyText;
 import vakiliner.chatcomponentapi.component.ChatHoverEvent;
 import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
+import vakiliner.chatcomponentapi.component.ChatStyle;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
-import vakiliner.chatcomponentapi.fabric.mixin.StyleMixin;
+import vakiliner.chatcomponentapi.fabric.mixin.StyleAccessor;
 
 public class FabricParser extends BaseParser {
 	private static final IStyleParser STYLE_PARSER;
+	private static final Constructor<ClientboundChatPacket> CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR;
+	private static final UUID NIL_UUID;
 	private static final Method SEND_MESSAGE_WITH_TYPE;
 	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
-	private static final Method BROADCAST_MESSAGE;
 	private static final Method SET_STYLE;
 	private static final Method APPEND;
+	private static final Field FONT;
 
 	static {
-		IStyleParser parser;
-		try {
-			parser = new HoverEventContents();
-		} catch (NoClassDefFoundError err) {
-			parser = new OldStyle();
-		}
-		STYLE_PARSER = parser;
 		try {
 			SET_STYLE = BaseComponent.class.getMethod("method_10862", Style.class);
 			APPEND = BaseComponent.class.getMethod("method_10852", Component.class);
 		} catch (NoSuchMethodException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
+		UUID nilUUID;
+		try {
+			nilUUID = (UUID) net.minecraft.Util.class.getField("field_25140").get(null);
+		} catch (NoSuchFieldException err) {
+			nilUUID = null;
+		} catch (IllegalAccessException err) {
+			throw new IllegalStateException(err);
+		}
+		NIL_UUID = nilUUID;
+		Field font;
+		try {
+			font = Style.class.getDeclaredField("font");
+			font.setAccessible(true);
+		} catch (NoSuchFieldException err) {
+			font = null;
+		}
+		FONT = font;
+		IStyleParser parser;
+		try {
+			parser = new HoverEventContents();
+		} catch (Throwable err) {
+			parser = new OldStyle();
+		}
+		STYLE_PARSER = parser;
+		Constructor<ClientboundChatPacket> clientboundChatPacketConstructor;
+		try {
+			clientboundChatPacketConstructor = ClientboundChatPacket.class.getConstructor(Component.class, ChatType.class, UUID.class);
+		} catch (NoSuchMethodException a) {
+			try {
+				clientboundChatPacketConstructor = ClientboundChatPacket.class.getConstructor(Component.class, ChatType.class);
+			} catch (NoSuchMethodException err) {
+				throw new IllegalStateException(err);
+			}
+		}
+		CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR = clientboundChatPacketConstructor;
 		Method sendMessageWithType;
 		try {
 			sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class, UUID.class);
@@ -72,7 +106,7 @@ public class FabricParser extends BaseParser {
 			try {
 				sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
@@ -83,53 +117,63 @@ public class FabricParser extends BaseParser {
 			try {
 				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class);
 			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
-		Method broadcastMessage;
-		try {
-			broadcastMessage = PlayerList.class.getMethod("method_14616", Component.class, ChatType.class, UUID.class);
-		} catch (NoSuchMethodException e) {
-			try {
-				broadcastMessage = PlayerList.class.getMethod("method_14616", Component.class, boolean.class);
-			} catch (NoSuchMethodException err) {
-				throw new RuntimeException(err);
-			}
-		}
-		BROADCAST_MESSAGE = broadcastMessage;
 	}
 
-	public void sendMessage(CommandSource commandSource, ChatComponent component, ChatMessageType type, UUID uuid) {
+	public boolean supportsSeparatorInSelector() {
+		return false;
+	}
+
+	public boolean supportsFontInStyle() {
+		return FONT != null;
+	}
+
+	public void sendMessage(CommandSource commandSource, ChatComponent chatComponent, ChatMessageType type, UUID uuid) {
+		if (uuid == null) uuid = NIL_UUID;
+		Component component = fabric(chatComponent, commandSource instanceof MinecraftServer);
 		try {
 			if (commandSource instanceof ServerPlayer) {
 				if (SEND_MESSAGE_WITH_TYPE.getParameterTypes().length == 3) {
-						SEND_MESSAGE_WITH_TYPE.invoke(commandSource, fabric(component), fabric(type), uuid != null ? uuid : Util.NIL_UUID);
+					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, component, fabric(type), uuid);
 				} else {
-					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, fabric(component), fabric(type));
+					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, component, fabric(type));
 				}
 			} else {
-				boolean isConsole = commandSource instanceof MinecraftServer;
 				if (SEND_MESSAGE_WITHOUT_TYPE.getParameterTypes().length == 2) {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component, isConsole), uuid != null ? uuid : Util.NIL_UUID);
+					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, component, uuid);
 				} else {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, fabric(component, isConsole));
+					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, component);
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 	}
 
 	public void broadcastMessage(PlayerList playerList, ChatComponent component, ChatMessageType type, UUID uuid) {
+		if (uuid == null) uuid = NIL_UUID;
+		this.sendMessage(playerList.getServer(), component, type, uuid);
+		final ClientboundChatPacket packet;
 		try {
-			if (BROADCAST_MESSAGE.getParameterTypes().length == 3) {
-				BROADCAST_MESSAGE.invoke(playerList, fabric(component), fabric(type), uuid);
+			if (CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.getParameterTypes().length == 3) {
+				packet = CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type), uuid);
 			} else {
-				BROADCAST_MESSAGE.invoke(playerList, fabric(component), type == ChatMessageType.SYSTEM);
+				packet = CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type));
 			}
-		} catch (IllegalAccessException | InvocationTargetException err) {
-			throw new RuntimeException(err);
+		} catch (IllegalAccessException | InvocationTargetException | InstantiationException err) {
+			throw new IllegalStateException(err);
+		}
+		playerList.broadcastAll(packet);
+	}
+
+	public void execute(MinecraftServer server, IChatPlugin plugin, Runnable runnable) {
+		if (plugin instanceof IFabricChatPlugin) {
+			server.execute(runnable);
+		} else {
+			throw new ClassCastException("Invalid plugin");
 		}
 	}
 
@@ -140,11 +184,7 @@ public class FabricParser extends BaseParser {
 	public static Component fabric(ChatComponent raw, boolean isConsole) {
 		final BaseComponent component;
 		if (raw instanceof ChatComponentModified) {
-			if (isConsole && raw instanceof ChatComponentWithLegacyText) {
-				raw = ((ChatComponentWithLegacyText) raw).getLegacyComponent();
-			} else {
-				raw = ((ChatComponentModified) raw).getComponent();
-			}
+			raw = ((ChatComponentModified) raw).getComponent(isConsole);
 		}
 		if (raw == null) {
 			return null;
@@ -161,16 +201,16 @@ public class FabricParser extends BaseParser {
 			throw new IllegalArgumentException("Could not parse Component from " + raw.getClass());
 		}
 		try {
-			SET_STYLE.invoke(component, fabricStyle(raw));
+			SET_STYLE.invoke(component, fabric(raw.getStyle()));
 		} catch (IllegalAccessException | InvocationTargetException err) {
-			throw new RuntimeException(err);
+			throw new IllegalStateException(err);
 		}
 		List<ChatComponent> extra = raw.getExtra();
 		if (extra != null) for (ChatComponent chatComponent : extra) {
 			try {
 				APPEND.invoke(component, fabric(chatComponent, isConsole));
 			} catch (IllegalAccessException | InvocationTargetException err) {
-				throw new RuntimeException(err);
+				throw new IllegalStateException(err);
 			}
 		}
 		return component;
@@ -192,17 +232,37 @@ public class FabricParser extends BaseParser {
 		} else {
 			throw new IllegalArgumentException("Could not parse ChatComponent from " + raw.getClass());
 		}
-		Style style = raw.getStyle();
-		STYLE_PARSER.copyColor(chatComponent, style);
-		chatComponent.setBold(((StyleMixin) style).getBold());
-		chatComponent.setItalic(((StyleMixin) style).getItalic());
-		chatComponent.setStrikethrough(((StyleMixin) style).getStrikethrough());
-		chatComponent.setUnderlined(((StyleMixin) style).getUnderlined());
-		chatComponent.setObfuscated(((StyleMixin) style).getObfuscated());
-		chatComponent.setClickEvent(fabric(style.getClickEvent()));
-		chatComponent.setHoverEvent(fabric(style.getHoverEvent()));
-		chatComponent.setExtra(raw.getSiblings().stream().map(FabricParser::fabric).collect(Collectors.toList()));
+		chatComponent.setStyle(fabric(raw.getStyle()));
+		for (Component component : raw.getSiblings()) {
+			chatComponent.append(fabric(component));
+		}
 		return chatComponent;
+	}
+
+	public static Style fabric(ChatStyle chatStyle) {
+		return chatStyle != null ? STYLE_PARSER.fabric(chatStyle) : null;
+	}
+
+	public static ChatStyle fabric(Style style) {
+		if (style == null) return null;
+		if (style.isEmpty()) return ChatStyle.EMPTY;
+		StyleAccessor accessor = (StyleAccessor) style;
+		ChatStyle.Builder builder = ChatStyle.newBuilder();
+		builder.withColor(STYLE_PARSER.injectColor(style));
+		builder.withBold(accessor.getBold());
+		builder.withItalic(accessor.getItalic());
+		builder.withUnderlined(accessor.getUnderlined());
+		builder.withStrikethrough(accessor.getStrikethrough());
+		builder.withObfuscated(accessor.getObfuscated());
+		builder.withClickEvent(fabric(accessor.getClickEvent()));
+		builder.withHoverEvent(fabric(accessor.getHoverEvent()));
+		builder.withInsertion(accessor.getInsertion());
+		if (FONT != null) try {
+			builder.withFont(fabric((ResourceLocation) FONT.get(style)));
+		} catch (IllegalAccessException err) {
+			throw new IllegalStateException(err);
+		}
+		return builder.build();
 	}
 
 	public static ClickEvent fabric(ChatClickEvent event) {
@@ -237,11 +297,6 @@ public class FabricParser extends BaseParser {
 		return type != null ? ChatMessageType.valueOf(type.name()) : null;
 	}
 
-	public static Style fabricStyle(ChatComponent component) {
-		Objects.requireNonNull(component);
-		return STYLE_PARSER.injectStyle(component);
-	}
-
 	public static ChatFormatting fabric(ChatTextFormat format) {
 		return format != null ? ChatFormatting.getByName(format.name()) : null;
 	}
@@ -267,5 +322,13 @@ public class FabricParser extends BaseParser {
 
 	public ChatTeam toChatTeam(PlayerTeam team) {
 		return team != null ? new FabricChatTeam(this, team) : null;
+	}
+
+	public ChatServer toChatServer(MinecraftServer server) {
+		return server != null ? new FabricChatServer(this, server) : null;
+	}
+
+	public ChatPlayerList toChatPlayerList(PlayerList playerList) {
+		return playerList != null ? new FabricChatPlayerList(this, playerList) : null;
 	}
 }
