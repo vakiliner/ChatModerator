@@ -27,6 +27,15 @@ public class MuteManager {
 		return this.map.get(uuid);
 	}
 
+	public MutedPlayer get(UUID uuid, Date filterExpared) {
+		if (filterExpared == null) return this.get(uuid);
+		MutedPlayer mute = this.get(uuid);
+		if (mute != null && !mute.isExpired(filterExpared)) {
+			return mute;
+		}
+		return null;
+	}
+
 	public MutedPlayer getMutedPlayer(String name) {
 		for (MutedPlayer mute : this.map.values()) {
 			if (mute.getName().equalsIgnoreCase(name)) return mute;

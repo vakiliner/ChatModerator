@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.forge.command;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.stream.Collectors;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
@@ -20,7 +21,6 @@ import net.minecraft.util.text.StringTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.forge.ForgeParser;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
-import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 import vakiliner.chatmoderator.forge.ChatModeratorModInitializer;
 import vakiliner.chatmoderator.forge.ForgeChatModerator;
@@ -34,7 +34,8 @@ public class MuteCommand {
 		return mute.requires((stack) -> {
 			return stack.hasPermission(3);
 		}).then(Commands.argument("target", GameProfileArgument.gameProfile()).suggests((context, builder) -> {
-			return ISuggestionProvider.suggest(manager.getOnlinePlayers().stream().filter((player) -> !player.isMuted()).map(ChatPlayer::getName).collect(Collectors.toList()), builder);
+			Date now = new Date();
+			return ISuggestionProvider.suggest(context.getSource().getServer().getPlayerList().getPlayers().stream().filter((player) -> manager.mutes.get(player.getUUID(), now) == null).map((player) -> player.getGameProfile().getName()).collect(Collectors.toList()), builder);
 		}).then(Commands.argument("duration", StringArgumentType.string()).suggests((context, builder) -> {
 			return ISuggestionProvider.suggest(Collections.singleton("infinite"), builder);
 		}).then(Commands.argument("reason", StringArgumentType.greedyString()).executes((context) -> {

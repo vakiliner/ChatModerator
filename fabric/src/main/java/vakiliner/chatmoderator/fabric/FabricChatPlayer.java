@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.fabric;
 
+import java.util.Date;
 import net.minecraft.server.level.ServerPlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.base.ChatServer;
@@ -17,12 +18,8 @@ public class FabricChatPlayer extends vakiliner.chatcomponentapi.fabric.FabricCh
 		return this.manager.toChatServer(this.player.server);
 	}
 
-	public MutedPlayer getMute(boolean ignoreExpired) {
-		MutedPlayer mute = this.manager.mutes.get(this.getUniqueId());
-		if (mute != null && !(ignoreExpired && mute.isExpired())) {
-			return mute;
-		}
-		return null;
+	public MutedPlayer getMute(Date filterExpired) {
+		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
 	public boolean isBypassModeration() {
