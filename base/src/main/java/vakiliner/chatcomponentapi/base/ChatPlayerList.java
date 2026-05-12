@@ -8,7 +8,7 @@ import vakiliner.chatcomponentapi.component.ChatComponent;
 public interface ChatPlayerList {
 	ChatServer getServer();
 
-	Collection<ChatPlayer> getPlayers();
+	Collection<? extends ChatPlayer> getPlayers();
 
 	ChatPlayer getPlayer(UUID uuid);
 

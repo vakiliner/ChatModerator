@@ -21,6 +21,8 @@ import vakiliner.chatcomponentapi.craftbukkit.BukkitParser;
 import vakiliner.chatmoderator.base.ChatModerator;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatPlayerList;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.base.Config;
 import vakiliner.chatmoderator.bukkit.event.AutoModerationTriggerEvent;
 import vakiliner.chatmoderator.core.AutoModeration.CheckResult;
@@ -126,5 +128,13 @@ public class BukkitChatModerator extends ChatModerator {
 			return this.toChatPlayer((Player) sender);
 		}
 		return sender != null ? new BukkitChatCommandSender(PARSER, sender) : null;
+	}
+
+	public ChatServer toChatServer(Server server) {
+		return server != null ? new BukkitChatServer(this, server) : null;
+	}
+
+	public ChatPlayerList toChatPlayerList(Server server) {
+		return server != null ? new BukkitChatServer(this, server) : null;
 	}
 }

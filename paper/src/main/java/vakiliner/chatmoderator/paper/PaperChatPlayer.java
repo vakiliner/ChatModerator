@@ -3,6 +3,7 @@ package vakiliner.chatmoderator.paper;
 import org.bukkit.entity.Player;
 import vakiliner.chatcomponentapi.paper.PaperParser;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.core.MutedPlayer;
 
 public class PaperChatPlayer extends vakiliner.chatcomponentapi.paper.PaperChatPlayer implements ChatPlayer {
@@ -11,6 +12,10 @@ public class PaperChatPlayer extends vakiliner.chatcomponentapi.paper.PaperChatP
 	public PaperChatPlayer(PaperChatModerator manager, Player player) {
 		super((PaperParser) PaperChatModerator.PARSER, player);
 		this.manager = manager;
+	}
+
+	public ChatServer getServer() {
+		return this.manager.toChatServer(this.getPlayer().getServer());
 	}
 
 	public MutedPlayer getMute(boolean ignoreExpired) {

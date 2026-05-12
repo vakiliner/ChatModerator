@@ -33,7 +33,7 @@ public class BukkitChatServer implements ChatServer, ChatPlayerList {
 		return this;
 	}
 
-	public Collection<ChatPlayer> getPlayers() {
+	public Collection<? extends ChatPlayer> getPlayers() {
 		return new ParseCollection<>(this.server.getOnlinePlayers(), this.parser::toChatPlayer);
 	}
 

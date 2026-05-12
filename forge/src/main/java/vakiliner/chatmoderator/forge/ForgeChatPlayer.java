@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.forge;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import vakiliner.chatmoderator.base.ChatPlayer;
+import vakiliner.chatmoderator.base.ChatServer;
 import vakiliner.chatmoderator.core.MutedPlayer;
 
 public class ForgeChatPlayer extends vakiliner.chatcomponentapi.forge.ForgeChatPlayer implements ChatPlayer {
@@ -10,6 +11,10 @@ public class ForgeChatPlayer extends vakiliner.chatcomponentapi.forge.ForgeChatP
 	public ForgeChatPlayer(ForgeChatModerator manager, ServerPlayerEntity player) {
 		super(ForgeChatModerator.PARSER, player);
 		this.manager = manager;
+	}
+
+	public ChatServer getServer() {
+		return this.manager.toChatServer(this.player.server);
 	}
 
 	public MutedPlayer getMute(boolean ignoreExpired) {

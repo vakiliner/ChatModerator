@@ -28,7 +28,7 @@ public class ForgeChatPlayerList implements ChatPlayerList {
 		return this.parser.toChatServer(this.playerList.getServer());
 	}
 
-	public Collection<ChatPlayer> getPlayers() {
+	public Collection<? extends ChatPlayer> getPlayers() {
 		return new ParseCollection<>(this.playerList.getPlayers(), this.parser::toChatPlayer);
 	}
 
