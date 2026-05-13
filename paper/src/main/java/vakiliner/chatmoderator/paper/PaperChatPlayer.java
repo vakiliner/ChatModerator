@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.paper;
 
+import java.util.Date;
 import org.bukkit.entity.Player;
 import vakiliner.chatcomponentapi.paper.PaperParser;
 import vakiliner.chatmoderator.base.ChatPlayer;
@@ -18,12 +19,8 @@ public class PaperChatPlayer extends vakiliner.chatcomponentapi.paper.PaperChatP
 		return this.manager.toChatServer(this.getPlayer().getServer());
 	}
 
-	public MutedPlayer getMute(boolean ignoreExpired) {
-		MutedPlayer mute = this.manager.mutes.get(this.getUniqueId());
-		if (mute != null && !(ignoreExpired && mute.isExpired())) {
-			return mute;
-		}
-		return null;
+	public MutedPlayer getMute(Date filterExpired) {
+		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
 	public boolean isBypassModeration() {

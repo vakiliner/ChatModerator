@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.bukkit;
 
+import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.permissions.Permission;
@@ -14,12 +15,8 @@ public class BukkitChatOfflinePlayer extends vakiliner.chatcomponentapi.craftbuk
 		this.manager = manager;
 	}
 
-	public MutedPlayer getMute(boolean ignoreExpired) {
-		MutedPlayer mute = this.manager.mutes.get(this.getUniqueId());
-		if (mute != null && !(ignoreExpired && mute.isExpired())) {
-			return mute;
-		}
-		return null;
+	public MutedPlayer getMute(Date filterExpired) {
+		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
 	public boolean isBypassModeration() {

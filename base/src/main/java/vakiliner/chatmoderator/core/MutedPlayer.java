@@ -80,11 +80,15 @@ public class MutedPlayer {
 
 	public boolean isExpired() {
 		if (this.isInfinite()) return false;
-		return this.isExpired(new Date());
+		return this.isExpired0(new Date());
 	}
 
 	public boolean isExpired(Date now) {
 		if (this.isInfinite()) return false;
+		return this.isExpired0(now);
+	}
+
+	private boolean isExpired0(Date now) {
 		return this.getExpirationAt().before(now);
 	}
 
