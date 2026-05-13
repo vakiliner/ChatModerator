@@ -2,11 +2,14 @@ package vakiliner.chatmoderator.bukkit.command;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
@@ -75,7 +78,8 @@ public class MuteCommand implements TabExecutor {
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		switch (args.length) {
 			case 1:
-				List<String> list = this.manager.getOnlinePlayers().stream().filter((player) -> !player.isMuted()).map(ChatPlayer::getName).collect(Collectors.toList());
+				Date now = new Date();
+				List<String> list = Bukkit.getOnlinePlayers().stream().filter((player) -> this.manager.mutes.get(player.getUniqueId(), now) == null).map(Player::getName).collect(Collectors.toList());
 				Collections.sort(list);
 				return list;
 			case 2: return Collections.singletonList("infinite");

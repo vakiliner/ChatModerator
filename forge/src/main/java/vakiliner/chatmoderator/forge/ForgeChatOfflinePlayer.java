@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.forge;
 
+import java.util.Date;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatmoderator.base.ChatOfflinePlayer;
@@ -18,12 +19,8 @@ public class ForgeChatOfflinePlayer extends vakiliner.chatcomponentapi.forge.For
 		this(manager, manager.server, gameProfile);
 	}
 
-	public MutedPlayer getMute(boolean ignoreExpired) {
-		MutedPlayer mute = this.manager.mutes.get(this.getUniqueId());
-		if (mute != null && !(ignoreExpired && mute.isExpired())) {
-			return mute;
-		}
-		return null;
+	public MutedPlayer getMute(Date filterExpired) {
+		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
 	public boolean isBypassModeration() {

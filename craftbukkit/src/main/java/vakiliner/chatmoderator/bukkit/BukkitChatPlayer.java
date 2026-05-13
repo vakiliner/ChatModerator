@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.bukkit;
 
+import java.util.Date;
 import org.bukkit.entity.Player;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.base.ChatServer;
@@ -17,12 +18,8 @@ public class BukkitChatPlayer extends vakiliner.chatcomponentapi.craftbukkit.Buk
 		return this.manager.toChatServer(this.getPlayer().getServer());
 	}
 
-	public MutedPlayer getMute(boolean ignoreExpired) {
-		MutedPlayer mute = this.manager.mutes.get(this.getUniqueId());
-		if (mute != null && !(ignoreExpired && mute.isExpired())) {
-			return mute;
-		}
-		return null;
+	public MutedPlayer getMute(Date filterExpired) {
+		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
 	public boolean isBypassModeration() {
