@@ -80,6 +80,7 @@ public class BukkitChatModerator extends ChatModerator {
 		return prefix != null ? prefix : description.getName();
 	}
 
+	@Deprecated
 	public void broadcast(ChatComponent chatComponent, boolean admins) {
 		Set<ChatCommandSender> recipients = new HashSet<>();
 		String permission = admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS;
@@ -91,6 +92,7 @@ public class BukkitChatModerator extends ChatModerator {
 		recipients.forEach((recipient) -> recipient.sendMessage(chatComponent));
 	}
 
+	@Deprecated
 	public Collection<ChatPlayer> getOnlinePlayers() {
 		return Bukkit.getOnlinePlayers().stream().map(this::toChatPlayer).collect(Collectors.toList());
 	}
