@@ -44,7 +44,7 @@ class HoverEventContents implements IStyleParser {
 	public Style fabric(ChatStyle chatStyle) {
 		if (chatStyle.isEmpty()) return Style.EMPTY;
 		try {
-			return STYLE_CONSTRUCTOR.newInstance(fabric(chatStyle.getColor()), chatStyle.getBold(), chatStyle.getItalic(), chatStyle.getUnderlined(), chatStyle.getStrikethrough(), chatStyle.getObfuscated(), FabricParser.fabric(chatStyle.getClickEvent()), fabric(chatStyle.getHoverEvent()), chatStyle.getInsertion(), FabricParser.fabric(chatStyle.getFont()));
+			return STYLE_CONSTRUCTOR.newInstance(fabric(chatStyle.getColor()), chatStyle.getBold(), chatStyle.getItalic(), chatStyle.getUnderlined(), chatStyle.getStrikethrough(), chatStyle.getObfuscated(), FabricParser.fabric(chatStyle.getClickEvent()), FabricParser.fabric(chatStyle.getHoverEvent()), chatStyle.getInsertion(), FabricParser.fabric(chatStyle.getFont()));
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException err) {
 			throw new IllegalStateException(err);
 		}
