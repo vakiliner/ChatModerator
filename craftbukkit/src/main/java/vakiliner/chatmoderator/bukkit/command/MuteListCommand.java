@@ -45,7 +45,7 @@ public class MuteListCommand implements TabExecutor {
 			}
 			MutedPlayer mute = this.manager.mutes.get(player.getUniqueId());
 			ChatTextComponent result = new ChatTextComponent();
-			result.append(new ChatTextComponent(player.getName()));
+			result.append(BukkitChatModerator.playerName(player));
 			if (mute == null || mute.isExpired(now)) {
 				result.append(new ChatTextComponent(" не заглушён"));
 			} else {
@@ -124,7 +124,8 @@ public class MuteListCommand implements TabExecutor {
 					unmute.withClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/unmute " + mute.getName()));
 					unmute.withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent("Unmute player")));
 					component.append(new ChatTextComponent("[❌]", unmute.build()));
-					component.append(new ChatTextComponent(" " + mute.getName()));
+					component.append(new ChatTextComponent(" "));
+					component.append(BukkitChatModerator.playerName(mute));
 					ModeratorType moderatorType = mute.getModeratorType();
 					switch (moderatorType) {
 						case PLAYER:

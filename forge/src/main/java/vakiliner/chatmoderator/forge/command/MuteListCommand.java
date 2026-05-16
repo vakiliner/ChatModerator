@@ -77,7 +77,8 @@ public class MuteListCommand {
 				unmute.withClickEvent(new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, "/unmute " + mute.getName()));
 				unmute.withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent("Unmute player")));
 				component.append(new ChatTextComponent("[❌]", unmute.build()));
-				component.append(new ChatTextComponent(" " + mute.getName()));
+				component.append(new ChatTextComponent(" "));
+				component.append(ForgeChatModerator.playerName(mute));
 				ModeratorType moderatorType = mute.getModeratorType();
 				switch (moderatorType) {
 					case PLAYER:
@@ -122,7 +123,7 @@ public class MuteListCommand {
 			ChatOfflinePlayer player = manager.toChatOfflinePlayer(server, profile);
 			MutedPlayer mute = player.getMute(false);
 			ChatTextComponent component = new ChatTextComponent();
-			component.append(new ChatTextComponent(player.getName()));
+			component.append(ForgeChatModerator.playerName(player));
 			if (mute != null && !mute.isExpired(now)) {
 				ModeratorType moderatorType = mute.getModeratorType();
 				switch (moderatorType) {
