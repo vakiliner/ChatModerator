@@ -176,12 +176,15 @@ public abstract class ChatModerator {
 		return this.automod.dictionaryPath;
 	}
 
+	@Deprecated
 	public void broadcast(ChatComponent component) {
 		this.broadcast(component, false);
 	}
 
+	@Deprecated
 	public abstract void broadcast(ChatComponent component, boolean admins);
 
+	@Deprecated
 	public abstract Collection<ChatPlayer> getOnlinePlayers();
 
 	public void onChat(ChatPlayer player, final String fullMessage, Runnable cancel, Runnable spectatorsChatRunnable) {
@@ -368,7 +371,10 @@ public abstract class ChatModerator {
 						getMessage.append(new ChatTextComponent("показать сообщение", ChatStyle.EMPTY.withUnderlined(true).withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(checkResult.getMessage())))));
 						log.append(getMessage.withLegacyText(": " + message));
 						ChatTranslateComponent component = new ChatTranslateComponent("[%s: %s]", "chat.type.admin", ChatNamedColor.GRAY, new ChatTextComponent("AutoMod"), log);
-						this.broadcast(component, true);
+						player.getServer().getPlayerList().getPlayers().forEach((admin) -> {
+							if (!admin.isOp()) return;
+							admin.sendMessage(component);
+						});
 					}
 					if (blockAction != null) return "custom:[AutoMod] " + (blockAction.isEmpty() ? this.getConfig().message("fail_reasons.automod_blocked_without_custom_message") : Utils.stringFormat(this.getConfig().message("fail_reasons.automod_blocked_with_custom_message"), blockAction));
 				}

@@ -175,6 +175,7 @@ public class ForgeChatModerator extends ChatModerator {
 		return this.server;
 	}
 
+	@Deprecated
 	public void broadcast(ChatComponent component, boolean adminMessage) {
 		Set<ChatCommandSender> admins = new HashSet<>();
 		admins.add(this.toChatCommandSender(this.server));
@@ -185,6 +186,7 @@ public class ForgeChatModerator extends ChatModerator {
 		admins.forEach((p) -> p.sendMessage(component));
 	}
 
+	@Deprecated
 	public Collection<ChatPlayer> getOnlinePlayers() {
 		return this.server.getPlayerList().getPlayers().stream().map(this::toChatPlayer).collect(Collectors.toList());
 	}
