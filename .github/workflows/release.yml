@@ -30,7 +30,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { version, tag_suffix: suffix } = context.payload.inputs
+            const { version, tag_suffix: suffix, recommended } = context.payload.inputs
             const versionMatch = version.match(/^(?<num>\d\.\d\.\d)(-(?<pre>[a-z]+\d+))?$/)
             if (!versionMatch) throw new TypeError(`Invalid version ${version}`)
             const { num, pre } = versionMatch.groups
@@ -38,10 +38,10 @@ jobs:
 
             const { execSync } = require('node:child_process')
 
-            execSync(`sed -i "s/version\s*=\s*.*/version=${version}/g" properties.gradle`)
-            execSync('git diff properties.gradle')
+            execSync(`sed -i "s/version\s*=\s*.*/version=${version}/g" gradle.properties`)
+            execSync('git diff gradle.properties')
             execSync(`git checkout -b ${head}`)
-            execSync('git add properties.gradle')
+            execSync('git add gradle.properties')
             execSync(`git commit -m "${title}"`)
             execSync(`git push origin ${head}`)
 
