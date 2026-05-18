@@ -5,11 +5,15 @@ on:
       version:
         type: string
         required: true
+      release-sufix:
+        type: string
+        required: false
+        description: В случае, если тэг релиза уже занят
       recommended:
         type: boolean
         required: true
         default: false
-        description: Replace recommended version on update.json
+        description: Заменить рекомендуемые версии в update.json
 jobs:
   release:
     name: Draft a new release
