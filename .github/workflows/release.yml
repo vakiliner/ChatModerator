@@ -1,0 +1,16 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+      recommended:
+        type: boolean
+        required: true
+        default: false
+        description: Replace recommended version on update.json
+jobs:
+  release:
+    name: Draft a new release
+    runs-on: ubuntu-latest
