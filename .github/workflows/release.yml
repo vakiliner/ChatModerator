@@ -39,8 +39,14 @@ jobs:
             const head = `chore/release-${version}`, title = `chore: Релиз обновления ${version}`
 
             const { execSync } = require('node:child_process')
+            const fs = require('node:fs')
 
             execSync(`sed -i "s/^version\s*=\s*.\\+$/version=${version}/g" gradle.properties`)
+            const updatePath = require.resolve('./update.json')
+            const update = JSON.parse(fs.readFileSync(updatePath, 'utf8'))
+            for (const minecraftVersion in update.promos) {}
+            fs.writeFileSync(`JSON.stringify(update, null, '\t')\n`, 'utf8')
+
             execSync('git diff gradle.properties')
             execSync(`git checkout -b ${head}`)
             execSync('git add gradle.properties')
