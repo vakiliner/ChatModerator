@@ -40,16 +40,17 @@ jobs:
 
             const { execSync } = require('node:child_process')
             const fs = require('node:fs')
+            const path = require('node:path')
 
             execSync(`sed -i "s/^version\s*=\s*.\\+$/version=${version}/g" gradle.properties`)
-            const updatePath = require.resolve('./update.json')
+            const updatePath = path.resolve('update.json')
             const update = JSON.parse(fs.readFileSync(updatePath, 'utf8'))
             for (const minecraftVersion in update.promos) {
               const { num, type } = minecraftVersion.match(/^(?<num>\d+\.\d+(\.\d+)?)-(?<type>latest|recommended)$/).groups
               if (type === 'recommended' && !recommended) continue
               update.promos[minecraftVersion] = version
             }
-            fs.writeFileSync(updatePath, `JSON.stringify(update, null, '\t')\n`, 'utf8')
+            fs.writeFileSync(updatePath, `${JSON.stringify(update, null, '\t')}\n`, 'utf8')
 
             execSync('git diff gradle.properties update.json')
             execSync(`git checkout -b ${head}`)
