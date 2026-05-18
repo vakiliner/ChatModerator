@@ -33,7 +33,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { version, tag_suffix: suffix, recommended } = context.payload.inputs
-            const versionMatch = version.match(/^(?<num>\d\.\d\.\d)(-(?<pre>[a-z]+\d+))?$/)
+            const versionMatch = version.match(/^(?<num>\d+\.\d+\.\d+)(-(?<pre>[a-z]+\d+))?$/)
             if (!versionMatch) throw new TypeError(`Invalid version ${version}`)
             const { num, pre } = versionMatch.groups
             const head = `chore/release-${version}`, title = `chore: Релиз обновления ${version}`
@@ -44,12 +44,16 @@ jobs:
             execSync(`sed -i "s/^version\s*=\s*.\\+$/version=${version}/g" gradle.properties`)
             const updatePath = require.resolve('./update.json')
             const update = JSON.parse(fs.readFileSync(updatePath, 'utf8'))
-            for (const minecraftVersion in update.promos) {}
-            fs.writeFileSync(`JSON.stringify(update, null, '\t')\n`, 'utf8')
+            for (const minecraftVersion in update.promos) {
+              const { num, type } = minecraftVersion.match(/^(?<num>\d+\.\d+(\.\d+)?)-(?<type>latest|recommended)$/).groups
+              if (type === 'recommended' && !recommended) continue
+              update.promos[minecraftVersion] = version
+            }
+            fs.writeFileSync(updatePath, `JSON.stringify(update, null, '\t')\n`, 'utf8')
 
-            execSync('git diff gradle.properties')
+            execSync('git diff gradle.properties update.json')
             execSync(`git checkout -b ${head}`)
-            execSync('git add gradle.properties')
+            execSync('git add gradle.properties update.json')
             execSync(`git commit -m "${title}"`)
             execSync(`git push origin ${head}`)
 
