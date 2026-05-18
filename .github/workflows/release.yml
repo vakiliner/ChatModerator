@@ -5,10 +5,11 @@ on:
       version:
         type: string
         required: true
-      release_suffix:
+        description: Версия
+      tag_suffix:
         type: string
         required: false
-        description: В случае, если тэг релиза уже занят
+        description: Суфикс тэга
       recommended:
         type: boolean
         required: true
@@ -29,7 +30,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { version, release_suffix: suffix } = context.payload.inputs
+            const { version, tag_suffix: suffix } = context.payload.inputs
             const versionMatch = version.match(/^(?<num>\d\.\d\.\d)(-(?<pre>[a-z]+\d+))?$/)
             if (!versionMatch) throw new TypeError(`Invalid version ${version}`)
             const { num, pre } = versionMatch.groups
