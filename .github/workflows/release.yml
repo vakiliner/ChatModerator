@@ -14,7 +14,7 @@ on:
         type: boolean
         required: true
         default: false
-        description: Заменить рекомендуемые версии в update.json
+        description: Рекомендуемый
 jobs:
   release:
     name: Draft a new release
@@ -46,8 +46,8 @@ jobs:
             const updatePath = path.resolve('update.json')
             const update = JSON.parse(fs.readFileSync(updatePath, 'utf8'))
             for (const minecraftVersion in update.promos) {
-              const { num, type } = minecraftVersion.match(/^(?<num>\d+\.\d+(\.\d+)?)-(?<type>latest|recommended)$/).groups
-              if (type === 'recommended' && !recommended) continue
+              const { type } = minecraftVersion.match(/^(?<num>\d+\.\d+(\.\d+)?)-(?<type>latest|recommended)$/).groups
+              if (type === 'recommended' && recommended !== 'true') continue
               update.promos[minecraftVersion] = version
             }
             fs.writeFileSync(updatePath, `${JSON.stringify(update, null, '\t')}\n`, 'utf8')
