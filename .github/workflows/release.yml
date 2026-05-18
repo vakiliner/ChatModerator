@@ -5,7 +5,7 @@ on:
       version:
         type: string
         required: true
-      release-sufix:
+      release_suffix:
         type: string
         required: false
         description: В случае, если тэг релиза уже занят
@@ -18,6 +18,37 @@ jobs:
   release:
     name: Draft a new release
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Run script
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { version, release_suffix: suffix } = context.payload.inputs
+            const versionMatch = version.match(/^(?<num>\d\.\d\.\d)(-(?<pre>[a-z]+\d+))?$/)
+            if (!versionMatch) throw new TypeError(`Invalid version ${version}`)
+            const { num, pre } = versionMatch.groups
+            const head = `chore/release-${version}`, title = `chore: Релиз обновления ${version}`
+
+            const { execSync } = require('node:child_process')
+
+            execSync(`sed -i "s/version\s*=\s*.*/version=${version}/g" properties.gradle`)
+            execSync('git diff properties.gradle')
+            execSync(`git checkout -b ${head}`)
+            execSync('git add properties.gradle')
+            execSync(`git commit -m "${title}"`)
+            execSync(`git push origin ${head}`)
+
+            const data = {
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            }
+
+            const pr = await github.rest.pulls.create({ ...data, title, head, base: 'main' })
+            await github.rest.issues.addLabels({ ...data, issue_number: pr.data.number, labels: ['release'] })
+            await github.rest.repos.createRelease({ ...data, tag_name: `${version}${suffix ? `-${suffix}` : ''}`, name: `v${version}`, draft: true, prerelease: pre !== undefined })
