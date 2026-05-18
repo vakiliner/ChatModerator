@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
       - name: Configure Git Actions Bot
         uses: drengskapur/gitbot-config@00aecab0a790b146951f9e0c48f564eaf26a9df6
       - name: Run script
