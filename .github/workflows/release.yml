@@ -14,3 +14,6 @@ jobs:
   release:
     name: Draft a new release
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
