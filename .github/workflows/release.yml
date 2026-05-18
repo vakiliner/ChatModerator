@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Configure Git Actions Bot
+        uses: drengskapur/gitbot-config@00aecab0a790b146951f9e0c48f564eaf26a9df6
       - name: Run script
         uses: actions/github-script@v7
         with:
@@ -38,7 +40,7 @@ jobs:
 
             const { execSync } = require('node:child_process')
 
-            execSync(`sed -i "s/^version\s*=\s*.+$/version=${version}/g" gradle.properties`)
+            execSync(`sed -i "s/^version\s*=\s*.\\+$/version=${version}/g" gradle.properties`)
             execSync('git diff gradle.properties')
             execSync(`git checkout -b ${head}`)
             execSync('git add gradle.properties')
