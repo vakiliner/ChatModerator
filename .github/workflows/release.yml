@@ -38,7 +38,7 @@ jobs:
 
             const { execSync } = require('node:child_process')
 
-            execSync(`sed -i "s/version\s*=\s*.*/version=${version}/g" gradle.properties`)
+            execSync(`sed -i "s/^version\s*=\s*.+$/version=${version}/g" gradle.properties`)
             execSync('git diff gradle.properties')
             execSync(`git checkout -b ${head}`)
             execSync('git add gradle.properties')
