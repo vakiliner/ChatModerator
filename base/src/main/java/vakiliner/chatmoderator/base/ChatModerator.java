@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import vakiliner.chatcomponentapi.base.IChatPlugin;
 import vakiliner.chatcomponentapi.common.ChatGameMode;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
@@ -141,6 +142,8 @@ public abstract class ChatModerator {
 		}
 		return false;
 	}
+
+	protected abstract IChatPlugin getPlugin();
 
 	protected abstract void log(String message);
 
@@ -364,18 +367,19 @@ public abstract class ChatModerator {
 					if (muteTime > 0) {
 						this.mutes.mute(player, firstRule.getName(), ModeratorType.AUTOMOD, muteTime, actions.muteReason());
 					}
-					if (logAdmins) {
+					ChatServer server = player.getServer();
+					if (logAdmins) server.execute(this.getPlugin(), () -> {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
 						log.append(player.getDisplayName());
 						ChatTextComponent getMessage = new ChatTextComponent(", ");
 						getMessage.append(new ChatTextComponent("показать сообщение", ChatStyle.EMPTY.withUnderlined(true).withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(checkResult.getMessage())))));
 						log.append(getMessage.withLegacyText(": " + message));
 						ChatTranslateComponent component = new ChatTranslateComponent("[%s: %s]", "chat.type.admin", ChatNamedColor.GRAY, new ChatTextComponent("AutoMod"), log);
-						player.getServer().getPlayerList().getPlayers().forEach((admin) -> {
+						server.getPlayerList().getPlayers().forEach((admin) -> {
 							if (!admin.isOp()) return;
 							admin.sendMessage(component);
 						});
-					}
+					});
 					if (blockAction != null) return "custom:[AutoMod] " + (blockAction.isEmpty() ? this.getConfig().message("fail_reasons.automod_blocked_without_custom_message") : Utils.stringFormat(this.getConfig().message("fail_reasons.automod_blocked_with_custom_message"), blockAction));
 				}
 			}

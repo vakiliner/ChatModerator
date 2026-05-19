@@ -136,8 +136,13 @@ public class ForgeChatModerator extends ChatModerator {
 		}
 	}
 
-	public ChatModeratorModInitializer getModInitializer() {
+	public ChatModeratorModInitializer getPlugin() {
 		return this.modInitializer;
+	}
+
+	@Deprecated
+	public ChatModeratorModInitializer getModInitializer() {
+		return this.getPlugin();
 	}
 
 	protected ForgeListener createListener() {
