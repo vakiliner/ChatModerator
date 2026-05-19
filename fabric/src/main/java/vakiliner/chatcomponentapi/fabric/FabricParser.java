@@ -314,10 +314,13 @@ public class FabricParser extends BaseParser {
 	}
 
 	public ChatCommandSender toChatCommandSender(CommandSource commandSource) {
+		if (commandSource == null) return null;
 		if (commandSource instanceof ServerPlayer) {
 			return this.toChatPlayer((ServerPlayer) commandSource);
+		} else if (commandSource instanceof MinecraftServer) {
+			return this.toChatServer((MinecraftServer) commandSource);
 		}
-		return commandSource != null ? new FabricChatCommandSender(this, commandSource) : null;
+		return new FabricChatCommandSender(this, commandSource);
 	}
 
 	public ChatTeam toChatTeam(PlayerTeam team) {
