@@ -375,6 +375,7 @@ public abstract class ChatModerator {
 						getMessage.append(new ChatTextComponent("показать сообщение", ChatStyle.EMPTY.withUnderlined(true).withHoverEvent(new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_TEXT, new ChatTextComponent(checkResult.getMessage())))));
 						log.append(getMessage.withLegacyText(": " + message));
 						ChatTranslateComponent component = new ChatTranslateComponent("[%s: %s]", "chat.type.admin", ChatNamedColor.GRAY, new ChatTextComponent("AutoMod"), log);
+						server.sendMessage(component);
 						server.getPlayerList().getPlayers().forEach((admin) -> {
 							if (!admin.isOp()) return;
 							admin.sendMessage(component);

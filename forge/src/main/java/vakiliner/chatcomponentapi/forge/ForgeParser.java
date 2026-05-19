@@ -316,10 +316,13 @@ public class ForgeParser extends BaseParser {
 	}
 
 	public ChatCommandSender toChatCommandSender(ICommandSource commandSource) {
+		if (commandSource == null) return null;
 		if (commandSource instanceof ServerPlayerEntity) {
 			return this.toChatPlayer((ServerPlayerEntity) commandSource);
+		} else if (commandSource instanceof MinecraftServer) {
+			return this.toChatServer((MinecraftServer) commandSource);
 		}
-		return commandSource != null ? new ForgeChatCommandSender(this, commandSource) : null;
+		return new ForgeChatCommandSender(this, commandSource);
 	}
 
 	public ChatTeam toChatTeam(ScorePlayerTeam team) {

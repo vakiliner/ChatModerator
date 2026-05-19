@@ -1,10 +1,13 @@
 package vakiliner.chatcomponentapi.forge;
 
 import java.util.Objects;
+import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;
 import vakiliner.chatcomponentapi.base.IChatPlugin;
+import vakiliner.chatcomponentapi.common.ChatMessageType;
+import vakiliner.chatcomponentapi.component.ChatComponent;
 
 public class ForgeChatServer implements ChatServer {
 	protected final ForgeParser parser;
@@ -21,6 +24,14 @@ public class ForgeChatServer implements ChatServer {
 
 	public ChatPlayerList getPlayerList() {
 		return this.parser.toChatPlayerList(this.server.getPlayerList());
+	}
+
+	public String getName() {
+		return "CONSOLE";
+	}
+
+	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
+		this.parser.sendMessage(this.server, component, type, uuid);
 	}
 
 	public void execute(IChatPlugin plugin, Runnable runnable) {
