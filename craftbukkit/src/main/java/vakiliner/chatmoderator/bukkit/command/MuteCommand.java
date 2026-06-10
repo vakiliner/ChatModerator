@@ -30,18 +30,18 @@ public class MuteCommand implements TabExecutor {
 		if (args.length < 2) return false;
 		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
 		String targetName = args[0];
-		String durationString = args[1];
+		String minutes = args[1];
 		final Integer duration;
-		if (durationString.equals("infinite")) {
+		if (minutes.equalsIgnoreCase("infinite")) {
 			duration = null;
 		} else {
-			double d = 0;
+			final double d;
 			try {
-				d = Double.parseDouble(durationString);
+				d = Double.parseDouble(minutes);
 			} catch (NumberFormatException err) {
-				d = 0;
+				return false;
 			}
-			if (d <= 0 || d * 10 % 1 != 0) return false;
+			if (d < 0.1) return false;
 			duration = (int) (d * 60);
 		}
 		String reason = args.length > 2 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : null;
