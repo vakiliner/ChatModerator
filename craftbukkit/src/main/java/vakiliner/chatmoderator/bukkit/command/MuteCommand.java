@@ -41,7 +41,7 @@ public class MuteCommand implements TabExecutor {
 			} catch (NumberFormatException err) {
 				return false;
 			}
-			if (d <= 0) return false;
+			if (d < 0.1) return false;
 			duration = (int) (d * 60);
 		}
 		String reason = args.length > 2 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : null;
