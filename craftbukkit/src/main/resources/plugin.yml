@@ -10,7 +10,7 @@ commands:
   mute:
     description: Заглушить игрока в чате
     permission: chatmoderator.command.mute
-    usage: /mute <player_name> [<duration>] [<reason>]
+    usage: /mute <player_name> <minutes> [<reason>]
   unmute:
     description: Снять с игрока мут
     permission: chatmoderator.command.unmute
