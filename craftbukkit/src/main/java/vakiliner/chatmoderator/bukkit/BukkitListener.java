@@ -1,6 +1,5 @@
 package vakiliner.chatmoderator.bukkit;
 
-import java.util.Iterator;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,12 +17,7 @@ public class BukkitListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		this.manager.onChat(this.manager.toChatPlayer(player), event.getMessage(), () -> event.setCancelled(true), () -> {
-			Iterator<Player> iterator = event.getRecipients().iterator();
-			while (iterator.hasNext()) {
-				if (iterator.next().getGameMode() != GameMode.SPECTATOR) iterator.remove();
-			}
-		});
+		this.manager.onChat(this.manager.toChatPlayer(player), event.getMessage(), () -> event.setCancelled(true), () -> event.getRecipients().removeIf((recipient) -> recipient.getGameMode() != GameMode.SPECTATOR));
 	}
 
 	@EventHandler(ignoreCancelled = true)
