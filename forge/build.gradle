@@ -2,6 +2,10 @@ plugins {
 	id 'dev.architectury.loom' version "${loom_version}"
 }
 
+loom {
+	forge {}
+}
+
 dependencies {
 	implementation project(':base')
 	minecraft group: 'net.minecraft', name: 'minecraft', version: project.minecraft_version
