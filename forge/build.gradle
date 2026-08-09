@@ -1,44 +1,12 @@
 plugins {
-	id 'net.minecraftforge.gradle' version "${forge_gradle_version}"
+	id 'dev.architectury.loom' version "${loom_version}"
 }
-
-minecraft {
-	mappings channel: mapping_channel, version: minecraft_version
-
-	runs {
-		configureEach {
-			workingDirectory project.file('run')
-
-			property 'forge.logging.markers', 'REGISTRIES'
-			property 'forge.logging.console.level', 'debug'
-
-			mods {
-				chatmoderator {
-					source sourceSets.main
-				}
-			}
-		}
-
-		client {
-		}
-
-		server {
-			args '--nogui'
-		}
-
-		data {
-			workingDirectory project.file('run-data')
-
-			args '--mod', 'chatmoderator', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-		}
-	}
-}
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
 	implementation project(':base')
-	minecraft group: 'net.minecraftforge', name: 'forge', version: "${project.minecraft_version}-${project.forge_version}"
+	minecraft group: 'net.minecraft', name: 'minecraft', version: project.minecraft_version
+	mappings loom.officialMojangMappings()
+	forge group: 'net.minecraftforge', name: 'forge', version: "${project.minecraft_version}-${project.forge_version}"
 }
 
 processResources {
@@ -59,6 +27,4 @@ jar {
 			MixinConfigs: 'mixins.chatcomponentapi.forge.json'
 		])
 	}
-
-	finalizedBy 'reobfJar'
 }
