@@ -1,6 +1,8 @@
 {
 	"pack": {
-		"description": "Модерация игроков в чате",
-		"pack_format": 6
+		"description": {
+			"text": "Модерация игроков в чате"
+		},
+		"pack_format": ${pack_format}
 	}
 }

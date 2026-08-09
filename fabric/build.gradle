@@ -8,9 +8,9 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: project.loader_version
 
-	modImplementation fabricApi.module('fabric-api-base', project.fabric_api)
-	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_api)
-	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_api)
+	modImplementation fabricApi.module('fabric-api-base', project.fabric_api_version)
+	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_api_version)
+	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_api_version)
 }
 
 loom {
@@ -20,13 +20,13 @@ loom {
 }
 
 processResources {
-	var replaceProperties = [
-		version: project.version,
-		license: project.license,
-	]
-	inputs.properties replaceProperties
-
 	filesMatching('fabric.mod.json') {
-		expand replaceProperties
+		expand inputs.properties
+	}
+}
+
+processTestResources {
+	filesMatching('fabric.mod.json') {
+		expand inputs.properties
 	}
 }
