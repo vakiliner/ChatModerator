@@ -21,6 +21,19 @@ allprojects {
 		compileOnly fileTree(include: ['*.jar'], dir: 'libs')
 	}
 
+	var replaceProperties = [
+		version: project.version,
+		license: project.license,
+	]
+
+	processResources {
+		inputs.properties replaceProperties
+	}
+
+	processTestResources {
+		inputs.properties replaceProperties
+	}
+
 	tasks.withType(JavaCompile).configureEach {
 		options.encoding = 'UTF-8'
 	}
@@ -44,8 +57,10 @@ def generateManifestAttributes() {
 		'Built-OS': System.getProperty('os.name'),
 	]
 	var githubActions = System.getenv('GITHUB_ACTIONS')
+	var githubSha = System.getenv('GITHUB_SHA')
 	var termProgram = System.getenv('TERM_PROGRAM')
 	if (githubActions != null) attributes['Built-GitHub-Actions'] = githubActions
+	if (githubSha != null) attributes['Built-GitHub-Sha'] = githubSha
 	if (termProgram != null) attributes['Built-Term-Program'] = termProgram
 	return attributes
 }
