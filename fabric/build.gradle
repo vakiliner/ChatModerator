@@ -8,9 +8,9 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: project.loader_version
 
-	modImplementation fabricApi.module('fabric-api-base', project.fabric_version)
-	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_version)
-	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_version)
+	modImplementation fabricApi.module('fabric-api-base', project.fabric_api_version)
+	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_api_version)
+	modImplementation fabricApi.module('fabric-command-api-v1', project.fabric_api_version)
 }
 
 loom {
