@@ -81,6 +81,7 @@ jar {
 	var fabricRemapJar = fabric != null ? fabric.tasks.getByName('remapJar') : null
 	var forgeJar = forge != null ? forge.tasks.getByName('jar') : null
 
+	from 'LICENSE'
 	if (baseJar != null) from(zipTree(baseJar.archiveFile)) {
 		exclude 'LICENSE'
 	}
