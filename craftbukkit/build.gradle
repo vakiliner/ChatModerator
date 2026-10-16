@@ -2,8 +2,24 @@ plugins {
 	id 'java'
 }
 
+repositories {
+	maven {
+		name = 'Codemc'
+		url = 'https://repo.codemc.io/repository/nms/'
+	}
+
+	maven {
+		name = 'MinecraftLibs'
+		url = 'https://libraries.minecraft.net'
+	}
+
+	mavenCentral()
+}
+
 dependencies {
 	implementation project(':base')
+	implementation "org.bukkit:bukkit:${project.minecraft_version}-${project.bukkit_version}"
+	implementation "com.mojang:authlib:${project.authlib_version}"
 }
 
 processResources {

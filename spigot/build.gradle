@@ -2,7 +2,18 @@ plugins {
 	id 'java'
 }
 
+repositories {
+	maven {
+		name = 'SpigotHub'
+		url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+	}
+
+	mavenCentral()
+}
+
 dependencies {
 	implementation project(':base')
 	implementation project(':craftbukkit')
+	implementation "org.spigotmc:spigot-api:${project.minecraft_version}-${project.spigot_version}"
+	implementation "net.md-5:bungeecord-chat:${project.bungeecord_version}"
 }
