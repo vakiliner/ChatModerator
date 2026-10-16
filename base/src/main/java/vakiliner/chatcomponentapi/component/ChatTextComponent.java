@@ -73,7 +73,7 @@ public class ChatTextComponent extends ChatComponent {
 			return true;
 		} else if (!(obj instanceof ChatTextComponent)) {
 			return false;
-		} else  {
+		} else {
 			ChatTextComponent other = (ChatTextComponent) obj;
 			return super.equals(other) && this.text.equals(other.text);
 		}
