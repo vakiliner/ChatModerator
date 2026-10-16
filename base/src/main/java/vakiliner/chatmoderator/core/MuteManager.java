@@ -2,9 +2,7 @@ package vakiliner.chatmoderator.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -12,14 +10,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import com.google.gson.Gson;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
 import vakiliner.chatmoderator.api.GsonMutedPlayer;
 import vakiliner.chatmoderator.api.GsonMutes;
+import vakiliner.chatmoderator.common.fileproviders.mutes.FileProvider;
+import vakiliner.chatmoderator.common.fileproviders.mutes.GsonProvider;
 import vakiliner.chatmoderator.core.MutedPlayer.ModeratorType;
 
 public class MuteManager {
 	private final Map<UUID, MutedPlayer> map = new HashMap<>();
+	private final FileProvider provider = new GsonProvider(StandardCharsets.UTF_8);
 	private ThreadSaveConfig threadSaveConfig;
 	public Path filepath;
 
@@ -127,7 +127,7 @@ public class MuteManager {
 
 	private void reload(File file, Path path, boolean saveIfNotExists) throws IOException {
 		if (file.exists()) {
-			GsonMutes mutes = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonMutes.class);
+			GsonMutes mutes = this.provider.reload(path);
 			synchronized (this.map) {
 				this.map.clear();
 				for (GsonMutedPlayer mute : mutes) {
@@ -159,7 +159,7 @@ public class MuteManager {
 				mutes.add(GsonMutedPlayer.fromMutedPlayer(mute));
 			}
 		}
-		Files.write(path, new Gson().toJson(mutes).getBytes(StandardCharsets.UTF_8));
+		this.provider.save(path, mutes);
 	}
 }
 
