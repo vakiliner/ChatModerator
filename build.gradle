@@ -17,10 +17,6 @@ allprojects {
 		targetCompatibility = JavaVersion.VERSION_1_8
 	}
 
-	dependencies {
-		compileOnly fileTree(include: ['*.jar'], dir: 'libs')
-	}
-
 	var replaceProperties = [
 		version: project.version,
 		license: project.license,

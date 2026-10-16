@@ -2,8 +2,18 @@ plugins {
 	id 'java'
 }
 
+repositories {
+	maven {
+		name = 'Papermc'
+		url = 'https://repo.papermc.io/repository/maven-public/'
+	}
+
+	mavenCentral()
+}
+
 dependencies {
 	implementation project(':base')
 	implementation project(':craftbukkit')
 	implementation project(':spigot')
+	implementation "com.destroystokyo.paper:paper-api:${project.minecraft_version}-${project.paper_version}"
 }
