@@ -267,7 +267,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 
 	protected void unsafeAppend(ChatComponent component) {
 		List<ChatComponent> extra = this.extra;
-		if (extra == null)  {
+		if (extra == null) {
 			extra = this.extra = new ArrayList<>();
 		}
 		extra.add(component);

@@ -94,7 +94,7 @@ public class ChatSelectorComponent extends ChatComponent {
 			return true;
 		} else if (!(obj instanceof ChatSelectorComponent)) {
 			return false;
-		} else  {
+		} else {
 			ChatSelectorComponent other = (ChatSelectorComponent) obj;
 			return super.equals(other) && this.selector.equals(other.selector) && Objects.equals(this.separator, other.separator);
 		}
