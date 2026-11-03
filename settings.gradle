@@ -13,7 +13,7 @@ pluginManagement {
 	}
 }
 
-include 'base'
+include 'core'
 include 'craftbukkit'
 include 'spigot'
 include 'paper'

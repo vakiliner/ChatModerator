@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 }
 
-var base = findProject(':base')
+var base = findProject(':core')
 var craftbukkit = findProject(':craftbukkit')
 var spigot = findProject(':spigot')
 var paper = findProject(':paper')

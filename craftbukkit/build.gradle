@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-	implementation project(':base')
+	implementation project(':core')
 	implementation "org.bukkit:bukkit:${project.minecraft_version}-${project.bukkit_version}"
 	implementation "com.mojang:authlib:${project.authlib_version}"
 }
