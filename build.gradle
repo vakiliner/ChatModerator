@@ -78,7 +78,7 @@ jar {
 	var forgeJar = forge != null ? forge.tasks.getByName('jar') : null
 
 	from 'LICENSE'
-	if (coreJar != null) from(zipTree(coreJar.archiveFile)) {
+	from(zipTree(coreJar.archiveFile)) {
 		exclude 'LICENSE'
 	}
 	if (craftbukkitJar != null) from(zipTree(craftbukkitJar.archiveFile)) {
@@ -98,7 +98,7 @@ jar {
 	}
 
 	manifest {
-		if (coreJar != null) from coreJar.manifest
+		from coreJar.manifest
 		if (craftbukkitJar != null) from craftbukkitJar.manifest
 		if (spigotJar != null) from spigotJar.manifest
 		if (paperJar != null) from paperJar.manifest
