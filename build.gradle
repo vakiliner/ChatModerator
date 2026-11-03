@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 }
 
-var base = findProject(':core')
+var core = findProject(':core')
 var craftbukkit = findProject(':craftbukkit')
 var spigot = findProject(':spigot')
 var paper = findProject(':paper')
@@ -38,7 +38,7 @@ allprojects {
 subprojects {
 	apply plugin: 'java'
 
-	it.base {
+	base {
 		archivesName = "${project.archives_base_name}-${project.display_name}"
 	}
 
@@ -62,14 +62,14 @@ def generateManifestAttributes() {
 }
 
 jar {
-	if (base != null) evaluationDependsOn(base.getName())
+	if (core != null) evaluationDependsOn(core.getName())
 	if (craftbukkit != null) evaluationDependsOn(craftbukkit.getName())
 	if (spigot != null) evaluationDependsOn(spigot.getName())
 	if (paper != null) evaluationDependsOn(paper.getName())
 	if (fabric != null) evaluationDependsOn(fabric.getName())
 	if (forge != null) evaluationDependsOn(forge.getName())
 
-	var baseJar = base != null ? base.tasks.getByName('jar') : null
+	var baseJar = core != null ? core.tasks.getByName('jar') : null
 	var craftbukkitJar = craftbukkit != null ? craftbukkit.tasks.getByName('jar') : null
 	var spigotJar = spigot != null ? spigot.tasks.getByName('jar') : null
 	var paperJar = paper != null ? paper.tasks.getByName('jar') : null
