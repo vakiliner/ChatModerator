@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-	implementation project(':base')
+	implementation project(':core')
 	minecraft group: 'com.mojang', name: 'minecraft', version: project.minecraft_version
 	mappings loom.officialMojangMappings()
 	modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: project.loader_version

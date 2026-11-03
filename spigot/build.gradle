@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-	implementation project(':base')
+	implementation project(':core')
 	implementation project(':craftbukkit')
 	implementation "org.spigotmc:spigot-api:${project.minecraft_version}-${project.spigot_version}"
 	implementation "net.md-5:bungeecord-chat:${project.bungeecord_version}"
