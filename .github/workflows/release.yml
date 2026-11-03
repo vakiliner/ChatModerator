@@ -44,7 +44,11 @@ jobs:
             const { readFileSync, writeFileSync } = require('node:fs')
             const { resolve } = require('node:path')
 
+            execSync(`git checkout -b ${head}`)
+
             execSync(`sed -i "s/^version\s*=\s*.\\+$/version=${version}/g" gradle.properties`)
+            execSync('git add gradle.properties')
+
             const updatePath = resolve('update.json')
             const update = JSON.parse(readFileSync(updatePath, 'utf8'))
             for (const minecraftVersion in update.promos) {
@@ -53,10 +57,8 @@ jobs:
               update.promos[minecraftVersion] = version
             }
             writeFileSync(updatePath, `${JSON.stringify(update, null, '\t')}\n`, 'utf8')
+            execSync('git add update.json')
 
-            execSync('git diff gradle.properties update.json')
-            execSync(`git checkout -b ${head}`)
-            execSync('git add gradle.properties update.json')
             execSync(`git commit -m "${title}"`)
             execSync(`git push origin ${head}`)
 
