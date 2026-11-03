@@ -18,7 +18,7 @@ public class Utils {
 			} else {
 				s = i++;
 			}
-			builder.append(s >= 0 && s < rawArgs.length ? rawArgs[s] : matcher.group()); 
+			builder.append(s >= 0 && s < rawArgs.length ? rawArgs[s] : matcher.group());
 			index = matcher.end();
 		}
 		builder.append(string.substring(index));

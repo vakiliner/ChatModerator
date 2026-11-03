@@ -91,7 +91,7 @@ public class AutoModerationTriggerEvent extends Event implements Cancellable {
 	public void setMuteTime(int muteTime) {
 		this.actions.muteTime(muteTime);
 	}
-	
+
 	public void setMuteReason(String muteReason) {
 		this.actions.muteReason(muteReason);
 	}
