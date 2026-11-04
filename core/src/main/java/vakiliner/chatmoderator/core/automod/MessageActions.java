@@ -44,6 +44,7 @@ public class MessageActions extends BaseActions {
 		this.muteReason = muteReason;
 	}
 
+	@Override
 	public GsonAutoModerationRule.Actions toGson() {
 		GsonAutoModerationRule.Actions data = super.toGson();
 		data.block_action = this.blockAction;

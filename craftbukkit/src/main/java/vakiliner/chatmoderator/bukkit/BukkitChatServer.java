@@ -16,22 +16,27 @@ public class BukkitChatServer extends vakiliner.chatcomponentapi.craftbukkit.Buk
 		this.manager = manager;
 	}
 
+	@Override
 	public ChatServer getServer() {
 		return this;
 	}
 
+	@Override
 	public ChatPlayerList getPlayerList() {
 		return this;
 	}
 
+	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
 		return new ParseCollection<>(this.server.getOnlinePlayers(), this.manager::toChatPlayer);
 	}
 
+	@Override
 	public ChatPlayer getPlayer(UUID uuid) {
 		return this.manager.toChatPlayer(this.server.getPlayer(uuid));
 	}
 
+	@Override
 	public ChatPlayer getPlayer(String name) {
 		return this.manager.toChatPlayer(this.server.getPlayerExact(name));
 	}

@@ -57,6 +57,7 @@ public class ChatTextColor {
 		return format != null ? format : orElse;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -68,6 +69,7 @@ public class ChatTextColor {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return String.format("#%06X", this.value);
 	}

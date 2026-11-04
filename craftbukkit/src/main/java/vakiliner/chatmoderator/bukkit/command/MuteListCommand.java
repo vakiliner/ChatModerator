@@ -26,6 +26,7 @@ public class MuteListCommand implements TabExecutor {
 		this.manager = manager;
 	}
 
+	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
 		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
 		String pageString;
@@ -153,6 +154,7 @@ public class MuteListCommand implements TabExecutor {
 		return true;
 	}
 
+	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		switch (args.length) {
 			case 1: return Collections.singletonList("get");

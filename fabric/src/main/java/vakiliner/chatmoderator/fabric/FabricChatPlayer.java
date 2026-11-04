@@ -14,18 +14,22 @@ public class FabricChatPlayer extends vakiliner.chatcomponentapi.fabric.FabricCh
 		this.manager = manager;
 	}
 
+	@Override
 	public ChatServer getServer() {
 		return this.manager.toChatServer(this.player.server);
 	}
 
+	@Override
 	public MutedPlayer getMute(Date filterExpired) {
 		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
+	@Override
 	public boolean isBypassModeration() {
 		return this.server.isSingleplayerOwner(this.player.getGameProfile());
 	}
 
+	@Override
 	public boolean isBypassMutes() {
 		return this.isOp();
 	}

@@ -13,110 +13,137 @@ class ConfigImpl implements Config {
 		this.configuration = configuration;
 	}
 
+	@Override
 	public int version() {
 		return this.configuration.getInt("version", Short.MIN_VALUE);
 	}
 
+	@Override
 	public void version(int version) {
 		this.configuration.set("version", version);
 	}
 
+	@Override
 	public int maxMessageLength() {
 		return this.configuration.getInt("max_message_length", 128);
 	}
 
+	@Override
 	public void maxMessageLength(int length) {
 		this.configuration.set("max_message_length", length);
 	}
 
+	@Override
 	public int maxMuteReasonLength() {
 		return this.configuration.getInt("max_mute_reason_length", 64);
 	}
 
+	@Override
 	public void maxMuteReasonLength(int length) {
 		this.configuration.set("max_mute_reason_length", length);
 	}
 
+	@Override
 	public boolean autoModerationEnabled() {
 		return this.configuration.getBoolean("auto_moderation_enabled", false);
 	}
 
+	@Override
 	public void autoModerationEnabled(boolean enabled) {
 		this.configuration.set("auto_moderation_enabled", enabled);
 	}
 
+	@Override
 	public boolean autoModerationUseThreadPool() {
 		return this.configuration.getBoolean("auto_moderation_use_thread_pool", false);
 	}
 
+	@Override
 	public void autoModerationUseThreadPool(boolean enabled) {
 		this.configuration.set("auto_moderation_use_thread_pool", enabled);
 	}
 
+	@Override
 	public boolean spectatorsChat() {
 		return this.configuration.getBoolean("spectators_chat", false);
 	}
 
+	@Override
 	public void spectatorsChat(boolean enabled) {
 		this.configuration.set("spectators_chat", enabled);
 	}
 
+	@Override
 	public String folderPath() {
 		return this.configuration.getString("folder_path", null);
 	}
 
+	@Override
 	public void folderPath(String name) {
 		this.configuration.set("folder_path", name);
 	}
 
+	@Override
 	public String mutesPath() {
 		return this.configuration.getString("mutes_path", "mutes.json");
 	}
 
+	@Override
 	public void mutesPath(String path) {
 		this.configuration.set("mutes_path", path);
 	}
 
+	@Override
 	public String autoModerationRulesPath() {
 		return this.configuration.getString("auto_moderation_rules_path", "auto_moderation_rules.json");
 	}
 
+	@Override
 	public void autoModerationRulesPath(String path) {
 		this.configuration.set("auto_moderation_rules_path", path);
 	}
 
+	@Override
 	public String dictionaryPath() {
 		return this.configuration.getString("dictionary_file", null);
 	}
 
+	@Override
 	public void dictionaryPath(String name) {
 		this.configuration.set("dictionary_file", name);
 	}
 
+	@Override
 	public boolean showFailMessage() {
 		return this.configuration.getBoolean("show_fail_message", true);
 	}
 
+	@Override
 	public void showFailMessage(boolean show) {
 		this.configuration.set("show_fail_message", show);
 	}
 
+	@Override
 	public boolean logBlockedMessages() {
 		return this.configuration.getBoolean("log_blocked_messages", false);
 	}
 
+	@Override
 	public void logBlockedMessages(boolean log) {
 		this.configuration.set("log_blocked_messages", log);
 	}
 
+	@Override
 	public boolean logBlockedCommands() {
 		return this.configuration.getBoolean("log_blocked_commands", false);
 	}
 
+	@Override
 	public void logBlockedCommands(boolean log) {
 		this.configuration.set("log_blocked_commands", log);
 	}
 
+	@Override
 	public String message(String key, boolean required) {
 		String message = this.messages().getString(key);
 		if (required) Objects.requireNonNull(message, "Message not found");
@@ -127,6 +154,7 @@ class ConfigImpl implements Config {
 		return Objects.requireNonNull(this.configuration.getConfigurationSection("messages"), "Config not have a messages property");
 	}
 
+	@Override
 	public void messages(Map<String, String> message) {
 		this.configuration.createSection("messages", message);
 	}

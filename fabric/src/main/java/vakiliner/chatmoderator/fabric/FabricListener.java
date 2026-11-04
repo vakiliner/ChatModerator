@@ -15,15 +15,18 @@ class FabricListener implements ServerStarted, ServerStopping, ServerStopped {
 		this.manager = manager;
 	}
 
+	@Override
 	public void onServerStarted(MinecraftServer server) {
 		this.manager.server = server;
 		this.manager.startServer();
 	}
 
+	@Override
 	public void onServerStopping(MinecraftServer server) {
 		this.manager.stopServer();
 	}
 
+	@Override
 	public void onServerStopped(MinecraftServer server) {
 		this.manager.server = null;
 	}

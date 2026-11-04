@@ -37,10 +37,12 @@ class HoverEventContents implements IStyleParser {
 		}
 	}
 
+	@Override
 	public ChatTextColor injectColor(Style style) {
 		return forge(style.getColor());
 	}
 
+	@Override
 	public Style forge(ChatStyle chatStyle) {
 		if (chatStyle.isEmpty()) return Style.EMPTY;
 		try {
@@ -50,6 +52,7 @@ class HoverEventContents implements IStyleParser {
 		}
 	}
 
+	@Override
 	public HoverEvent forge(ChatHoverEvent<?> event) {
 		ChatHoverEvent.Action<?> action = event.getAction();
 		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
@@ -63,6 +66,7 @@ class HoverEventContents implements IStyleParser {
 		}
 	}
 
+	@Override
 	public ChatHoverEvent<?> forge(HoverEvent event) {
 		HoverEvent.Action<?> action = event.getAction();
 		if (action == HoverEvent.Action.SHOW_TEXT) {

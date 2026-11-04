@@ -17,18 +17,22 @@ public class ForgeChatOfflinePlayer implements ChatOfflinePlayer {
 		this.gameProfile = Objects.requireNonNull(gameProfile);
 	}
 
+	@Override
 	public GameProfile getGameProfile() {
 		return this.gameProfile;
 	}
 
+	@Override
 	public boolean isOp() {
 		return this.server.getPlayerList().isOp(this.gameProfile);
 	}
 
+	@Override
 	public ChatTeam getTeam() {
 		return this.parser.toChatTeam(this.server.getScoreboard().getPlayerTeam(this.getName()));
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

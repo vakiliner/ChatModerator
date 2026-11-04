@@ -50,6 +50,7 @@ public class BukkitChatModerator extends ChatModerator {
 		}
 	}
 
+	@Override
 	public ChatModeratorPlugin getPlugin() {
 		return this.plugin;
 	}
@@ -58,22 +59,27 @@ public class BukkitChatModerator extends ChatModerator {
 		return new BukkitListener(this);
 	}
 
+	@Override
 	protected void log(String message) {
 		this.plugin.getLogger().info(message);
 	}
 
+	@Override
 	public Config getConfig() {
 		return this.config;
 	}
 
+	@Override
 	protected Path getDefaultFolderPath() {
 		return this.plugin.getDataFolder().toPath();
 	}
 
+	@Override
 	public Path getConfigPath() {
 		return this.getDefaultFolderPath().resolve("config.yml");
 	}
 
+	@Override
 	public String getName() {
 		PluginDescriptionFile description = this.plugin.getDescription();
 		String prefix = description.getPrefix();
@@ -81,6 +87,7 @@ public class BukkitChatModerator extends ChatModerator {
 	}
 
 	@Deprecated
+	@Override
 	public void broadcast(ChatComponent chatComponent, boolean admins) {
 		Set<ChatCommandSender> recipients = new HashSet<>();
 		String permission = admins ? Server.BROADCAST_CHANNEL_ADMINISTRATIVE : Server.BROADCAST_CHANNEL_USERS;
@@ -93,10 +100,12 @@ public class BukkitChatModerator extends ChatModerator {
 	}
 
 	@Deprecated
+	@Override
 	public Collection<ChatPlayer> getOnlinePlayers() {
 		return Bukkit.getOnlinePlayers().stream().map(this::toChatPlayer).collect(Collectors.toList());
 	}
 
+	@Override
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
 		AutoModerationTriggerEvent event = new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.craftbukkit.BukkitChatPlayer) player).getPlayer(), checkResult, actions, !Bukkit.isPrimaryThread());
 		Bukkit.getPluginManager().callEvent(event);

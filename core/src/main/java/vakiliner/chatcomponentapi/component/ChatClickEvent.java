@@ -21,6 +21,7 @@ public class ChatClickEvent implements IGsonSerializer {
 		this.value = event.value;
 	}
 
+	@Override
 	public ChatClickEvent clone() {
 		return new ChatClickEvent(this);
 	}
@@ -33,6 +34,7 @@ public class ChatClickEvent implements IGsonSerializer {
 		return this.value;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -44,6 +46,7 @@ public class ChatClickEvent implements IGsonSerializer {
 		}
 	}
 
+	@Override
 	public JsonElement serialize() {
 		return serialize(this);
 	}

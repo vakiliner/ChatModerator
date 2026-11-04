@@ -16,18 +16,22 @@ public class FabricChatPlayerList extends vakiliner.chatcomponentapi.fabric.Fabr
 		this.manager = manager;
 	}
 
+	@Override
 	public ChatServer getServer() {
 		return this.manager.toChatServer(this.playerList.getServer());
 	}
 
+	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
 		return new ParseCollection<>(this.playerList.getPlayers(), this.manager::toChatPlayer);
 	}
 
+	@Override
 	public ChatPlayer getPlayer(UUID uuid) {
 		return this.manager.toChatPlayer(this.playerList.getPlayer(uuid));
 	}
 
+	@Override
 	public ChatPlayer getPlayer(String name) {
 		return this.manager.toChatPlayer(this.playerList.getPlayerByName(name));
 	}

@@ -22,22 +22,27 @@ public class ForgeChatServer implements ChatServer {
 		return this.server;
 	}
 
+	@Override
 	public ChatPlayerList getPlayerList() {
 		return this.parser.toChatPlayerList(this.server.getPlayerList());
 	}
 
+	@Override
 	public String getName() {
 		return "CONSOLE";
 	}
 
+	@Override
 	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.sendMessage(this.server, component, type, uuid);
 	}
 
+	@Override
 	public void execute(IChatPlugin plugin, Runnable runnable) {
 		this.parser.execute(this.server, plugin, runnable);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

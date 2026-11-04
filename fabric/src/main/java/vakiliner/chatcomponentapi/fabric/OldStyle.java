@@ -59,6 +59,7 @@ class OldStyle implements IStyleParser {
 		}
 	}
 
+	@Override
 	public ChatTextColor injectColor(Style style) {
 		try {
 			return ChatNamedColor.getByFormat(FabricParser.fabric((ChatFormatting) COLOR_FIELD.get(style)));
@@ -67,6 +68,7 @@ class OldStyle implements IStyleParser {
 		}
 	}
 
+	@Override
 	public Style fabric(ChatStyle chatStyle) {
 		final Style style;
 		try {
@@ -93,6 +95,7 @@ class OldStyle implements IStyleParser {
 	}
 
 	@SuppressWarnings("deprecation")
+	@Override
 	public HoverEvent fabric(ChatHoverEvent<?> event) {
 		try {
 			return HOVER_EVENT_CONSTRUCTOR.newInstance(HoverEvent.Action.getByName(event.getAction().getName()), FabricParser.fabric(event.getValue()));
@@ -102,6 +105,7 @@ class OldStyle implements IStyleParser {
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Override
 	public ChatHoverEvent<?> fabric(HoverEvent event) {
 		final HoverEvent.Action action;
 		final Component contents;
