@@ -65,6 +65,7 @@ public class ChatSelectorComponent extends ChatComponent {
 		this.separator = component.separator;
 	}
 
+	@Override
 	public ChatSelectorComponent clone(boolean cloneExtra) {
 		return new ChatSelectorComponent(this, cloneExtra);
 	}
@@ -85,10 +86,12 @@ public class ChatSelectorComponent extends ChatComponent {
 		this.separator = separator;
 	}
 
+	@Override
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.selector;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -100,6 +103,7 @@ public class ChatSelectorComponent extends ChatComponent {
 		}
 	}
 
+	@Override
 	protected void serialize(JsonObject object) {
 		object.addProperty("selector", this.selector);
 		ChatComponent separator = this.separator;

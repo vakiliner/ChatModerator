@@ -60,6 +60,7 @@ public final class ChatStyle implements IGsonSerializer {
 		return newBuilder(this);
 	}
 
+	@Override
 	public ChatStyle clone() {
 		return new ChatStyle(this);
 	}
@@ -215,6 +216,7 @@ public final class ChatStyle implements IGsonSerializer {
 		);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;
@@ -236,6 +238,7 @@ public final class ChatStyle implements IGsonSerializer {
 		}
 	}
 
+	@Override
 	public JsonElement serialize() {
 		return serialize(this);
 	}

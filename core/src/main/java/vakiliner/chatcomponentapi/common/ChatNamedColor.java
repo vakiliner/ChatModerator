@@ -35,10 +35,12 @@ public final class ChatNamedColor extends ChatTextColor {
 		return this.asFormat.getName();
 	}
 
+	@Override
 	public ChatTextFormat asFormat(ChatTextFormat orElse) {
 		return this.asFormat;
 	}
 
+	@Override
 	public String toString() {
 		return this.getName();
 	}

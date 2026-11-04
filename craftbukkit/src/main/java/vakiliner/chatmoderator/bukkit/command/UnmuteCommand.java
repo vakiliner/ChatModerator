@@ -19,6 +19,7 @@ public class UnmuteCommand implements TabExecutor {
 		this.manager = manager;
 	}
 
+	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
 		if (args.length < 1) return false;
 		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
@@ -32,6 +33,7 @@ public class UnmuteCommand implements TabExecutor {
 		return true;
 	}
 
+	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		if (args.length != 1) return Collections.emptyList();
 		List<String> list = this.manager.mutes.map().values().stream().map(MutedPlayer::getName).collect(Collectors.toList());

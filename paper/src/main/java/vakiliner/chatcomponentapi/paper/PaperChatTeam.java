@@ -11,6 +11,7 @@ public class PaperChatTeam extends BukkitChatTeam {
 		super(parser, team);
 	}
 
+	@Override
 	public ChatNamedColor getColor() {
 		try {
 			return PaperParser.paper((NamedTextColor) this.team.color());
@@ -19,14 +20,17 @@ public class PaperChatTeam extends BukkitChatTeam {
 		}
 	}
 
+	@Override
 	public ChatComponent getDisplayName() {
 		return PaperParser.paper(this.team.displayName());
 	}
 
+	@Override
 	public ChatComponent getPrefix() {
 		return PaperParser.paper(this.team.prefix());
 	}
 
+	@Override
 	public ChatComponent getSuffix() {
 		return PaperParser.paper(this.team.suffix());
 	}

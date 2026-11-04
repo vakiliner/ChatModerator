@@ -16,6 +16,7 @@ public class ChatModeratorModInitializer implements ModInitializer, IFabricChatP
 		MANAGER = new FabricChatModerator();
 	}
 
+	@Override
 	public void onInitialize() {
 		MANAGER.init(this);
 		try {

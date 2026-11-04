@@ -27,6 +27,7 @@ public enum ChatComponentFormat {
 		return this.name().toLowerCase();
 	}
 
+	@Override
 	public String toString() {
 		return this.textFormat.toString();
 	}

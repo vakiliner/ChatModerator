@@ -30,10 +30,12 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 		if (triggerMetadata.allow_list != null) this.triggerMetadata.setAllowList(triggerMetadata.allow_list);
 	}
 
+	@Override
 	public TriggerType<KeywordAutoModerationRule> getTriggerType() {
 		return TriggerType.KEYWORD;
 	}
 
+	@Override
 	protected boolean isSupportEventType(EventType eventType) {
 		return eventType == EventType.MESSAGE;
 	}
@@ -42,6 +44,7 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 		return this.triggerMetadata;
 	}
 
+	@Override
 	public MatchResult checkText(ChatPlayer player, String rawMessage) {
 		Map<Character, String> cleaner = this.automod.cleaner;
 		final List<String> words;
@@ -179,6 +182,7 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 		}
 	}
 
+	@Override
 	public GsonAutoModerationRule toGson() {
 		GsonAutoModerationRule data = super.toGson();
 		data.trigger_metadata = new Gson().toJsonTree(this.triggerMetadata.toGson()).getAsJsonObject();

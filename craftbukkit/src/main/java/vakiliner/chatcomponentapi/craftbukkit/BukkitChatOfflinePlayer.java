@@ -21,26 +21,32 @@ public class BukkitChatOfflinePlayer implements ChatOfflinePlayer {
 		return this.player;
 	}
 
+	@Override
 	public GameProfile getGameProfile() {
 		return new GameProfile(this.player.getUniqueId(), this.player.getName());
 	}
 
+	@Override
 	public String getName() {
 		return this.player.getName();
 	}
 
+	@Override
 	public UUID getUniqueId() {
 		return this.player.getUniqueId();
 	}
 
+	@Override
 	public boolean isOp() {
 		return this.player.isOp();
 	}
 
+	@Override
 	public ChatTeam getTeam() {
 		return this.parser.toChatTeam(Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(this.getName()));
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

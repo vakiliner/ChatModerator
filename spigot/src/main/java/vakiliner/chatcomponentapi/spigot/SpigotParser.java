@@ -52,10 +52,12 @@ public class SpigotParser extends BukkitParser {
 		supportsFontInStyle = method != null;
 	}
 
+	@Override
 	public boolean supportsFontInStyle() {
 		return supportsFontInStyle;
 	}
 
+	@Override
 	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.sendMessage(sender, spigot(component, sender instanceof ConsoleCommandSender), spigot(type), uuid);
 	}
@@ -77,6 +79,7 @@ public class SpigotParser extends BukkitParser {
 		}
 	}
 
+	@Override
 	public void broadcast(Iterable<CommandSender> recipients, ChatComponent chatComponent, ChatMessageType chatMessageType, UUID uuid) {
 		BaseComponent component = spigot(chatComponent, false);
 		BaseComponent consoleComponent = spigot(chatComponent, true);

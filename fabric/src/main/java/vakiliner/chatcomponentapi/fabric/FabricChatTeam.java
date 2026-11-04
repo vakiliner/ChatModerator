@@ -20,26 +20,32 @@ public class FabricChatTeam implements ChatTeam {
 		return this.team;
 	}
 
+	@Override
 	public String getName() {
 		return this.team.getName();
 	}
 
+	@Override
 	public ChatNamedColor getColor() {
 		return ChatNamedColor.getByFormat(FabricParser.fabric(this.team.getColor()));
 	}
 
+	@Override
 	public ChatComponent getDisplayName() {
 		return FabricParser.fabric(this.team.getDisplayName());
 	}
 
+	@Override
 	public ChatComponent getPrefix() {
 		return FabricParser.fabric(this.team.getPlayerPrefix());
 	}
 
+	@Override
 	public ChatComponent getSuffix() {
 		return FabricParser.fabric(this.team.getPlayerSuffix());
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

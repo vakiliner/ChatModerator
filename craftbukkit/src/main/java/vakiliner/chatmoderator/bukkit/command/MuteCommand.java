@@ -26,6 +26,7 @@ public class MuteCommand implements TabExecutor {
 		this.manager = manager;
 	}
 
+	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
 		if (args.length < 2) return false;
 		ChatCommandSender sender = this.manager.toChatCommandSender(commandSender);
@@ -75,6 +76,7 @@ public class MuteCommand implements TabExecutor {
 		return true;
 	}
 
+	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		switch (args.length) {
 			case 1:

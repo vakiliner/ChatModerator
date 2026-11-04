@@ -51,6 +51,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		}
 	}
 
+	@Override
 	public ChatComponent clone() {
 		return this.clone(true);
 	}
@@ -292,6 +293,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		return new ChatComponentWithLegacyText(this, new ChatTextComponent(legacyText));
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -303,6 +305,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		}
 	}
 
+	@Override
 	public JsonElement serialize() {
 		return serialize(this);
 	}

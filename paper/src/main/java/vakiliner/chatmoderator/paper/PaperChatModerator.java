@@ -7,10 +7,12 @@ import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.spigot.SpigotChatModerator;
 
 public class PaperChatModerator extends SpigotChatModerator {
+	@Override
 	public ChatOfflinePlayer getOfflinePlayerIfCached(String name) {
 		return this.toChatOfflinePlayer(Bukkit.getOfflinePlayerIfCached(name));
 	}
 
+	@Override
 	public ChatPlayer toChatPlayer(Player player) {
 		return player != null ? new PaperChatPlayer(this, player) : null;
 	}

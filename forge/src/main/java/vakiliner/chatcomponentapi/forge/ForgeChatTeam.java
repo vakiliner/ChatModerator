@@ -19,26 +19,32 @@ public class ForgeChatTeam implements ChatTeam {
 		return this.team;
 	}
 
+	@Override
 	public String getName() {
 		return this.team.getName();
 	}
 
+	@Override
 	public ChatNamedColor getColor() {
 		return ChatNamedColor.getByFormat(ForgeParser.forge(this.team.getColor()));
 	}
 
+	@Override
 	public ChatComponent getDisplayName() {
 		return ForgeParser.forge(this.team.getDisplayName());
 	}
 
+	@Override
 	public ChatComponent getPrefix() {
 		return ForgeParser.forge(this.team.getPlayerPrefix());
 	}
 
+	@Override
 	public ChatComponent getSuffix() {
 		return ForgeParser.forge(this.team.getPlayerSuffix());
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;
