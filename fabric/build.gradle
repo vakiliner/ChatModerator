@@ -4,9 +4,9 @@ plugins {
 
 dependencies {
 	implementation project(':core')
-	minecraft group: 'com.mojang', name: 'minecraft', version: project.minecraft_version
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.officialMojangMappings()
-	modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: project.loader_version
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation fabricApi.module('fabric-api-base', project.fabric_api_version)
 	modImplementation fabricApi.module('fabric-lifecycle-events-v1', project.fabric_api_version)
