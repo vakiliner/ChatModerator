@@ -1,19 +1,18 @@
 package vakiliner.chatcomponentapi.craftbukkit;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import org.bukkit.scoreboard.Team;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
 import vakiliner.chatcomponentapi.component.ChatComponent;
-import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 public class BukkitChatTeam implements ChatTeam {
 	protected final BukkitParser parser;
 	protected final Team team;
 
 	public BukkitChatTeam(BukkitParser parser, Team team) {
-		this.parser = Objects.requireNonNull(parser);
-		this.team = Objects.requireNonNull(team);
+		this.parser = requireNonNull(parser);
+		this.team = requireNonNull(team);
 	}
 
 	public Team getTeam() {
@@ -32,17 +31,17 @@ public class BukkitChatTeam implements ChatTeam {
 
 	@Override
 	public ChatComponent getDisplayName() {
-		return new ChatTextComponent(this.team.getDisplayName());
+		return this.parser.getDisplayName(this.team);
 	}
 
 	@Override
 	public ChatComponent getPrefix() {
-		return new ChatTextComponent(this.team.getPrefix());
+		return this.parser.getPrefix(this.team);
 	}
 
 	@Override
 	public ChatComponent getSuffix() {
-		return new ChatTextComponent(this.team.getSuffix());
+		return this.parser.getSuffix(this.team);
 	}
 
 	@Override

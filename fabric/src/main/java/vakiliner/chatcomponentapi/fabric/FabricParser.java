@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
@@ -45,7 +46,6 @@ import vakiliner.chatcomponentapi.component.ChatSelectorComponent;
 import vakiliner.chatcomponentapi.component.ChatStyle;
 import vakiliner.chatcomponentapi.component.ChatTextComponent;
 import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
-import vakiliner.chatcomponentapi.fabric.mixin.StyleAccessor;
 
 public class FabricParser extends BaseParser {
 	private static final IStyleParser STYLE_PARSER;
@@ -156,8 +156,11 @@ public class FabricParser extends BaseParser {
 	}
 
 	public void broadcastMessage(PlayerList playerList, ChatComponent component, ChatMessageType type, UUID uuid) {
+		this.broadcastMessage(playerList, component, type, uuid, null);
+	}
+
+	protected void broadcastMessage(PlayerList playerList, ChatComponent component, ChatMessageType type, UUID uuid, Predicate<? super ChatPlayer> predicate) {
 		if (uuid == null) uuid = NIL_UUID;
-		this.sendMessage(playerList.getServer(), component, type, uuid);
 		final ClientboundChatPacket packet;
 		try {
 			if (CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.getParameterTypes().length == 3) {
@@ -168,9 +171,17 @@ public class FabricParser extends BaseParser {
 		} catch (IllegalAccessException | InvocationTargetException | InstantiationException err) {
 			throw new IllegalStateException(err);
 		}
-		playerList.broadcastAll(packet);
+		this.sendMessage(playerList.getServer(), component, type, uuid);
+		if (predicate == null) {
+			playerList.broadcastAll(packet);
+		} else for (ServerPlayer player : playerList.getPlayers()) {
+			if (predicate.test(this.toChatPlayer(player))) {
+				player.connection.send(packet);
+			}
+		}
 	}
 
+	@Deprecated
 	public void execute(MinecraftServer server, IChatPlugin plugin, Runnable runnable) {
 		if (plugin instanceof IFabricChatPlugin) {
 			server.execute(runnable);
@@ -184,13 +195,12 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static Component fabric(ChatComponent raw, boolean isConsole) {
-		final BaseComponent component;
+		if (raw == null) return null;
 		if (raw instanceof ChatComponentModified) {
 			raw = ((ChatComponentModified) raw).getComponent(isConsole);
 		}
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof ChatTextComponent) {
+		final BaseComponent component;
+		if (raw instanceof ChatTextComponent) {
 			ChatTextComponent chatComponent = (ChatTextComponent) raw;
 			component = new TextComponent(chatComponent.getText());
 		} else if (raw instanceof ChatTranslateComponent) {
@@ -219,10 +229,9 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static ChatComponent fabric(Component raw) {
+		if (raw == null) return null;
 		final ChatComponent chatComponent;
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof TextComponent) {
+		if (raw instanceof TextComponent) {
 			TextComponent component = (TextComponent) raw;
 			chatComponent = new ChatTextComponent(component.getText());
 		} else if (raw instanceof TranslatableComponent) {
@@ -248,17 +257,16 @@ public class FabricParser extends BaseParser {
 	public static ChatStyle fabric(Style style) {
 		if (style == null) return null;
 		if (style.isEmpty()) return ChatStyle.EMPTY;
-		StyleAccessor accessor = (StyleAccessor) style;
 		ChatStyle.Builder builder = ChatStyle.newBuilder();
 		builder.withColor(STYLE_PARSER.injectColor(style));
-		builder.withBold(accessor.getBold());
-		builder.withItalic(accessor.getItalic());
-		builder.withUnderlined(accessor.getUnderlined());
-		builder.withStrikethrough(accessor.getStrikethrough());
-		builder.withObfuscated(accessor.getObfuscated());
-		builder.withClickEvent(fabric(accessor.getClickEvent()));
-		builder.withHoverEvent(fabric(accessor.getHoverEvent()));
-		builder.withInsertion(accessor.getInsertion());
+		builder.withBold(style.bold);
+		builder.withItalic(style.italic);
+		builder.withUnderlined(style.underlined);
+		builder.withStrikethrough(style.strikethrough);
+		builder.withObfuscated(style.obfuscated);
+		builder.withClickEvent(fabric(style.clickEvent));
+		builder.withHoverEvent(fabric(style.hoverEvent));
+		builder.withInsertion(style.insertion);
 		if (FONT != null) try {
 			builder.withFont(fabric((ResourceLocation) FONT.get(style)));
 		} catch (IllegalAccessException err) {
@@ -268,11 +276,29 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static ClickEvent fabric(ChatClickEvent event) {
-		return event != null ? new ClickEvent(ClickEvent.Action.getByName(event.getAction().getName()), event.getValue()) : null;
+		if (event == null) return null;
+		switch (event.action()) {
+			case OPEN_URL: return new ClickEvent(ClickEvent.Action.OPEN_URL, event.value());
+			case OPEN_FILE: return new ClickEvent(ClickEvent.Action.OPEN_FILE, event.value());
+			case RUN_COMMAND: return new ClickEvent(ClickEvent.Action.RUN_COMMAND, event.value());
+			case SUGGEST_COMMAND: return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, event.value());
+			case CHANGE_PAGE: return new ClickEvent(ClickEvent.Action.CHANGE_PAGE, event.value());
+			case COPY_TO_CLIPBOARD: return new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, event.value());
+			default: throw new IllegalArgumentException("Unknown ChatClickEvent.Action " + event.action());
+		}
 	}
 
 	public static ChatClickEvent fabric(ClickEvent event) {
-		return event != null ? new ChatClickEvent(ChatClickEvent.Action.getByName(event.getAction().getName()), event.getValue()) : null;
+		if (event == null) return null;
+		switch (event.getAction()) {
+			case OPEN_URL: return new ChatClickEvent(ChatClickEvent.Action.OPEN_URL, event.getValue());
+			case OPEN_FILE: return new ChatClickEvent(ChatClickEvent.Action.OPEN_FILE, event.getValue());
+			case RUN_COMMAND: return new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, event.getValue());
+			case SUGGEST_COMMAND: return new ChatClickEvent(ChatClickEvent.Action.SUGGEST_COMMAND, event.getValue());
+			case CHANGE_PAGE: return new ChatClickEvent(ChatClickEvent.Action.CHANGE_PAGE, event.getValue());
+			case COPY_TO_CLIPBOARD: return new ChatClickEvent(ChatClickEvent.Action.COPY_TO_CLIPBOARD, event.getValue());
+			default: throw new IllegalArgumentException("Unknown ClickEvent.Action " + event.getAction());
+		}
 	}
 
 	public static HoverEvent fabric(ChatHoverEvent<?> event) {
@@ -284,7 +310,7 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static ResourceLocation fabric(ChatId id) {
-		return id != null ? new ResourceLocation(id.getNamespace(), id.getValue()) : null;
+		return id != null ? new ResourceLocation(id.namespace(), id.value()) : null;
 	}
 
 	public static ChatId fabric(ResourceLocation resourceLocation) {
@@ -292,15 +318,25 @@ public class FabricParser extends BaseParser {
 	}
 
 	public static ChatType fabric(ChatMessageType type) {
-		return type != null ? ChatType.valueOf(type.name()) : null;
+		if (type == null) return null;
+		switch (type) {
+			case CHAT: return ChatType.CHAT;
+			case SYSTEM: return ChatType.SYSTEM;
+			default: throw new IllegalArgumentException("Unknown ChatMessageType " + type);
+		}
 	}
 
 	public static ChatMessageType fabric(ChatType type) {
-		return type != null ? ChatMessageType.valueOf(type.name()) : null;
+		if (type == null) return null;
+		switch (type) {
+			case CHAT: return ChatMessageType.CHAT;
+			case SYSTEM: return ChatMessageType.SYSTEM;
+			default: throw new IllegalArgumentException("Unknown ChatType " + type);
+		}
 	}
 
 	public static ChatFormatting fabric(ChatTextFormat format) {
-		return format != null ? ChatFormatting.getByName(format.name()) : null;
+		return format != null ? ChatFormatting.getByName(format.getName()) : null;
 	}
 
 	public static ChatTextFormat fabric(ChatFormatting formatting) {

@@ -59,13 +59,17 @@ class OldStyle implements IStyleParser {
 		}
 	}
 
-	@Override
-	public ChatTextColor injectColor(Style style) {
+	private static ChatFormatting getColor(Style style) {
 		try {
-			return ChatNamedColor.getByFormat(FabricParser.fabric((ChatFormatting) COLOR_FIELD.get(style)));
+			return (ChatFormatting) COLOR_FIELD.get(style);
 		} catch (IllegalAccessException err) {
 			throw new IllegalStateException(err);
 		}
+	}
+
+	@Override
+	public ChatTextColor injectColor(Style style) {
+		return ChatNamedColor.getByFormat(FabricParser.fabric(getColor(style)));
 	}
 
 	@Override

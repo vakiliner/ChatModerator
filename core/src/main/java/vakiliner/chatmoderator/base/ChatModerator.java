@@ -368,7 +368,7 @@ public abstract class ChatModerator {
 						this.mutes.mute(player, firstRule.getName(), ModeratorType.AUTOMOD, muteTime, actions.muteReason());
 					}
 					ChatServer server = player.getServer();
-					if (logAdmins) server.execute(this.getPlugin(), () -> {
+					if (logAdmins) server.execute(() -> {
 						ChatTextComponent log = new ChatTextComponent((blockAction != null ? "Заблокировано" : "Отмечено") + " сообщение от игрока ");
 						log.append(player.getDisplayName());
 						ChatTextComponent getMessage = new ChatTextComponent(", ");

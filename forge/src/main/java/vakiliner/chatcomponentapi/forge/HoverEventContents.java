@@ -54,7 +54,7 @@ class HoverEventContents implements IStyleParser {
 
 	@Override
 	public HoverEvent forge(ChatHoverEvent<?> event) {
-		ChatHoverEvent.Action<?> action = event.getAction();
+		ChatHoverEvent.Action<?> action = event.action();
 		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
 			return new HoverEvent(HoverEvent.Action.SHOW_TEXT, ForgeParser.forge(event.getValue(ChatHoverEvent.Action.SHOW_TEXT)));
 		} else if (action == ChatHoverEvent.Action.SHOW_ENTITY) {
@@ -62,7 +62,7 @@ class HoverEventContents implements IStyleParser {
 		} else if (action == ChatHoverEvent.Action.SHOW_ITEM) {
 			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, forge(event.getValue(ChatHoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Unknown action");
+			throw new IllegalArgumentException("Unknown ChatHoverEvent.Action " + action);
 		}
 	}
 
@@ -76,7 +76,7 @@ class HoverEventContents implements IStyleParser {
 		} else if (action == HoverEvent.Action.SHOW_ITEM) {
 			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, forge(event.getValue(HoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Unknown action");
+			throw new IllegalArgumentException("Unknown HoverEvent.Action " + action);
 		}
 	}
 

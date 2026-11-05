@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Function;
 
+@Deprecated
 public class ParseCollection<Output, Input> extends AbstractCollection<Output> {
 	protected final Collection<? extends Input> impl;
 	protected final Function<Input, Output> i2o;

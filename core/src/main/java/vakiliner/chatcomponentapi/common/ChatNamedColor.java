@@ -1,7 +1,7 @@
 package vakiliner.chatcomponentapi.common;
 
+import static java.util.Objects.requireNonNull;
 import java.util.Map;
-import java.util.Objects;
 import com.google.common.collect.Maps;
 
 public final class ChatNamedColor extends ChatTextColor {
@@ -25,8 +25,7 @@ public final class ChatNamedColor extends ChatTextColor {
 	public static final ChatNamedColor WHITE = new ChatNamedColor(ChatTextFormat.WHITE, 16777215);
 
 	private ChatNamedColor(ChatTextFormat format, int color) {
-		super(color, Objects.requireNonNull(format));
-		if (this.asFormat.isFormat()) throw new IllegalArgumentException("ChatTextFormat cannot be a format");
+		super(color, requireNonNull(format));
 		BY_FORMAT.put(this.asFormat, this);
 		BY_VALUE.put(this.value, this);
 	}
