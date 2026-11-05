@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.fabric;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
@@ -14,8 +14,8 @@ public class FabricChatServer implements ChatServer {
 	protected final MinecraftServer server;
 
 	public FabricChatServer(FabricParser parser, MinecraftServer server) {
-		this.parser = Objects.requireNonNull(parser);
-		this.server = Objects.requireNonNull(server);
+		this.parser = requireNonNull(parser);
+		this.server = requireNonNull(server);
 	}
 
 	public MinecraftServer getImpl() {
@@ -37,6 +37,17 @@ public class FabricChatServer implements ChatServer {
 		this.parser.sendMessage(this.server, component, type, uuid);
 	}
 
+	@Override
+	public void execute(Runnable command) {
+		this.server.execute(command);
+	}
+
+	@Override
+	public void executeBlocking(Runnable command) {
+		this.server.executeBlocking(command);
+	}
+
+	@Deprecated
 	@Override
 	public void execute(IChatPlugin plugin, Runnable runnable) {
 		this.parser.execute(this.server, plugin, runnable);

@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.component;
 
+import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,8 +19,8 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 	private final V contents;
 
 	public ChatHoverEvent(Action<V> action, V contents) {
-		this.action = Objects.requireNonNull(action);
-		this.contents = Objects.requireNonNull(contents);
+		this.action = requireNonNull(action);
+		this.contents = requireNonNull(contents);
 	}
 
 	@Deprecated
@@ -37,12 +38,22 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 		return new ChatHoverEvent<>(this);
 	}
 
-	public Action<V> getAction() {
+	public Action<V> action() {
 		return this.action;
 	}
 
-	public V getContents() {
+	public V contents() {
 		return this.contents;
+	}
+
+	@Deprecated
+	public Action<V> getAction() {
+		return this.action();
+	}
+
+	@Deprecated
+	public V getContents() {
+		return this.contents();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -118,7 +129,7 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 		throw new JsonParseException("No content");
 	}
 
-	public static class Action<V extends IContent> {
+	public static final class Action<V extends IContent> {
 		private static final Map<String, Action<?>> BY_NAME = Maps.newHashMap();
 		public static final Action<ChatComponent> SHOW_TEXT = new Action<>("show_text", ChatComponent.class);
 		public static final Action<ShowEntity> SHOW_ENTITY = new Action<>("show_entity", ShowEntity.class);
@@ -164,8 +175,8 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 		}
 
 		public ShowEntity(ChatId type, UUID id, ChatComponent name) {
-			this.type = Objects.requireNonNull(type);
-			this.id = Objects.requireNonNull(id);
+			this.type = requireNonNull(type);
+			this.id = requireNonNull(id);
 			this.name = name;
 		}
 
@@ -231,7 +242,7 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 
 		public static ShowEntity deserialize(JsonElement element, boolean old) {
 			JsonObject object = element.getAsJsonObject();
-			ChatId type = ChatId.of(object.getAsJsonPrimitive("type").getAsString());
+			ChatId type = ChatId.fromString(object.getAsJsonPrimitive("type").getAsString());
 			UUID id = UUID.fromString(object.getAsJsonPrimitive("id").getAsString());
 			JsonElement name = object.get("name");
 			if (name != null) {
@@ -252,7 +263,7 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 		}
 
 		public ShowItem(ChatId id, int count) {
-			this.id = Objects.requireNonNull(id);
+			this.id = requireNonNull(id);
 			this.count = count;
 		}
 
@@ -294,7 +305,7 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 
 		public static ShowItem deserialize(JsonElement element) {
 			JsonObject object = element.getAsJsonObject();
-			ChatId id = ChatId.of(object.getAsJsonPrimitive("id").getAsString());
+			ChatId id = ChatId.fromString(object.getAsJsonPrimitive("id").getAsString());
 			JsonPrimitive count = object.getAsJsonPrimitive("count");
 			if (count != null) {
 				return new ShowItem(id, count.getAsInt());

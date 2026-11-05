@@ -1,0 +1,9 @@
+accessWidener	v1	named
+accessible	field	net/minecraft/network/chat/Style	bold			Ljava/lang/Boolean;
+accessible	field	net/minecraft/network/chat/Style	italic			Ljava/lang/Boolean;
+accessible	field	net/minecraft/network/chat/Style	underlined		Ljava/lang/Boolean;
+accessible	field	net/minecraft/network/chat/Style	strikethrough	Ljava/lang/Boolean;
+accessible	field	net/minecraft/network/chat/Style	obfuscated		Ljava/lang/Boolean;
+accessible	field	net/minecraft/network/chat/Style	clickEvent		Lnet/minecraft/network/chat/ClickEvent;
+accessible	field	net/minecraft/network/chat/Style	hoverEvent		Lnet/minecraft/network/chat/HoverEvent;
+accessible	field	net/minecraft/network/chat/Style	insertion		Ljava/lang/String;

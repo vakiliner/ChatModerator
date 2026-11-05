@@ -14,6 +14,8 @@ dependencies {
 }
 
 loom {
+	accessWidenerPath = file('src/main/resources/chatcomponentapi.accesswidener')
+
 	mixin {
 		useLegacyMixinAp = false
 	}

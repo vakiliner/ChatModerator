@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.key.Key;
@@ -22,8 +23,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import vakiliner.chatcomponentapi.base.ChatPlayer;
-import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
@@ -46,8 +45,16 @@ public class PaperParser extends SpigotParser {
 	}
 
 	@Override
-	public void sendMessage(CommandSender sender, ChatComponent component, ChatMessageType type, UUID uuid) {
-		sender.sendMessage(uuid != null ? Identity.identity(uuid) : Identity.nil(), paper(component, sender instanceof ConsoleCommandSender), paper(type));
+	public void sendMessage(CommandSender sender, ChatComponent chatComponent, ChatMessageType chatMessageType, UUID uuid) {
+		this.sendMessage(sender, paper(chatComponent, sender instanceof ConsoleCommandSender), paper(chatMessageType), uuid != null ? Identity.identity(uuid) : null);
+	}
+
+	private void sendMessage(Audience audience, Component component, MessageType type, Identity identity) {
+		if (identity != null) {
+			audience.sendMessage(identity, component, type);
+		} else {
+			audience.sendMessage(component, type);
+		}
 	}
 
 	@Override
@@ -55,10 +62,30 @@ public class PaperParser extends SpigotParser {
 		Component component = paper(chatComponent, false);
 		Component consoleComponent = paper(chatComponent, true);
 		MessageType type = paper(chatMessageType);
-		Identity identity = uuid != null ? Identity.identity(uuid) : Identity.nil();
+		Identity identity = uuid != null ? Identity.identity(uuid) : null;
 		for (CommandSender recipient : recipients) {
-			recipient.sendMessage(identity, recipient instanceof ConsoleCommandSender ? consoleComponent : component, type);
+			this.sendMessage(recipient, recipient instanceof ConsoleCommandSender ? consoleComponent : component, type, identity);
 		}
+	}
+
+	@Override
+	public ChatComponent getDisplayName(Player player) {
+		return paper(player.displayName());
+	}
+
+	@Override
+	public ChatComponent getDisplayName(Team team) {
+		return paper(team.displayName());
+	}
+
+	@Override
+	public ChatComponent getPrefix(Team team) {
+		return paper(team.prefix());
+	}
+
+	@Override
+	public ChatComponent getSuffix(Team team) {
+		return paper(team.suffix());
 	}
 
 	public static Component paper(ChatComponent raw) {
@@ -92,10 +119,9 @@ public class PaperParser extends SpigotParser {
 	}
 
 	public static ChatComponent paper(Component raw) {
+		if (raw == null) return null;
 		final ChatComponent chatComponent;
-		if (raw == null) {
-			return null;
-		} else if (raw instanceof TextComponent) {
+		if (raw instanceof TextComponent) {
 			TextComponent component = (TextComponent) raw;
 			chatComponent = new ChatTextComponent(component.content());
 		} else if (raw instanceof TranslatableComponent) {
@@ -151,16 +177,34 @@ public class PaperParser extends SpigotParser {
 	}
 
 	public static ClickEvent paper(ChatClickEvent event) {
-		return event != null ? ClickEvent.clickEvent(ClickEvent.Action.NAMES.value(event.getAction().getName()), event.getValue()) : null;
+		if (event == null) return null;
+		switch (event.action()) {
+			case OPEN_URL: return ClickEvent.openUrl(event.value());
+			case OPEN_FILE: return ClickEvent.openFile(event.value());
+			case RUN_COMMAND: return ClickEvent.runCommand(event.value());
+			case SUGGEST_COMMAND: return ClickEvent.suggestCommand(event.value());
+			case CHANGE_PAGE: return ClickEvent.changePage(event.value());
+			case COPY_TO_CLIPBOARD: return ClickEvent.copyToClipboard(event.value());
+			default: throw new IllegalArgumentException("Unknown ChatClickEvent.Action " + event.action());
+		}
 	}
 
 	public static ChatClickEvent paper(ClickEvent event) {
-		return event != null ? new ChatClickEvent(ChatClickEvent.Action.getByName(event.action().toString()), event.value()) : null;
+		if (event == null) return null;
+		switch (event.action()) {
+			case OPEN_URL: return new ChatClickEvent(ChatClickEvent.Action.OPEN_URL, event.value());
+			case OPEN_FILE: return new ChatClickEvent(ChatClickEvent.Action.OPEN_FILE, event.value());
+			case RUN_COMMAND: return new ChatClickEvent(ChatClickEvent.Action.RUN_COMMAND, event.value());
+			case SUGGEST_COMMAND: return new ChatClickEvent(ChatClickEvent.Action.SUGGEST_COMMAND, event.value());
+			case CHANGE_PAGE: return new ChatClickEvent(ChatClickEvent.Action.CHANGE_PAGE, event.value());
+			case COPY_TO_CLIPBOARD: return new ChatClickEvent(ChatClickEvent.Action.COPY_TO_CLIPBOARD, event.value());
+			default: throw new IllegalArgumentException("Unknown ClickEvent.Action " + event.action());
+		}
 	}
 
 	public static HoverEvent<?> paper(ChatHoverEvent<?> event) {
 		if (event == null) return null;
-		ChatHoverEvent.Action<?> action = event.getAction();
+		ChatHoverEvent.Action<?> action = event.action();
 		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
 			return HoverEvent.showText(paper(event.getValue(ChatHoverEvent.Action.SHOW_TEXT)));
 		} else if (action == ChatHoverEvent.Action.SHOW_ENTITY) {
@@ -168,7 +212,7 @@ public class PaperParser extends SpigotParser {
 		} else if (action == ChatHoverEvent.Action.SHOW_ITEM) {
 			return HoverEvent.showItem(paper(event.getValue(ChatHoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Unknown action");
+			throw new IllegalArgumentException("Unknown ChatHoverEvent.Action " + action);
 		}
 	}
 
@@ -183,7 +227,7 @@ public class PaperParser extends SpigotParser {
 		} else if (action == HoverEvent.Action.SHOW_ITEM) {
 			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, paper((HoverEvent.ShowItem) value));
 		} else {
-			throw new IllegalArgumentException("Unknown action");
+			throw new IllegalArgumentException("Unknown HoverEvent.Action " + action);
 		}
 	}
 
@@ -204,7 +248,7 @@ public class PaperParser extends SpigotParser {
 	}
 
 	public static Key paper(ChatId id) {
-		return id != null ? Key.key(id.getNamespace(), id.getValue()) : null;
+		return id != null ? Key.key(id.namespace(), id.value()) : null;
 	}
 
 	public static ChatId paper(Key key) {
@@ -212,11 +256,21 @@ public class PaperParser extends SpigotParser {
 	}
 
 	public static MessageType paper(ChatMessageType type) {
-		return type != null ? MessageType.valueOf(type.name()) : null;
+		if (type == null) return null;
+		switch (type) {
+			case CHAT: return MessageType.CHAT;
+			case SYSTEM: return MessageType.SYSTEM;
+			default: throw new IllegalArgumentException("Unknown ChatMessageType " + type);
+		}
 	}
 
 	public static ChatMessageType paper(MessageType type) {
-		return type != null ? ChatMessageType.valueOf(type.name()) : null;
+		if (type == null) return null;
+		switch (type) {
+			case CHAT: return ChatMessageType.CHAT;
+			case SYSTEM: return ChatMessageType.SYSTEM;
+			default: throw new IllegalArgumentException("Unknown MessageType " + type);
+		}
 	}
 
 	public static NamedTextColor paper(ChatNamedColor color) {
@@ -263,15 +317,5 @@ public class PaperParser extends SpigotParser {
 	@Deprecated
 	public static ChatTextColor paperColor(TextColor color) {
 		return paper(color);
-	}
-
-	@Override
-	public ChatPlayer toChatPlayer(Player player) {
-		return player != null ? new PaperChatPlayer(this, player) : null;
-	}
-
-	@Override
-	public ChatTeam toChatTeam(Team team) {
-		return team != null ? new PaperChatTeam(this, team) : null;
 	}
 }

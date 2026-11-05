@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -26,6 +27,7 @@ import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
 import vakiliner.chatcomponentapi.component.ChatComponent;
+import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 public class BukkitParser extends BaseParser {
 	protected static final boolean sendMessageWithUUID;
@@ -63,10 +65,15 @@ public class BukkitParser extends BaseParser {
 	}
 
 	public void broadcastMessage(Server server, ChatComponent component, ChatMessageType type, UUID uuid) {
+		this.broadcastMessage(server, component, type, uuid, null);
+	}
+
+	public void broadcastMessage(Server server, ChatComponent component, ChatMessageType type, UUID uuid, Predicate<? super ChatPlayer> predicate) {
+		if (predicate == null) predicate = (p) -> true;
 		Set<CommandSender> recipients = new HashSet<>();
 		Set<Permissible> permissibles = server.getPluginManager().getPermissionSubscriptions(Server.BROADCAST_CHANNEL_USERS);
 		for (Permissible permissible : permissibles) {
-			if (permissible instanceof CommandSender && permissible.hasPermission(Server.BROADCAST_CHANNEL_USERS)) {
+			if (permissible instanceof CommandSender && permissible.hasPermission(Server.BROADCAST_CHANNEL_USERS) && !(permissible instanceof Player && !predicate.test(this.toChatPlayer((Player) permissible)))) {
 				recipients.add((CommandSender) permissible);
 			}
 		}
@@ -81,16 +88,34 @@ public class BukkitParser extends BaseParser {
 		}
 	}
 
-	public void execute(BukkitScheduler scheduler, IChatPlugin plugin, Runnable runnable) {
-		if (plugin instanceof IBukkitChatPlugin) {
+	@Deprecated
+	public void execute(BukkitScheduler scheduler, IChatPlugin raw, Runnable runnable) {
+		if (raw instanceof IBukkitChatPlugin) {
+			IBukkitChatPlugin chatPlugin = (IBukkitChatPlugin) raw;
 			if (!Bukkit.isPrimaryThread()) {
-				scheduler.runTask(((IBukkitChatPlugin) plugin).asPlugin(), runnable);
+				scheduler.runTask(chatPlugin.asPlugin(), runnable);
 			} else {
 				runnable.run();
 			}
 		} else {
 			throw new ClassCastException("Invalid plugin");
 		}
+	}
+
+	public ChatComponent getDisplayName(Player player) {
+		return new ChatTextComponent(player.getDisplayName());
+	}
+
+	public ChatComponent getDisplayName(Team team) {
+		return new ChatTextComponent(team.getDisplayName());
+	}
+
+	public ChatComponent getPrefix(Team team) {
+		return new ChatTextComponent(team.getPrefix());
+	}
+
+	public ChatComponent getSuffix(Team team) {
+		return new ChatTextComponent(team.getSuffix());
 	}
 
 	public static ChatColor bukkit(ChatTextFormat color) {

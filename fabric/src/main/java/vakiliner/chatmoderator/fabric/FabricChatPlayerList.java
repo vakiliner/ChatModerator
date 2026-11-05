@@ -2,8 +2,8 @@ package vakiliner.chatmoderator.fabric;
 
 import java.util.Collection;
 import java.util.UUID;
+import com.google.common.collect.Collections2;
 import net.minecraft.server.players.PlayerList;
-import vakiliner.chatcomponentapi.util.ParseCollection;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.base.ChatPlayerList;
 import vakiliner.chatmoderator.base.ChatServer;
@@ -23,7 +23,7 @@ public class FabricChatPlayerList extends vakiliner.chatcomponentapi.fabric.Fabr
 
 	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
-		return new ParseCollection<>(this.playerList.getPlayers(), this.manager::toChatPlayer);
+		return Collections2.transform(this.playerList.getPlayers(), this.manager::toChatPlayer);
 	}
 
 	@Override

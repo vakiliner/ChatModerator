@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.component;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Supplier;
 import vakiliner.chatcomponentapi.common.ChatTextColor;
@@ -12,14 +12,14 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, Supplier<ChatComponent> getLegacyComponent) {
 		super(component);
-		this.getLegacyComponent = Objects.requireNonNull(getLegacyComponent);
+		this.getLegacyComponent = requireNonNull(getLegacyComponent);
 	}
 
 	@Deprecated
 	public ChatComponentWithLegacyText(ChatComponent component, ChatComponent legacyComponent) {
 		super(component);
 		this.getLegacyComponent = null;
-		this.legacyComponent = Objects.requireNonNull(legacyComponent);
+		this.legacyComponent = requireNonNull(legacyComponent);
 	}
 
 	@Deprecated
@@ -42,11 +42,11 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		if (this.legacyComponent != null) {
 			return this.legacyComponent;
 		}
-		synchronized (this) {
+		synchronized (this.getLegacyComponent) {
 			if (this.legacyComponent != null) {
 				return this.legacyComponent;
 			}
-			return this.legacyComponent = this.getLegacyComponent.get();
+			return requireNonNull(this.legacyComponent = this.getLegacyComponent.get());
 		}
 	}
 

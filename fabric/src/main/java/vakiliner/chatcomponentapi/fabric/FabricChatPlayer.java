@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.fabric;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import vakiliner.chatcomponentapi.base.ChatPlayer;
@@ -14,7 +14,7 @@ public class FabricChatPlayer extends FabricChatOfflinePlayer implements ChatPla
 
 	public FabricChatPlayer(FabricParser parser, ServerPlayer player) {
 		super(parser, player.server, player.getGameProfile());
-		this.player = Objects.requireNonNull(player);
+		this.player = requireNonNull(player);
 	}
 
 	public ServerPlayer getPlayer() {

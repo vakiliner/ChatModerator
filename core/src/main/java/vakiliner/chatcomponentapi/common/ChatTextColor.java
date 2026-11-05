@@ -8,7 +8,7 @@ public class ChatTextColor {
 		this.value = value & 0xFFFFFF;
 		this.asFormat = asFormat;
 		if (this.asFormat != null && this.asFormat.isFormat()) {
-			throw new IllegalArgumentException("Invalid ChatTextFormat");
+			throw new IllegalArgumentException("ChatTextFormat cannot be a format");
 		}
 	}
 
