@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.forge;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import vakiliner.chatcomponentapi.base.ChatPlayer;
@@ -14,7 +14,7 @@ public class ForgeChatPlayer extends ForgeChatOfflinePlayer implements ChatPlaye
 
 	public ForgeChatPlayer(ForgeParser parser, ServerPlayerEntity player) {
 		super(parser, player.server, player.getGameProfile());
-		this.player = Objects.requireNonNull(player);
+		this.player = requireNonNull(player);
 	}
 
 	public ServerPlayerEntity getPlayer() {

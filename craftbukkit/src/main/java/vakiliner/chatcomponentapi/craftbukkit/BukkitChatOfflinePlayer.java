@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.craftbukkit;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,8 +13,8 @@ public class BukkitChatOfflinePlayer implements ChatOfflinePlayer {
 	protected final OfflinePlayer player;
 
 	public BukkitChatOfflinePlayer(BukkitParser parser, OfflinePlayer player) {
-		this.parser = Objects.requireNonNull(parser);
-		this.player = Objects.requireNonNull(player);
+		this.parser = requireNonNull(parser);
+		this.player = requireNonNull(player);
 	}
 
 	public OfflinePlayer getPlayer() {

@@ -1,9 +1,9 @@
 package vakiliner.chatcomponentapi.component;
 
+import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import com.google.gson.JsonObject;
@@ -16,7 +16,7 @@ public abstract class ChatComponentModified extends ChatComponent {
 		if (component instanceof ChatComponentModified) {
 			throw new IllegalArgumentException(component.getClass().getSimpleName() + " cannot be used as a component");
 		}
-		this.component = Objects.requireNonNull(component);
+		this.component = requireNonNull(component);
 	}
 
 	protected ChatComponentModified(ChatComponentModified component) {

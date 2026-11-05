@@ -1,6 +1,8 @@
 package vakiliner.chatcomponentapi.base;
 
-public interface ChatServer extends ChatCommandSender {
+import java.util.concurrent.Executor;
+
+public interface ChatServer extends Executor, ChatCommandSender {
 	ChatPlayerList getPlayerList();
 
 	@Override
@@ -8,5 +10,11 @@ public interface ChatServer extends ChatCommandSender {
 		return true;
 	}
 
+	@Override
+	void execute(Runnable command);
+
+	void executeBlocking(Runnable command);
+
+	@Deprecated
 	void execute(IChatPlugin plugin, Runnable runnable);
 }

@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.forge;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import vakiliner.chatcomponentapi.base.ChatTeam;
 import vakiliner.chatcomponentapi.common.ChatNamedColor;
@@ -11,8 +11,8 @@ public class ForgeChatTeam implements ChatTeam {
 	protected final ScorePlayerTeam team;
 
 	public ForgeChatTeam(ForgeParser parser, ScorePlayerTeam team) {
-		this.parser = Objects.requireNonNull(parser);
-		this.team = Objects.requireNonNull(team);
+		this.parser = requireNonNull(parser);
+		this.team = requireNonNull(team);
 	}
 
 	public ScorePlayerTeam getTeam() {

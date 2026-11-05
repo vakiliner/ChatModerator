@@ -3,6 +3,7 @@ package vakiliner.chatcomponentapi.util;
 import java.util.Iterator;
 import java.util.function.Function;
 
+@Deprecated
 public class ParseIterator<Output, Input> implements Iterator<Output> {
 	protected final Iterator<? extends Input> impl;
 	protected final Function<Input, Output> i2o;

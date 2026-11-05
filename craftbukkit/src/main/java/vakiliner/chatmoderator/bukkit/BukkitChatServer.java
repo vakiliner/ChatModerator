@@ -3,7 +3,7 @@ package vakiliner.chatmoderator.bukkit;
 import java.util.Collection;
 import java.util.UUID;
 import org.bukkit.Server;
-import vakiliner.chatcomponentapi.util.ParseCollection;
+import com.google.common.collect.Collections2;
 import vakiliner.chatmoderator.base.ChatPlayer;
 import vakiliner.chatmoderator.base.ChatPlayerList;
 import vakiliner.chatmoderator.base.ChatServer;
@@ -28,7 +28,7 @@ public class BukkitChatServer extends vakiliner.chatcomponentapi.craftbukkit.Buk
 
 	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
-		return new ParseCollection<>(this.server.getOnlinePlayers(), this.manager::toChatPlayer);
+		return Collections2.transform(this.server.getOnlinePlayers(), this.manager::toChatPlayer);
 	}
 
 	@Override

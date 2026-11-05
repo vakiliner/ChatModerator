@@ -14,7 +14,7 @@ import vakiliner.chatcomponentapi.component.ChatTextComponent;
 
 class HoverEventParser {
 	public HoverEvent spigot(ChatHoverEvent<?> event) {
-		ChatHoverEvent.Action<?> action = event.getAction();
+		ChatHoverEvent.Action<?> action = event.action();
 		if (action == ChatHoverEvent.Action.SHOW_TEXT) {
 			return new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new BaseComponent[] { SpigotParser.spigot(event.getValue(ChatHoverEvent.Action.SHOW_TEXT)) }));
 		} else if (action == ChatHoverEvent.Action.SHOW_ENTITY) {
@@ -22,7 +22,7 @@ class HoverEventParser {
 		} else if (action == ChatHoverEvent.Action.SHOW_ITEM) {
 			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, spigot(event.getValue(ChatHoverEvent.Action.SHOW_ITEM)));
 		} else {
-			throw new IllegalArgumentException("Unknown action");
+			throw new IllegalArgumentException("Unknown ChatHoverEvent.Action " + action);
 		}
 	}
 
@@ -35,7 +35,7 @@ class HoverEventParser {
 			if (value instanceof String) {
 				chatComponent = new ChatTextComponent((String) value);
 			} else if (value instanceof BaseComponent[]) {
-				chatComponent = SpigotParser.spigot(((BaseComponent[]) value)[0]);
+				chatComponent = SpigotParser.spigot((BaseComponent[]) value);
 			} else {
 				throw new IllegalArgumentException("Could not parse ChatComponent from " + value.getClass());
 			}
@@ -45,7 +45,7 @@ class HoverEventParser {
 		} else if (action == HoverEvent.Action.SHOW_ITEM) {
 			return new ChatHoverEvent<>(ChatHoverEvent.Action.SHOW_ITEM, spigot((Item) content));
 		} else {
-			throw new IllegalArgumentException("Unknown action");
+			throw new IllegalArgumentException("Unknown HoverEvent.Action " + action);
 		}
 	}
 
@@ -54,7 +54,7 @@ class HoverEventParser {
 	}
 
 	public static ChatHoverEvent.ShowEntity spigot(Entity content) {
-		return content != null ? new ChatHoverEvent.ShowEntity(ChatId.of(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName())) : null;
+		return content != null ? new ChatHoverEvent.ShowEntity(ChatId.fromString(content.getType()), UUID.fromString(content.getId()), SpigotParser.spigot(content.getName())) : null;
 	}
 
 	public static Item spigot(ChatHoverEvent.ShowItem content) {
@@ -62,6 +62,6 @@ class HoverEventParser {
 	}
 
 	public static ChatHoverEvent.ShowItem spigot(Item content) {
-		return content != null ? new ChatHoverEvent.ShowItem(ChatId.of(content.getId()), content.getCount()) : null;
+		return content != null ? new ChatHoverEvent.ShowItem(ChatId.fromString(content.getId()), content.getCount()) : null;
 	}
 }
