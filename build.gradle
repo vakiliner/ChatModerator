@@ -9,10 +9,10 @@ var paper = findProject(':paper')
 var fabric = findProject(':fabric')
 var forge = findProject(':forge')
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-
 allprojects {
 	apply plugin: 'java'
+
+	java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 	var replaceProperties = [
 		version: project.version,
