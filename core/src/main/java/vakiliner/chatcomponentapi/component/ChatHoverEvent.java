@@ -33,7 +33,6 @@ public class ChatHoverEvent<V extends ChatHoverEvent.IContent> implements IGsonS
 		this.contents = event.contents;
 	}
 
-	@Override
 	public ChatHoverEvent<V> clone() {
 		return new ChatHoverEvent<>(this);
 	}

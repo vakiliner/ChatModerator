@@ -51,7 +51,6 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		}
 	}
 
-	@Override
 	public ChatComponent clone() {
 		return this.clone(true);
 	}
