@@ -5,7 +5,6 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;
-import vakiliner.chatcomponentapi.base.IChatPlugin;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 
@@ -40,17 +39,6 @@ public class ForgeChatServer implements ChatServer {
 	@Override
 	public void execute(Runnable command) {
 		this.server.execute(command);
-	}
-
-	@Override
-	public void executeBlocking(Runnable command) {
-		this.server.executeBlocking(command);
-	}
-
-	@Deprecated
-	@Override
-	public void execute(IChatPlugin plugin, Runnable runnable) {
-		this.parser.execute(this.server, plugin, runnable);
 	}
 
 	@Override

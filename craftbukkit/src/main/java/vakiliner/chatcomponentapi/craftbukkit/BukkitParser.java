@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
@@ -13,7 +12,6 @@ import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.Team;
 import vakiliner.chatcomponentapi.base.BaseParser;
 import vakiliner.chatcomponentapi.base.ChatCommandSender;
@@ -22,7 +20,6 @@ import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
-import vakiliner.chatcomponentapi.base.IChatPlugin;
 import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
@@ -85,20 +82,6 @@ public class BukkitParser extends BaseParser {
 		boolean system = chatMessageType == ChatMessageType.SYSTEM;
 		for (CommandSender recipient : recipients) {
 			this.sendMessage(recipient, message, system, uuid);
-		}
-	}
-
-	@Deprecated
-	public void execute(BukkitScheduler scheduler, IChatPlugin raw, Runnable runnable) {
-		if (raw instanceof IBukkitChatPlugin) {
-			IBukkitChatPlugin chatPlugin = (IBukkitChatPlugin) raw;
-			if (!Bukkit.isPrimaryThread()) {
-				scheduler.runTask(chatPlugin.asPlugin(), runnable);
-			} else {
-				runnable.run();
-			}
-		} else {
-			throw new ClassCastException("Invalid plugin");
 		}
 	}
 
