@@ -24,26 +24,32 @@ public class ForgeChatPlayerList implements ChatPlayerList {
 		return this.playerList;
 	}
 
+	@Override
 	public ChatServer getServer() {
 		return this.parser.toChatServer(this.playerList.getServer());
 	}
 
+	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
 		return new ParseCollection<>(this.playerList.getPlayers(), this.parser::toChatPlayer);
 	}
 
+	@Override
 	public ChatPlayer getPlayer(UUID uuid) {
 		return this.parser.toChatPlayer(this.playerList.getPlayer(uuid));
 	}
 
+	@Override
 	public ChatPlayer getPlayer(String name) {
 		return this.parser.toChatPlayer(this.playerList.getPlayerByName(name));
 	}
 
+	@Override
 	public void broadcastMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.broadcastMessage(this.playerList, component, type, uuid);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

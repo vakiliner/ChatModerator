@@ -33,6 +33,7 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		this.legacyComponent = component.legacyComponent;
 	}
 
+	@Override
 	public ChatComponent clone(boolean cloneExtra) {
 		return new ChatComponentWithLegacyText(this);
 	}
@@ -49,18 +50,22 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		}
 	}
 
+	@Override
 	public ChatComponent getComponent(boolean isConsole) {
 		return isConsole ? this.getLegacyComponent() : super.getComponent();
 	}
 
+	@Override
 	public String toLegacyText() {
 		return this.getLegacyComponent().toLegacyText();
 	}
 
+	@Override
 	public String toLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.getLegacyComponent().toLegacyText(parentColor, parentFormats);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

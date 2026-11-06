@@ -136,6 +136,7 @@ public class ForgeChatModerator extends ChatModerator {
 		}
 	}
 
+	@Override
 	public ChatModeratorModInitializer getPlugin() {
 		return this.modInitializer;
 	}
@@ -149,28 +150,34 @@ public class ForgeChatModerator extends ChatModerator {
 		return new ForgeListener(this);
 	}
 
+	@Override
 	protected void log(String message) {
 		LOGGER.info(message);
 	}
 
+	@Override
 	public Config getConfig() {
 		return this.config;
 	}
 
+	@Override
 	protected Path getDefaultFolderPath() {
 		return new File("config").toPath().resolve("ChatModerator");
 	}
 
+	@Override
 	public Path getConfigPath() {
 		return new File("config").toPath().resolve(this.modInitializer.modContainer.getModId() + ".json");
 	}
 
+	@Override
 	public String getName() {
 		IModInfo modInfo = this.modInitializer.modContainer.getModInfo();
 		String displayName = modInfo.getDisplayName();
 		return displayName != null ? displayName : modInfo.getModId();
 	}
 
+	@Override
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
 		return !MinecraftForge.EVENT_BUS.post(new AutoModerationTriggerEvent(((vakiliner.chatcomponentapi.forge.ForgeChatPlayer) player).getPlayer(), checkResult, actions));
 	}

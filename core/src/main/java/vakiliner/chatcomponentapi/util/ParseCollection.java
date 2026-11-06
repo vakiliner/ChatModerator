@@ -18,22 +18,27 @@ public class ParseCollection<Output, Input> extends AbstractCollection<Output> {
 		return impl;
 	}
 
+	@Override
 	public Iterator<Output> iterator() {
 		return new ParseIterator<>(this.impl.iterator(), this.i2o);
 	}
 
+	@Override
 	public int size() {
 		return this.impl.size();
 	}
 
+	@Override
 	public boolean isEmpty() {
 		return this.impl.isEmpty();
 	}
 
+	@Override
 	public boolean add(Output e) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear() {
 		this.impl.clear();
 	}

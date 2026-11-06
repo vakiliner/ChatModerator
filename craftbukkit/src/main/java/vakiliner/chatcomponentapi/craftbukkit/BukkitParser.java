@@ -40,10 +40,12 @@ public class BukkitParser extends BaseParser {
 		sendMessageWithUUID = method != null;
 	}
 
+	@Override
 	public boolean supportsSeparatorInSelector() {
 		return false;
 	}
 
+	@Override
 	public boolean supportsFontInStyle() {
 		return false;
 	}

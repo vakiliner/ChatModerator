@@ -25,42 +25,52 @@ public class BukkitChatServer implements ChatServer, ChatPlayerList {
 		return this.server;
 	}
 
+	@Override
 	public ChatServer getServer() {
 		return this;
 	}
 
+	@Override
 	public ChatPlayerList getPlayerList() {
 		return this;
 	}
 
+	@Override
 	public String getName() {
 		return this.server.getConsoleSender().getName();
 	}
 
+	@Override
 	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.sendMessage(this.server.getConsoleSender(), component, type, uuid);
 	}
 
+	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
 		return new ParseCollection<>(this.server.getOnlinePlayers(), this.parser::toChatPlayer);
 	}
 
+	@Override
 	public ChatPlayer getPlayer(UUID uuid) {
 		return this.parser.toChatPlayer(this.server.getPlayer(uuid));
 	}
 
+	@Override
 	public ChatPlayer getPlayer(String name) {
 		return this.parser.toChatPlayer(this.server.getPlayerExact(name));
 	}
 
+	@Override
 	public void execute(IChatPlugin plugin, Runnable runnable) {
 		this.parser.execute(this.server.getScheduler(), plugin, runnable);
 	}
 
+	@Override
 	public void broadcastMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.broadcastMessage(this.server, component, type, uuid);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

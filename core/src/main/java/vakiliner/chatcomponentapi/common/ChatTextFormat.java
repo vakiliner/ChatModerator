@@ -52,6 +52,7 @@ public enum ChatTextFormat {
 		return this.name().toLowerCase();
 	}
 
+	@Override
 	public String toString() {
 		return this.string;
 	}

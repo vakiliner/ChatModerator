@@ -12,6 +12,7 @@ public class ForgeChatServer extends vakiliner.chatcomponentapi.forge.ForgeChatS
 		this.manager = manager;
 	}
 
+	@Override
 	public ChatPlayerList getPlayerList() {
 		return this.manager.toChatPlayerList(this.server.getPlayerList());
 	}

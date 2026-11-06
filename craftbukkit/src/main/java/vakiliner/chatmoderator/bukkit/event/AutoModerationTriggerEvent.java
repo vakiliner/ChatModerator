@@ -100,14 +100,17 @@ public class AutoModerationTriggerEvent extends Event implements Cancellable {
 		this.actions.logAdmins(logAdmins);
 	}
 
+	@Override
 	public boolean isCancelled() {
 		return this.cancel;
 	}
 
+	@Override
 	public void setCancelled(boolean cancel) {
 		this.cancel = cancel;
 	}
 
+	@Override
 	public HandlerList getHandlers() {
 		return handlers;
 	}

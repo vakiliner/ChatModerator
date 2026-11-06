@@ -52,6 +52,7 @@ public class ChatTextComponent extends ChatComponent {
 		this.text = component.text;
 	}
 
+	@Override
 	public ChatTextComponent clone(boolean cloneExtra) {
 		return new ChatTextComponent(this, cloneExtra);
 	}
@@ -64,10 +65,12 @@ public class ChatTextComponent extends ChatComponent {
 		this.text = Objects.requireNonNull(text);
 	}
 
+	@Override
 	protected String getLegacyText(ChatTextColor parentColor, Set<ChatComponentFormat> parentFormats) {
 		return this.text;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -106,6 +109,7 @@ public class ChatTextComponent extends ChatComponent {
 		return component;
 	}
 
+	@Override
 	protected void serialize(JsonObject object) {
 		object.addProperty("text", this.text);
 	}

@@ -17,18 +17,22 @@ public class BukkitChatCommandSender implements ChatCommandSender {
 		this.sender = Objects.requireNonNull(sender);
 	}
 
+	@Override
 	public String getName() {
 		return this.sender.getName();
 	}
 
+	@Override
 	public boolean isConsole() {
 		return this.sender instanceof ConsoleCommandSender;
 	}
 
+	@Override
 	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.sendMessage(this.sender, component, type, uuid);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;
