@@ -12,9 +12,4 @@ public interface ChatServer extends Executor, ChatCommandSender {
 
 	@Override
 	void execute(Runnable command);
-
-	void executeBlocking(Runnable command);
-
-	@Deprecated
-	void execute(IChatPlugin plugin, Runnable runnable);
 }

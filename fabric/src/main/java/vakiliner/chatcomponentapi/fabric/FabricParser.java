@@ -34,7 +34,6 @@ import vakiliner.chatcomponentapi.base.ChatPlayer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;
 import vakiliner.chatcomponentapi.base.ChatTeam;
-import vakiliner.chatcomponentapi.base.IChatPlugin;
 import vakiliner.chatcomponentapi.common.ChatId;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.common.ChatTextFormat;
@@ -178,15 +177,6 @@ public class FabricParser extends BaseParser {
 			if (predicate.test(this.toChatPlayer(player))) {
 				player.connection.send(packet);
 			}
-		}
-	}
-
-	@Deprecated
-	public void execute(MinecraftServer server, IChatPlugin plugin, Runnable runnable) {
-		if (plugin instanceof IFabricChatPlugin) {
-			server.execute(runnable);
-		} else {
-			throw new ClassCastException("Invalid plugin");
 		}
 	}
 
