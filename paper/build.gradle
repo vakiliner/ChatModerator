@@ -15,5 +15,5 @@ dependencies {
 	implementation project(':core')
 	implementation project(':craftbukkit')
 	implementation project(':spigot')
-	implementation "com.destroystokyo.paper:paper-api:${project.minecraft_version}-${project.paper_version}"
+	compileOnly "com.destroystokyo.paper:paper-api:${project.minecraft_version}-${project.paper_version}"
 }
