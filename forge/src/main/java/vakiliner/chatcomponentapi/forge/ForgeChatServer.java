@@ -1,11 +1,10 @@
 package vakiliner.chatcomponentapi.forge;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatPlayerList;
 import vakiliner.chatcomponentapi.base.ChatServer;
-import vakiliner.chatcomponentapi.base.IChatPlugin;
 import vakiliner.chatcomponentapi.common.ChatMessageType;
 import vakiliner.chatcomponentapi.component.ChatComponent;
 
@@ -14,8 +13,8 @@ public class ForgeChatServer implements ChatServer {
 	protected final MinecraftServer server;
 
 	public ForgeChatServer(ForgeParser parser, MinecraftServer server) {
-		this.parser = Objects.requireNonNull(parser);
-		this.server = Objects.requireNonNull(server);
+		this.parser = requireNonNull(parser);
+		this.server = requireNonNull(server);
 	}
 
 	public MinecraftServer getImpl() {
@@ -38,8 +37,8 @@ public class ForgeChatServer implements ChatServer {
 	}
 
 	@Override
-	public void execute(IChatPlugin plugin, Runnable runnable) {
-		this.parser.execute(this.server, plugin, runnable);
+	public void execute(Runnable command) {
+		this.server.execute(command);
 	}
 
 	@Override
