@@ -16,4 +16,5 @@ dependencies {
 	implementation project(':craftbukkit')
 	implementation project(':spigot')
 	compileOnly "com.destroystokyo.paper:paper-api:${project.minecraft_version}-${project.paper_version}"
+	compileOnly "com.mojang:authlib:${project.authlib_version}"
 }

@@ -16,4 +16,5 @@ dependencies {
 	implementation project(':craftbukkit')
 	compileOnly "org.spigotmc:spigot-api:${project.minecraft_version}-${project.spigot_version}"
 	compileOnly "net.md-5:bungeecord-chat:${project.bungeecord_version}"
+	compileOnly "com.mojang:authlib:${project.authlib_version}"
 }
