@@ -32,6 +32,9 @@ public abstract class ChatComponentModified extends ChatComponent {
 	}
 
 	@Override
+	public abstract ChatComponentModified copy();
+
+	@Override
 	public String toLegacyText() {
 		return this.component.toLegacyText();
 	}
