@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 }
 
-var core = findProject(':core')
+var core = project(':core')
 var craftbukkit = findProject(':craftbukkit')
 var spigot = findProject(':spigot')
 var paper = findProject(':paper')
@@ -12,10 +12,7 @@ var forge = findProject(':forge')
 allprojects {
 	apply plugin: 'java'
 
-	java {
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
-	}
+	java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 	var replaceProperties = [
 		version: project.version,
@@ -38,13 +35,7 @@ allprojects {
 subprojects {
 	apply plugin: 'java'
 
-	base {
-		archivesName = "${project.archives_base_name}-${project.display_name}"
-	}
-
-	jar {
-		from '../LICENSE'
-	}
+	base.archivesName = "${project.archives_base_name}-${project.display_name}"
 }
 
 def generateManifestAttributes() {
@@ -62,14 +53,14 @@ def generateManifestAttributes() {
 }
 
 jar {
-	if (core != null) evaluationDependsOn(core.getName())
+	evaluationDependsOn(core.getName())
 	if (craftbukkit != null) evaluationDependsOn(craftbukkit.getName())
 	if (spigot != null) evaluationDependsOn(spigot.getName())
 	if (paper != null) evaluationDependsOn(paper.getName())
 	if (fabric != null) evaluationDependsOn(fabric.getName())
 	if (forge != null) evaluationDependsOn(forge.getName())
 
-	var baseJar = core != null ? core.tasks.getByName('jar') : null
+	var coreJar = core.tasks.getByName('jar')
 	var craftbukkitJar = craftbukkit != null ? craftbukkit.tasks.getByName('jar') : null
 	var spigotJar = spigot != null ? spigot.tasks.getByName('jar') : null
 	var paperJar = paper != null ? paper.tasks.getByName('jar') : null
@@ -78,27 +69,15 @@ jar {
 	var forgeJar = forge != null ? forge.tasks.getByName('jar') : null
 
 	from 'LICENSE'
-	if (baseJar != null) from(zipTree(baseJar.archiveFile)) {
-		exclude 'LICENSE'
-	}
-	if (craftbukkitJar != null) from(zipTree(craftbukkitJar.archiveFile)) {
-		exclude 'LICENSE'
-	}
-	if (spigotJar != null) from(zipTree(spigotJar.archiveFile)) {
-		exclude 'LICENSE'
-	}
-	if (paperJar != null) from(zipTree(paperJar.archiveFile)) {
-		exclude 'LICENSE'
-	}
-	if (fabricRemapJar != null) from(zipTree(fabricRemapJar.archiveFile)) {
-		exclude 'LICENSE'
-	}
-	if (forgeJar != null) from(zipTree(forgeJar.archiveFile)) {
-		exclude 'LICENSE'
-	}
+	from(zipTree(coreJar.archiveFile))
+	if (craftbukkitJar != null) from(zipTree(craftbukkitJar.archiveFile))
+	if (spigotJar != null) from(zipTree(spigotJar.archiveFile))
+	if (paperJar != null) from(zipTree(paperJar.archiveFile))
+	if (fabricRemapJar != null) from(zipTree(fabricRemapJar.archiveFile))
+	if (forgeJar != null) from(zipTree(forgeJar.archiveFile))
 
 	manifest {
-		if (baseJar != null) from baseJar.manifest
+		from coreJar.manifest
 		if (craftbukkitJar != null) from craftbukkitJar.manifest
 		if (spigotJar != null) from spigotJar.manifest
 		if (paperJar != null) from paperJar.manifest

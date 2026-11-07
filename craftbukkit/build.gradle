@@ -18,8 +18,8 @@ repositories {
 
 dependencies {
 	implementation project(':core')
-	implementation "org.bukkit:bukkit:${project.minecraft_version}-${project.bukkit_version}"
-	implementation "com.mojang:authlib:${project.authlib_version}"
+	compileOnly "org.bukkit:bukkit:${project.minecraft_version}-${project.bukkit_version}"
+	compileOnly "com.mojang:authlib:${project.authlib_version}"
 }
 
 processResources {

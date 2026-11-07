@@ -38,7 +38,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
 	implementation project(':core')
-	minecraft group: 'net.minecraftforge', name: 'forge', version: "${project.minecraft_version}-${project.forge_version}"
+	minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 }
 
 processResources {
