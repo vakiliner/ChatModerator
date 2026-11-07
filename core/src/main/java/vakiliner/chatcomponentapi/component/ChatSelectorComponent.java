@@ -60,15 +60,22 @@ public class ChatSelectorComponent extends ChatComponent {
 		this.separator = separator;
 	}
 
+	@Deprecated
 	public ChatSelectorComponent(ChatSelectorComponent component, boolean cloneExtra) {
 		super(component, cloneExtra);
 		this.selector = component.selector;
 		this.separator = component.separator;
 	}
 
+	@Deprecated
 	@Override
 	public ChatSelectorComponent clone(boolean cloneExtra) {
 		return new ChatSelectorComponent(this, cloneExtra);
+	}
+
+	@Override
+	public ChatSelectorComponent copy() {
+		return new ChatSelectorComponent(this, false);
 	}
 
 	public String getSelector() {

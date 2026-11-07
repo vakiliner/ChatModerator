@@ -62,6 +62,7 @@ public class ChatTranslateComponent extends ChatComponent {
 		this.legacyText = legacyText;
 	}
 
+	@Deprecated
 	public ChatTranslateComponent(ChatTranslateComponent component, boolean cloneExtra) {
 		super(component, cloneExtra);
 		this.key = component.key;
@@ -69,9 +70,15 @@ public class ChatTranslateComponent extends ChatComponent {
 		this.legacyText = component.legacyText;
 	}
 
+	@Deprecated
 	@Override
 	public ChatTranslateComponent clone(boolean cloneExtra) {
 		return new ChatTranslateComponent(this, cloneExtra);
+	}
+
+	@Override
+	public ChatTranslateComponent copy() {
+		return new ChatTranslateComponent(this, false);
 	}
 
 	public String getKey() {
