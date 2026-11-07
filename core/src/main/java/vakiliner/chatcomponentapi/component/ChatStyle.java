@@ -36,6 +36,7 @@ public final class ChatStyle implements IGsonSerializer {
 		this.font = font;
 	}
 
+	@Deprecated
 	private ChatStyle(ChatStyle style) {
 		this.color = style.color;
 		this.bold = style.bold;
@@ -61,6 +62,7 @@ public final class ChatStyle implements IGsonSerializer {
 		return newBuilder(this);
 	}
 
+	@Deprecated
 	public ChatStyle clone() {
 		return new ChatStyle(this);
 	}

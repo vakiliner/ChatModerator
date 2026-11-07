@@ -16,11 +16,13 @@ public class ChatClickEvent implements IGsonSerializer {
 		this.value = requireNonNull(value);
 	}
 
+	@Deprecated
 	public ChatClickEvent(ChatClickEvent event) {
 		this.action = event.action;
 		this.value = event.value;
 	}
 
+	@Deprecated
 	public ChatClickEvent clone() {
 		return new ChatClickEvent(this);
 	}

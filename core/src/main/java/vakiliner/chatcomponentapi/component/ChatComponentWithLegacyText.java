@@ -33,8 +33,14 @@ public class ChatComponentWithLegacyText extends ChatComponentModified {
 		this.legacyComponent = component.legacyComponent;
 	}
 
+	@Deprecated
 	@Override
 	public ChatComponent clone(boolean cloneExtra) {
+		return this.copy();
+	}
+
+	@Override
+	public ChatComponentWithLegacyText copy() {
 		return new ChatComponentWithLegacyText(this);
 	}
 
