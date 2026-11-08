@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.fabric;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
 import vakiliner.chatcomponentapi.base.ChatTeam;
@@ -12,8 +12,8 @@ public class FabricChatTeam implements ChatTeam {
 	protected final PlayerTeam team;
 
 	public FabricChatTeam(FabricParser parser, PlayerTeam team) {
-		this.parser = Objects.requireNonNull(parser);
-		this.team = Objects.requireNonNull(team);
+		this.parser = requireNonNull(parser);
+		this.team = requireNonNull(team);
 	}
 
 	public Team getTeam() {
