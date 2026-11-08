@@ -50,8 +50,8 @@ public class ForgeParser extends BaseParser {
 	private static final IStyleParser STYLE_PARSER;
 	private static final Constructor<SChatPacket> CHAT_PACKET_CONSTRUCTOR;
 	private static final UUID NIL_UUID;
-	private static final Method SEND_MESSAGE_WITH_TYPE;
-	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
+	private static final Method PLAYER_SEND_MESSAGE;
+	private static final Method COMMAND_SOURCE_SEND_MESSAGE;
 	private static final Method SET_STYLE;
 	private static final Method APPEND;
 	private static final Field FONT;
@@ -98,28 +98,28 @@ public class ForgeParser extends BaseParser {
 			}
 		}
 		CHAT_PACKET_CONSTRUCTOR = сhatPacketConstructor;
-		Method sendMessageWithType;
+		Method playerSendMessage;
 		try {
-			sendMessageWithType = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class, UUID.class);
+			playerSendMessage = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithType = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class);
+				playerSendMessage = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
 		}
-		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
-		Method sendMessageWithoutType;
+		PLAYER_SEND_MESSAGE = playerSendMessage;
+		Method commandSourceSendMessage;
 		try {
-			sendMessageWithoutType = ICommandSource.class.getMethod("func_145747_a", ITextComponent.class, UUID.class);
+			commandSourceSendMessage = ICommandSource.class.getMethod("func_145747_a", ITextComponent.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithoutType = ICommandSource.class.getMethod("func_145747_a", ITextComponent.class);
+				commandSourceSendMessage = ICommandSource.class.getMethod("func_145747_a", ITextComponent.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
 		}
-		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
+		COMMAND_SOURCE_SEND_MESSAGE = commandSourceSendMessage;
 	}
 
 	@Override
@@ -137,16 +137,16 @@ public class ForgeParser extends BaseParser {
 		ITextComponent component = forge(chatComponent, commandSource instanceof MinecraftServer);
 		try {
 			if (commandSource instanceof ServerPlayerEntity) {
-				if (SEND_MESSAGE_WITH_TYPE.getParameterTypes().length == 3) {
-					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, component, forge(type), uuid);
+				if (PLAYER_SEND_MESSAGE.getParameterTypes().length == 3) {
+					PLAYER_SEND_MESSAGE.invoke(commandSource, component, forge(type), uuid);
 				} else {
-					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, component, forge(type));
+					PLAYER_SEND_MESSAGE.invoke(commandSource, component, forge(type));
 				}
 			} else {
-				if (SEND_MESSAGE_WITHOUT_TYPE.getParameterTypes().length == 2) {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, component, uuid);
+				if (COMMAND_SOURCE_SEND_MESSAGE.getParameterTypes().length == 2) {
+					COMMAND_SOURCE_SEND_MESSAGE.invoke(commandSource, component, uuid);
 				} else {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, component);
+					COMMAND_SOURCE_SEND_MESSAGE.invoke(commandSource, component);
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException err) {
