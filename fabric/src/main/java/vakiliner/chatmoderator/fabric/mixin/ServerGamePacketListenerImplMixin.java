@@ -3,7 +3,7 @@ package vakiliner.chatmoderator.fabric.mixin;
 import java.util.HashSet;
 import java.util.Set;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -22,14 +22,14 @@ import vakiliner.chatmoderator.fabric.ChatModeratorModInitializer;
 import vakiliner.chatmoderator.fabric.FabricChatModerator;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerGamePacketListenerImplMixin {
+abstract class ServerGamePacketListenerImplMixin {
 	private static final String A = "/all ";
 
-	@Accessor("server")
-	public abstract MinecraftServer getServer();
+	@Shadow
+	MinecraftServer server;
 
-	@Accessor("player")
-	public abstract ServerPlayer getPlayer();
+	@Shadow
+	ServerPlayer player;
 
 	@ModifyVariable(at = @At("HEAD"), method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;)V", argsOnly = true)
 	ServerboundChatPacket handleChat(ServerboundChatPacket packet) {
@@ -61,14 +61,14 @@ public abstract class ServerGamePacketListenerImplMixin {
 			}
 		}
 		FabricChatModerator manager = ChatModeratorModInitializer.MANAGER;
-		ChatPlayer player = manager.toChatPlayer(this.getPlayer());
+		ChatPlayer player = manager.toChatPlayer(this.player);
 		String message = command;
 		try {
 			manager.onChat(player, message, callbackInfo::cancel, () -> {
 				callbackInfo.cancel();
 				ChatTranslateComponent component = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
 				Set<ChatCommandSender> recipients = new HashSet<>();
-				MinecraftServer server = this.getServer();
+				MinecraftServer server = this.server;
 				recipients.add(manager.toChatCommandSender(server));
 				for (ServerPlayer recipient : server.getPlayerList().getPlayers()) {
 					if (recipient.isSpectator()) {
@@ -86,7 +86,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		if (message.startsWith("/") || callbackInfo.isCancelled()) return;
 		callbackInfo.cancel();
 		ChatComponent chatComponent = new ChatTranslateComponent("<%s> %s", "chat.type.text", player.getDisplayName(), new ChatTextComponent(message));
-		FabricChatModerator.PARSER.broadcastMessage(this.getServer().getPlayerList(), chatComponent, ChatMessageType.CHAT, player.getUniqueId());
+		FabricChatModerator.PARSER.broadcastMessage(this.server.getPlayerList(), chatComponent, ChatMessageType.CHAT, player.getUniqueId());
 	}
 
 	private static class HandledPacket extends ServerboundChatPacket {
