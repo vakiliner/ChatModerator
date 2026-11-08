@@ -20,26 +20,32 @@ public class BukkitChatTeam implements ChatTeam {
 		return this.team;
 	}
 
+	@Override
 	public String getName() {
 		return this.team.getName();
 	}
 
+	@Override
 	public ChatNamedColor getColor() {
 		return ChatNamedColor.getByFormat(BukkitParser.bukkit(this.team.getColor()));
 	}
 
+	@Override
 	public ChatComponent getDisplayName() {
 		return new ChatTextComponent(this.team.getDisplayName());
 	}
 
+	@Override
 	public ChatComponent getPrefix() {
 		return new ChatTextComponent(this.team.getPrefix());
 	}
 
+	@Override
 	public ChatComponent getSuffix() {
 		return new ChatTextComponent(this.team.getSuffix());
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

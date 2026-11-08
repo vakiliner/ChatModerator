@@ -17,18 +17,22 @@ public class ForgeChatCommandSender implements ChatCommandSender {
 		this.commandSource = Objects.requireNonNull(commandSource);
 	}
 
+	@Override
 	public boolean isConsole() {
 		return commandSource instanceof MinecraftServer;
 	}
 
+	@Override
 	public String getName() {
 		return "CONSOLE";
 	}
 
+	@Override
 	public void sendMessage(ChatComponent component, ChatMessageType type, UUID uuid) {
 		this.parser.sendMessage(this.commandSource, component, type, uuid);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
 			return true;

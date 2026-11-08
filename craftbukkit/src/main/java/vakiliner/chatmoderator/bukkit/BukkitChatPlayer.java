@@ -14,18 +14,22 @@ public class BukkitChatPlayer extends vakiliner.chatcomponentapi.craftbukkit.Buk
 		this.manager = manager;
 	}
 
+	@Override
 	public ChatServer getServer() {
 		return this.manager.toChatServer(this.getPlayer().getServer());
 	}
 
+	@Override
 	public MutedPlayer getMute(Date filterExpired) {
 		return this.manager.mutes.get(this.getUniqueId(), filterExpired);
 	}
 
+	@Override
 	public boolean isBypassModeration() {
 		return this.getPlayer().hasPermission("chatmoderator.bypass_moderation.*");
 	}
 
+	@Override
 	public boolean isBypassMutes() {
 		return this.getPlayer().hasPermission("chatmoderator.bypass_moderation.mutes");
 	}

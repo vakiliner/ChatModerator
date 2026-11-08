@@ -16,14 +16,17 @@ public class ParseIterator<Output, Input> implements Iterator<Output> {
 		return this.impl;
 	}
 
+	@Override
 	public boolean hasNext() {
 		return this.impl.hasNext();
 	}
 
+	@Override
 	public Output next() {
 		return this.i2o.apply(this.impl.next());
 	}
 
+	@Override
 	public void remove() {
 		this.impl.remove();
 	}

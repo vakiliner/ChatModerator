@@ -9,6 +9,7 @@ public class PaperChatPlayer extends BukkitChatPlayer {
 		super(parser, player);
 	}
 
+	@Override
 	public ChatComponent getDisplayName() {
 		return PaperParser.paper(this.getPlayer().displayName());
 	}

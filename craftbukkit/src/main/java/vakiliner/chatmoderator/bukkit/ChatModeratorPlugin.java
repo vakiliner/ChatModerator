@@ -32,14 +32,17 @@ public class ChatModeratorPlugin extends JavaPlugin implements IBukkitChatPlugin
 		MANAGER = manager;
 	}
 
+	@Override
 	public Plugin asPlugin() {
 		return this;
 	}
 
+	@Override
 	public void onLoad() {
 		this.saveDefaultConfig();
 	}
 
+	@Override
 	public void onEnable() {
 		MANAGER.init(this);
 		Bukkit.getPluginManager().registerEvents(this.listener, this);
@@ -49,16 +52,19 @@ public class ChatModeratorPlugin extends JavaPlugin implements IBukkitChatPlugin
 		this.getLogger().info("Plugin enabled");
 	}
 
+	@Override
 	public void onDisable() {
 		MANAGER.stop(this);
 		this.getLogger().info("Plugin disabled");
 	}
 
+	@Override
 	public void reloadConfig() {
 		super.reloadConfig();
 		MANAGER.reloadConfig(this.getConfig());
 	}
 
+	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		return Collections.emptyList();
 	}

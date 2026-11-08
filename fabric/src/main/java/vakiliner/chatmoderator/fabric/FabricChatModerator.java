@@ -118,6 +118,7 @@ public class FabricChatModerator extends ChatModerator {
 		}
 	}
 
+	@Override
 	public ChatModeratorModInitializer getPlugin() {
 		return this.modInitializer;
 	}
@@ -131,28 +132,34 @@ public class FabricChatModerator extends ChatModerator {
 		return new FabricListener(this);
 	}
 
+	@Override
 	protected void log(String message) {
 		LOGGER.info(message);
 	}
 
+	@Override
 	public Config getConfig() {
 		return this.config;
 	}
 
+	@Override
 	protected Path getDefaultFolderPath() {
 		return FabricLoader.getInstance().getConfigDir().resolve("ChatModerator");
 	}
 
+	@Override
 	public Path getConfigPath() {
 		return FabricLoader.getInstance().getConfigDir().resolve(this.modInitializer.modContainer.getMetadata().getId() + ".json");
 	}
 
+	@Override
 	public String getName() {
 		ModMetadata metadata = this.modInitializer.modContainer.getMetadata();
 		String name = metadata.getName();
 		return name != null ? name : metadata.getId();
 	}
 
+	@Override
 	protected boolean automodTrigger(ChatPlayer player, CheckResult checkResult, MessageActions actions) {
 		return AutoModerationTriggerCallback.EVENT.invoker().trigger(((vakiliner.chatcomponentapi.fabric.FabricChatPlayer) player).getPlayer(), checkResult, actions, true);
 	}
@@ -163,6 +170,7 @@ public class FabricChatModerator extends ChatModerator {
 	}
 
 	@Deprecated
+	@Override
 	public void broadcast(ChatComponent component, boolean adminMessage) {
 		Set<ChatCommandSender> admins = new HashSet<>();
 		admins.add(this.toChatCommandSender(this.server));
@@ -174,6 +182,7 @@ public class FabricChatModerator extends ChatModerator {
 	}
 
 	@Deprecated
+	@Override
 	public Collection<ChatPlayer> getOnlinePlayers() {
 		return this.server.getPlayerList().getPlayers().stream().map(this::toChatPlayer).collect(Collectors.toList());
 	}

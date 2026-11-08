@@ -12,6 +12,7 @@ public class FabricChatServer extends vakiliner.chatcomponentapi.fabric.FabricCh
 		this.manager = manager;
 	}
 
+	@Override
 	public ChatPlayerList getPlayerList() {
 		return this.manager.toChatPlayerList(this.server.getPlayerList());
 	}

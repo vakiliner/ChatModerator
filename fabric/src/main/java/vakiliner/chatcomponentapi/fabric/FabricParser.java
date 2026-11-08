@@ -123,10 +123,12 @@ public class FabricParser extends BaseParser {
 		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
 	}
 
+	@Override
 	public boolean supportsSeparatorInSelector() {
 		return false;
 	}
 
+	@Override
 	public boolean supportsFontInStyle() {
 		return FONT != null;
 	}
