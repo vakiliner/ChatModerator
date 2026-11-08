@@ -48,7 +48,7 @@ import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 
 public class ForgeParser extends BaseParser {
 	private static final IStyleParser STYLE_PARSER;
-	private static final Constructor<SChatPacket> S_CHAT_PACKET_CONSTRUCTOR;
+	private static final Constructor<SChatPacket> CHAT_PACKET_CONSTRUCTOR;
 	private static final UUID NIL_UUID;
 	private static final Method SEND_MESSAGE_WITH_TYPE;
 	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
@@ -87,17 +87,17 @@ public class ForgeParser extends BaseParser {
 			parser = new OldStyle();
 		}
 		STYLE_PARSER = parser;
-		Constructor<SChatPacket> SChatPacketConstructor;
+		Constructor<SChatPacket> сhatPacketConstructor;
 		try {
-			SChatPacketConstructor = SChatPacket.class.getConstructor(ITextComponent.class, ChatType.class, UUID.class);
+			сhatPacketConstructor = SChatPacket.class.getConstructor(ITextComponent.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException a) {
 			try {
-				SChatPacketConstructor = SChatPacket.class.getConstructor(ITextComponent.class, ChatType.class);
+				сhatPacketConstructor = SChatPacket.class.getConstructor(ITextComponent.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
 		}
-		S_CHAT_PACKET_CONSTRUCTOR = SChatPacketConstructor;
+		CHAT_PACKET_CONSTRUCTOR = сhatPacketConstructor;
 		Method sendMessageWithType;
 		try {
 			sendMessageWithType = ServerPlayerEntity.class.getMethod("func_241151_a_", ITextComponent.class, ChatType.class, UUID.class);
@@ -162,10 +162,10 @@ public class ForgeParser extends BaseParser {
 		if (uuid == null) uuid = NIL_UUID;
 		final SChatPacket packet;
 		try {
-			if (S_CHAT_PACKET_CONSTRUCTOR.getParameterTypes().length == 3) {
-				packet = S_CHAT_PACKET_CONSTRUCTOR.newInstance(forge(component), forge(type), uuid);
+			if (CHAT_PACKET_CONSTRUCTOR.getParameterTypes().length == 3) {
+				packet = CHAT_PACKET_CONSTRUCTOR.newInstance(forge(component), forge(type), uuid);
 			} else {
-				packet = S_CHAT_PACKET_CONSTRUCTOR.newInstance(forge(component), forge(type));
+				packet = CHAT_PACKET_CONSTRUCTOR.newInstance(forge(component), forge(type));
 			}
 		} catch (IllegalAccessException | InvocationTargetException | InstantiationException err) {
 			throw new IllegalStateException(err);
@@ -257,12 +257,10 @@ public class ForgeParser extends BaseParser {
 		builder.withClickEvent(forge(style.clickEvent));
 		builder.withHoverEvent(forge(style.hoverEvent));
 		builder.withInsertion(style.insertion);
-		if (FONT != null) {
-			try {
-				builder.withFont(forge((ResourceLocation) FONT.get(style)));
-			} catch (IllegalAccessException err) {
-				throw new IllegalStateException(err);
-			}
+		if (FONT != null) try {
+			builder.withFont(forge((ResourceLocation) FONT.get(style)));
+		} catch (IllegalAccessException err) {
+			throw new IllegalStateException(err);
 		}
 		return builder.build();
 	}

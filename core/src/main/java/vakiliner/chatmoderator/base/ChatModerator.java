@@ -204,7 +204,7 @@ public abstract class ChatModerator {
 			i = fullCommand.indexOf(':');
 			if (i == -1) {
 				pluginCommand = null;
-				commandName = fullCommand.substring(0).toLowerCase();
+				commandName = fullCommand.toLowerCase();
 			} else {
 				String pluginName = fullCommand.substring(0, i);
 				if (pluginName.equalsIgnoreCase("minecraft")) {

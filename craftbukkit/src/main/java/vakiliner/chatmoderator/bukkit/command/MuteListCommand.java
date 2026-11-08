@@ -164,6 +164,7 @@ public class MuteListCommand implements TabExecutor {
 					Collections.sort(list);
 					return list;
 				}
+				// fall through
 			default: return Collections.emptyList();
 		}
 	}
