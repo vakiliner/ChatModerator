@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.fabric;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +51,7 @@ public class FabricChatModerator extends ChatModerator {
 		try {
 			this.reloadConfig();
 		} catch (IOException err) {
-			throw new RuntimeException(err);
+			throw new UncheckedIOException(err);
 		}
 	}
 
