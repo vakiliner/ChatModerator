@@ -81,6 +81,11 @@ public class BukkitChatServer implements ChatServer, ChatPlayerList {
 	}
 
 	@Override
+	public boolean isSameThread() {
+		return this.server.isPrimaryThread();
+	}
+
+	@Override
 	public Collection<? extends ChatPlayer> getPlayers() {
 		return Collections2.transform(this.server.getOnlinePlayers(), this.parser::toChatPlayer);
 	}

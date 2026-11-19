@@ -37,6 +37,11 @@ public class FabricChatServer implements ChatServer {
 	}
 
 	@Override
+	public boolean isSameThread() {
+		return this.server.isSameThread();
+	}
+
+	@Override
 	public void execute(Runnable command) {
 		this.server.execute(command);
 	}

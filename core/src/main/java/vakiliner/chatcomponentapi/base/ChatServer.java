@@ -10,6 +10,8 @@ public interface ChatServer extends Executor, ChatCommandSender {
 		return true;
 	}
 
+	boolean isSameThread();
+
 	@Override
 	void execute(Runnable command);
 }
