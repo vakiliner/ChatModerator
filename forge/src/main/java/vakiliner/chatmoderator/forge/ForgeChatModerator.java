@@ -99,10 +99,8 @@ public class ForgeChatModerator extends ChatModerator {
 					object.add("messages", gson.fromJson(messages.getAsString(), JsonObject.class));
 				}
 				config = gson.fromJson(object, GsonConfig.class);
-			} else try {
+			} else {
 				config = gson.fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				throw err;
 			}
 			this.config.reload(config);
 			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {

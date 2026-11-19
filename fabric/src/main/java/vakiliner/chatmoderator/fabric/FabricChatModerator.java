@@ -80,12 +80,7 @@ public class FabricChatModerator extends ChatModerator {
 			}
 		}
 		if (configVersionType != null) {
-			final GsonConfig config;
-			try {
-				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				throw err;
-			}
+			GsonConfig config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
 			this.config.reload(config);
 			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
