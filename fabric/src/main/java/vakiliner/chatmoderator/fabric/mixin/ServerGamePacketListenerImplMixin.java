@@ -1,5 +1,6 @@
 package vakiliner.chatmoderator.fabric.mixin;
 
+import static java.util.Objects.requireNonNull;
 import java.util.HashSet;
 import java.util.Set;
 import org.spongepowered.asm.mixin.Mixin;
@@ -90,8 +91,17 @@ public abstract class ServerGamePacketListenerImplMixin {
 	}
 
 	private static class HandledPacket extends ServerboundChatPacket {
+		private final String message;
+
 		public HandledPacket(String message) {
-			super(message);
+			super("");
+
+			this.message = requireNonNull(message);
+		}
+
+		@Override
+		public String getMessage() {
+			return this.message;
 		}
 	}
 }
