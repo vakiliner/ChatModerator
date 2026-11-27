@@ -48,10 +48,10 @@ import vakiliner.chatcomponentapi.component.ChatTranslateComponent;
 
 public class FabricParser extends BaseParser {
 	private static final IStyleParser STYLE_PARSER;
-	private static final Constructor<ClientboundChatPacket> CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR;
+	private static final Constructor<ClientboundChatPacket> CHAT_PACKET_CONSTRUCTOR;
 	private static final UUID NIL_UUID;
-	private static final Method SEND_MESSAGE_WITH_TYPE;
-	private static final Method SEND_MESSAGE_WITHOUT_TYPE;
+	private static final Method PLAYER_SEND_MESSAGE;
+	private static final Method COMMAND_SOURCE_SEND_MESSAGE;
 	private static final Method SET_STYLE;
 	private static final Method APPEND;
 	private static final Field FONT;
@@ -87,39 +87,39 @@ public class FabricParser extends BaseParser {
 			parser = new OldStyle();
 		}
 		STYLE_PARSER = parser;
-		Constructor<ClientboundChatPacket> clientboundChatPacketConstructor;
+		Constructor<ClientboundChatPacket> сhatPacketConstructor;
 		try {
-			clientboundChatPacketConstructor = ClientboundChatPacket.class.getConstructor(Component.class, ChatType.class, UUID.class);
+			сhatPacketConstructor = ClientboundChatPacket.class.getConstructor(Component.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException a) {
 			try {
-				clientboundChatPacketConstructor = ClientboundChatPacket.class.getConstructor(Component.class, ChatType.class);
+				сhatPacketConstructor = ClientboundChatPacket.class.getConstructor(Component.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
 		}
-		CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR = clientboundChatPacketConstructor;
-		Method sendMessageWithType;
+		CHAT_PACKET_CONSTRUCTOR = сhatPacketConstructor;
+		Method playerSendMessage;
 		try {
-			sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class, UUID.class);
+			playerSendMessage = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithType = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class);
+				playerSendMessage = ServerPlayer.class.getMethod("method_14254", Component.class, ChatType.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
 		}
-		SEND_MESSAGE_WITH_TYPE = sendMessageWithType;
-		Method sendMessageWithoutType;
+		PLAYER_SEND_MESSAGE = playerSendMessage;
+		Method commandSourceSendMessage;
 		try {
-			sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class, UUID.class);
+			commandSourceSendMessage = CommandSource.class.getMethod("method_9203", Component.class, UUID.class);
 		} catch (NoSuchMethodException e) {
 			try {
-				sendMessageWithoutType = CommandSource.class.getMethod("method_9203", Component.class);
+				commandSourceSendMessage = CommandSource.class.getMethod("method_9203", Component.class);
 			} catch (NoSuchMethodException err) {
 				throw new IllegalStateException(err);
 			}
 		}
-		SEND_MESSAGE_WITHOUT_TYPE = sendMessageWithoutType;
+		COMMAND_SOURCE_SEND_MESSAGE = commandSourceSendMessage;
 	}
 
 	@Override
@@ -137,16 +137,16 @@ public class FabricParser extends BaseParser {
 		Component component = fabric(chatComponent, commandSource instanceof MinecraftServer);
 		try {
 			if (commandSource instanceof ServerPlayer) {
-				if (SEND_MESSAGE_WITH_TYPE.getParameterTypes().length == 3) {
-					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, component, fabric(type), uuid);
+				if (PLAYER_SEND_MESSAGE.getParameterTypes().length == 3) {
+					PLAYER_SEND_MESSAGE.invoke(commandSource, component, fabric(type), uuid);
 				} else {
-					SEND_MESSAGE_WITH_TYPE.invoke(commandSource, component, fabric(type));
+					PLAYER_SEND_MESSAGE.invoke(commandSource, component, fabric(type));
 				}
 			} else {
-				if (SEND_MESSAGE_WITHOUT_TYPE.getParameterTypes().length == 2) {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, component, uuid);
+				if (COMMAND_SOURCE_SEND_MESSAGE.getParameterTypes().length == 2) {
+					COMMAND_SOURCE_SEND_MESSAGE.invoke(commandSource, component, uuid);
 				} else {
-					SEND_MESSAGE_WITHOUT_TYPE.invoke(commandSource, component);
+					COMMAND_SOURCE_SEND_MESSAGE.invoke(commandSource, component);
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException err) {
@@ -162,10 +162,10 @@ public class FabricParser extends BaseParser {
 		if (uuid == null) uuid = NIL_UUID;
 		final ClientboundChatPacket packet;
 		try {
-			if (CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.getParameterTypes().length == 3) {
-				packet = CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type), uuid);
+			if (CHAT_PACKET_CONSTRUCTOR.getParameterTypes().length == 3) {
+				packet = CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type), uuid);
 			} else {
-				packet = CLIENTBOUND_CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type));
+				packet = CHAT_PACKET_CONSTRUCTOR.newInstance(fabric(component), fabric(type));
 			}
 		} catch (IllegalAccessException | InvocationTargetException | InstantiationException err) {
 			throw new IllegalStateException(err);

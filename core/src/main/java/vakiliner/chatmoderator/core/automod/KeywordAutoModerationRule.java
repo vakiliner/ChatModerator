@@ -1,11 +1,12 @@
 package vakiliner.chatmoderator.core.automod;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -54,7 +55,8 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 			List<StringBuilder> cleanedWordsBuilder = new ArrayList<>();
 			wordsBuilder.add(new StringBuilder());
 			cleanedWordsBuilder.add(new StringBuilder());
-			for (char ch : rawMessage.toCharArray()) {
+			for (int i = 0; i < rawMessage.length(); i++) {
+				char ch = rawMessage.charAt(i);
 				int index = wordsBuilder.size() - 1;
 				if (ch == ' ' || ch == '\n') {
 					if (ch != ' ' || wordsBuilder.get(index).length() > 0) {
@@ -64,10 +66,10 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 					continue;
 				}
 				wordsBuilder.get(index).append(ch);
-				cleanedWordsBuilder.get(index).append(cleaner.getOrDefault(ch, Character.toString(ch)));
+				cleanedWordsBuilder.get(index).append(cleaner.getOrDefault(ch, String.valueOf(ch)));
 			}
-			words = new ArrayList<>(wordsBuilder.stream().map(StringBuilder::toString).collect(Collectors.toList()));
-			cleanedWords = new ArrayList<>(cleanedWordsBuilder.stream().map(StringBuilder::toString).collect(Collectors.toList()));
+			words = wordsBuilder.stream().map(StringBuilder::toString).collect(Collectors.toCollection(ArrayList::new));
+			cleanedWords = cleanedWordsBuilder.stream().map(StringBuilder::toString).collect(Collectors.toCollection(ArrayList::new));
 		}
 		int size = words.size();
 		TriggerMetadata metadata = this.triggerMetadata;
@@ -75,7 +77,7 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 			byte flags = parseFlags(rawAllow);
 			String allow = (flags > 0 ? rawAllow.replaceAll("^\\*\\s*|\\s*\\*$", "") : rawAllow).toLowerCase();
 			int count = allow.split(" ").length;
-			LinkedList<String> list = new LinkedList<>();
+			Queue<String> list = new ArrayDeque<>();
 			for (int i = 0; size > i; i++) {
 				String word = words.get(i);
 				if (word == null) {
@@ -84,7 +86,7 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 				}
 				list.add(word);
 				if (list.size() < count) continue;
-				if (list.size() > count) list.removeFirst();
+				if (list.size() > count) list.remove();
 				String check = String.join(" ", list);
 				if (checkWord(check.toLowerCase(), allow, flags)) {
 					list.clear();
@@ -99,8 +101,8 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 			byte flags = parseFlags(rawKeyword);
 			String keyword = (flags > 0 ? rawKeyword.replaceAll("^\\*\\s*|\\s*\\*$", "") : rawKeyword).toLowerCase();
 			int count = keyword.split(" ").length;
-			LinkedList<String> list = new LinkedList<>();
-			LinkedList<String> cleaned = new LinkedList<>();
+			Queue<String> list = new ArrayDeque<>();
+			Queue<String> cleaned = new ArrayDeque<>();
 			for (int i = 0; size > i; i++) {
 				String word = words.get(i);
 				String cleanedWord = cleanedWords.get(i);
@@ -113,8 +115,8 @@ public class KeywordAutoModerationRule extends BaseAutoModerationRule {
 				cleaned.add(cleanedWord);
 				if (list.size() < count) continue;
 				if (list.size() > count) {
-					list.removeFirst();
-					cleaned.removeFirst();
+					list.remove();
+					cleaned.remove();
 				}
 				String check = String.join(" ", list);
 				String cleanedCheck = String.join(" ", cleaned);

@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.base;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -59,7 +60,7 @@ public abstract class ChatModerator {
 			this.automod.setup(folderPath.resolve(autoModerationRulesPath), autoModerationRulesPath.equals("auto_moderation_rules.json"));
 			if (dictionaryPath != null) this.automod.setupDictionary(folderPath.resolve(dictionaryPath), dictionaryPath.equals("dictionary_ru.json"));
 		} catch (IOException err) {
-			throw new RuntimeException(err);
+			throw new UncheckedIOException(err);
 		}
 	}
 
@@ -108,7 +109,7 @@ public abstract class ChatModerator {
 						try {
 							rules = new Gson().fromJson(new InputStreamReader(Files.newInputStream(autoModerationRulesPath), StandardCharsets.UTF_8), JsonArray.class);
 						} catch (IOException err) {
-							throw new RuntimeException(err);
+							throw new UncheckedIOException(err);
 						}
 						for (JsonElement element : rules) {
 							JsonObject rule = element.getAsJsonObject();
@@ -126,7 +127,7 @@ public abstract class ChatModerator {
 						try {
 							Files.write(autoModerationRulesPath, new Gson().toJson(rules).getBytes(StandardCharsets.UTF_8));
 						} catch (IOException err) {
-							throw new RuntimeException(err);
+							throw new UncheckedIOException(err);
 						}
 					}
 				case 1:
@@ -204,7 +205,7 @@ public abstract class ChatModerator {
 			i = fullCommand.indexOf(':');
 			if (i == -1) {
 				pluginCommand = null;
-				commandName = fullCommand.substring(0).toLowerCase();
+				commandName = fullCommand.toLowerCase();
 			} else {
 				String pluginName = fullCommand.substring(0, i);
 				if (pluginName.equalsIgnoreCase("minecraft")) {

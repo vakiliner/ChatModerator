@@ -3,6 +3,7 @@ package vakiliner.chatmoderator.forge;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,7 +55,7 @@ public class ForgeChatModerator extends ChatModerator {
 		try {
 			this.reloadConfig();
 		} catch (IOException err) {
-			throw new RuntimeException(err);
+			throw new UncheckedIOException(err);
 		}
 	}
 
@@ -98,10 +99,8 @@ public class ForgeChatModerator extends ChatModerator {
 					object.add("messages", gson.fromJson(messages.getAsString(), JsonObject.class));
 				}
 				config = gson.fromJson(object, GsonConfig.class);
-			} else try {
+			} else {
 				config = gson.fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				throw err;
 			}
 			this.config.reload(config);
 			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {

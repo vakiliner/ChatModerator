@@ -2,6 +2,7 @@ package vakiliner.chatmoderator.fabric;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +51,7 @@ public class FabricChatModerator extends ChatModerator {
 		try {
 			this.reloadConfig();
 		} catch (IOException err) {
-			throw new RuntimeException(err);
+			throw new UncheckedIOException(err);
 		}
 	}
 
@@ -79,12 +80,7 @@ public class FabricChatModerator extends ChatModerator {
 			}
 		}
 		if (configVersionType != null) {
-			final GsonConfig config;
-			try {
-				config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
-			} catch (IOException err) {
-				throw err;
-			}
+			GsonConfig config = new Gson().fromJson(new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8), GsonConfig.class);
 			this.config.reload(config);
 			if (this.checkConfigUpdates(configVersionType) || configVersionType != ConfigVersionType.LATEST_FABRIC_FORGE) {
 				this.saveConfig();
