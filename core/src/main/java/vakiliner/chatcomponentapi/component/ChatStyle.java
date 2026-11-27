@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.component;
 
+import static java.util.Objects.requireNonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +36,7 @@ public final class ChatStyle implements IGsonSerializer {
 		this.font = font;
 	}
 
+	@Deprecated
 	private ChatStyle(ChatStyle style) {
 		this.color = style.color;
 		this.bold = style.bold;
@@ -60,6 +62,7 @@ public final class ChatStyle implements IGsonSerializer {
 		return newBuilder(this);
 	}
 
+	@Deprecated
 	public ChatStyle clone() {
 		return new ChatStyle(this);
 	}
@@ -197,9 +200,9 @@ public final class ChatStyle implements IGsonSerializer {
 	}
 
 	public ChatStyle applyTo(ChatStyle style) {
-		if (this == EMPTY) {
+		if (this.isEmpty()) {
 			return style;
-		} else if (style == EMPTY) {
+		} else if (style.isEmpty()) {
 			return this;
 		} else return new ChatStyle(
 			this.color			!= null ? this.color			: style.color,
@@ -247,7 +250,7 @@ public final class ChatStyle implements IGsonSerializer {
 	}
 
 	public static JsonObject serialize(ChatStyle style, JsonObject object) {
-		Objects.requireNonNull(object);
+		requireNonNull(object);
 		ChatTextColor color = style.color;
 		Boolean bold = style.bold;
 		Boolean italic = style.italic;
@@ -293,7 +296,7 @@ public final class ChatStyle implements IGsonSerializer {
 		if (clickEvent != null) builder.withClickEvent(ChatClickEvent.deserialize(clickEvent));
 		if (hoverEvent != null) builder.withHoverEvent(ChatHoverEvent.deserialize(hoverEvent));
 		if (insertion != null) builder.withInsertion(insertion.getAsString());
-		if (font != null) builder.withFont(ChatId.of(font.getAsString()));
+		if (font != null) builder.withFont(ChatId.fromString(font.getAsString()));
 		return builder.build();
 	}
 

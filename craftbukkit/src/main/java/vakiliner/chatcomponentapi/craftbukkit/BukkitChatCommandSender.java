@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.craftbukkit;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -13,8 +13,8 @@ public class BukkitChatCommandSender implements ChatCommandSender {
 	protected final CommandSender sender;
 
 	public BukkitChatCommandSender(BukkitParser parser, CommandSender sender) {
-		this.parser = Objects.requireNonNull(parser);
-		this.sender = Objects.requireNonNull(sender);
+		this.parser = requireNonNull(parser);
+		this.sender = requireNonNull(sender);
 	}
 
 	@Override

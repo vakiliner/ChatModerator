@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.component;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,32 +29,39 @@ public class ChatTextComponent extends ChatComponent {
 	}
 
 	public ChatTextComponent(String text) {
-		this.text = Objects.requireNonNull(text);
+		this.text = requireNonNull(text);
 	}
 
 	public ChatTextComponent(String text, ChatStyle style) {
 		super(style);
-		this.text = Objects.requireNonNull(text);
+		this.text = requireNonNull(text);
 	}
 
 	public ChatTextComponent(String text, ChatTextColor color) {
 		super(color);
-		this.text = Objects.requireNonNull(text);
+		this.text = requireNonNull(text);
 	}
 
 	public ChatTextComponent(String text, ChatComponentFormat format) {
 		super(format);
-		this.text = Objects.requireNonNull(text);
+		this.text = requireNonNull(text);
 	}
 
+	@Deprecated
 	public ChatTextComponent(ChatTextComponent component, boolean cloneExtra) {
 		super(component, cloneExtra);
 		this.text = component.text;
 	}
 
+	@Deprecated
 	@Override
 	public ChatTextComponent clone(boolean cloneExtra) {
 		return new ChatTextComponent(this, cloneExtra);
+	}
+
+	@Override
+	public ChatTextComponent copy() {
+		return new ChatTextComponent(this, false);
 	}
 
 	public String getText() {
@@ -62,7 +69,7 @@ public class ChatTextComponent extends ChatComponent {
 	}
 
 	public void setText(String text) {
-		this.text = Objects.requireNonNull(text);
+		this.text = requireNonNull(text);
 	}
 
 	@Override

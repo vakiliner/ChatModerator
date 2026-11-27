@@ -5,6 +5,8 @@ plugins {
 minecraft {
 	mappings channel: mapping_channel, version: minecraft_version
 
+	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
 	runs {
 		configureEach {
 			workingDirectory project.file('run')
@@ -54,11 +56,5 @@ processTestResources {
 }
 
 jar {
-	manifest {
-		attributes([
-			MixinConfigs: 'mixins.chatcomponentapi.forge.json'
-		])
-	}
-
 	finalizedBy 'reobfJar'
 }

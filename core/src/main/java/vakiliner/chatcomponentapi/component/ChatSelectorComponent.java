@@ -1,5 +1,6 @@
 package vakiliner.chatcomponentapi.component;
 
+import static java.util.Objects.requireNonNull;
 import java.util.Objects;
 import java.util.Set;
 import com.google.gson.JsonElement;
@@ -21,7 +22,7 @@ public class ChatSelectorComponent extends ChatComponent {
 	}
 
 	public ChatSelectorComponent(String selector) {
-		this.selector = Objects.requireNonNull(selector);
+		this.selector = requireNonNull(selector);
 	}
 
 	public ChatSelectorComponent(String selector, ChatComponent separator) {
@@ -31,17 +32,17 @@ public class ChatSelectorComponent extends ChatComponent {
 
 	public ChatSelectorComponent(String selector, ChatStyle style) {
 		super(style);
-		this.selector = Objects.requireNonNull(selector);
+		this.selector = requireNonNull(selector);
 	}
 
 	public ChatSelectorComponent(String selector, ChatTextColor color) {
 		super(color);
-		this.selector = Objects.requireNonNull(selector);
+		this.selector = requireNonNull(selector);
 	}
 
 	public ChatSelectorComponent(String selector, ChatComponentFormat format) {
 		super(format);
-		this.selector = Objects.requireNonNull(selector);
+		this.selector = requireNonNull(selector);
 	}
 
 	public ChatSelectorComponent(String selector, ChatComponent separator, ChatStyle style) {
@@ -59,15 +60,22 @@ public class ChatSelectorComponent extends ChatComponent {
 		this.separator = separator;
 	}
 
+	@Deprecated
 	public ChatSelectorComponent(ChatSelectorComponent component, boolean cloneExtra) {
 		super(component, cloneExtra);
 		this.selector = component.selector;
 		this.separator = component.separator;
 	}
 
+	@Deprecated
 	@Override
 	public ChatSelectorComponent clone(boolean cloneExtra) {
 		return new ChatSelectorComponent(this, cloneExtra);
+	}
+
+	@Override
+	public ChatSelectorComponent copy() {
+		return new ChatSelectorComponent(this, false);
 	}
 
 	public String getSelector() {
@@ -79,7 +87,7 @@ public class ChatSelectorComponent extends ChatComponent {
 	}
 
 	public void setSelector(String selector) {
-		this.selector = Objects.requireNonNull(selector);
+		this.selector = requireNonNull(selector);
 	}
 
 	public void setSeparator(ChatComponent separator) {

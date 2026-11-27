@@ -1,6 +1,6 @@
 package vakiliner.chatcomponentapi.fabric;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.MinecraftServer;
 import vakiliner.chatcomponentapi.base.ChatOfflinePlayer;
@@ -12,9 +12,9 @@ public class FabricChatOfflinePlayer implements ChatOfflinePlayer {
 	protected final GameProfile gameProfile;
 
 	public FabricChatOfflinePlayer(FabricParser parser, MinecraftServer server, GameProfile gameProfile) {
-		this.parser = Objects.requireNonNull(parser);
-		this.server = Objects.requireNonNull(server);
-		this.gameProfile = Objects.requireNonNull(gameProfile);
+		this.parser = requireNonNull(parser);
+		this.server = requireNonNull(server);
+		this.gameProfile = requireNonNull(gameProfile);
 	}
 
 	@Override

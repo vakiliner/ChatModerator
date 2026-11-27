@@ -1,10 +1,10 @@
 package vakiliner.chatcomponentapi.component;
 
+import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +12,10 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,7 +31,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 	}
 
 	public ChatComponent(ChatStyle style) {
-		this.style = Objects.requireNonNull(style);
+		this.style = requireNonNull(style);
 	}
 
 	public ChatComponent(ChatTextColor color) {
@@ -38,24 +42,31 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 		this(ChatStyle.EMPTY.withFormat(format));
 	}
 
-	protected ChatComponent(ChatComponent component, boolean cloneExtra) {
+	protected ChatComponent(ChatComponent component) {
 		this.style = component.style;
+		this.extra = component.extra;
+	}
+
+	@Deprecated
+	protected ChatComponent(ChatComponent component, boolean cloneExtra) {
+		this(component);
+
 		if (cloneExtra) {
-			List<ChatComponent> clone = component.extra;
-			if (clone != null) {
-				List<ChatComponent> extra = this.extra = new ArrayList<>();
-				clone.forEach((c) -> extra.add(c.clone(true)));
+			if (this.extra != null) {
+				this.extra = this.extra.stream().map((c) -> c.clone(true)).collect(Collectors.toCollection(ArrayList::new));
 			}
-		} else {
-			this.extra = component.extra;
 		}
 	}
 
+	@Deprecated
 	public ChatComponent clone() {
 		return this.clone(true);
 	}
 
+	@Deprecated
 	public abstract ChatComponent clone(boolean cloneExtra);
+
+	public abstract ChatComponent copy();
 
 	public String toLegacyText() {
 		return this.toLegacyText(null, Collections.emptySet());
@@ -180,7 +191,7 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 	}
 
 	public void setStyle(ChatStyle style) {
-		this.style = Objects.requireNonNull(style);
+		this.style = requireNonNull(style);
 	}
 
 	@Deprecated
@@ -250,16 +261,15 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 	public void append(ChatComponent component) {
 		if (component == this) throw new IllegalArgumentException("This component cannot be added");
 		List<ChatComponent> extra = component.extra;
-		if (extra != null) {
-			Set<ChatComponent> checked = new HashSet<>();
-			Queue<ChatComponent> queue = new LinkedList<>(extra);
-			ChatComponent current = null;
+		if (extra != null && !extra.isEmpty()) {
+			Collection<ChatComponent> checked = Sets.newIdentityHashSet();
+			Queue<ChatComponent> queue = Queues.newArrayDeque(extra);
+			ChatComponent current;
 			while ((current = queue.poll()) != null) {
-				if (checked.contains(current)) continue;
+				if (!checked.add(current)) continue;
 				if (current == this) throw new IllegalArgumentException("Components are looping, try cloning the component before appending");
 				List<ChatComponent> e = current.extra;
 				if (e != null) queue.addAll(e);
-				checked.add(current);
 			}
 		}
 		this.unsafeAppend(component);
@@ -338,6 +348,12 @@ public abstract class ChatComponent implements ChatHoverEvent.IContent {
 	}
 
 	public static ChatComponent deserialize(JsonElement element) {
+		if (element.isJsonArray()) {
+			Queue<ChatComponent> components = StreamSupport.stream(element.getAsJsonArray().spliterator(), false).map(ChatComponent::deserialize).collect(Collectors.toCollection(Queues::newArrayDeque));
+			ChatComponent component = components.remove();
+			components.forEach(component::append);
+			return requireNonNull(component);
+		}
 		return getDeserializer(element).apply(element);
 	}
 

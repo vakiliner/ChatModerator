@@ -17,4 +17,4 @@ updateJSONURL="https://raw.githubusercontent.com/vakiliner/ChatModerator/refs/he
 [[dependencies.chatmoderator]]
 	modId="forge"
 	mandatory=true
-	versionRange="[32.0.72,37)"
+	versionRange="[32.0.67,37)"

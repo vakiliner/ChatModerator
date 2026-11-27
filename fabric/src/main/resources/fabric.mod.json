@@ -19,8 +19,7 @@
 		"sources": "https://github.com/vakiliner/ChatModerator"
 	},
 	"mixins": [
-		"mixins.chatmoderator.fabric.json",
-		"mixins.chatcomponentapi.fabric.json"
+		"mixins.chatmoderator.fabric.json"
 	],
 	"depends": {
 		"minecraft": "<1.19",
@@ -30,6 +29,7 @@
 		"fabric-api-base": "*"
 	},
 	"license": "${license}",
+	"accessWidener": "chatcomponentapi.accesswidener",
 	"custom": {
 		"modmenu": {
 			"links": {
